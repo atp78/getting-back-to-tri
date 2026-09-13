@@ -104,6 +104,8 @@ main{padding:14px 0 90px}
 .routine-step{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;padding:8px 9px;background:#101b23;border-radius:9px;font-size:.79rem}
 .routine-step.current{outline:2px solid #477b96;background:#17303f}
 .routine-step.done{opacity:.58}
+.quicktimer.resting{border-color:#756537;background:linear-gradient(135deg,#302a18,#18232b)}
+.quicktimer.resting .bigclock{color:#ffd166}
 .routine-step .t{font-variant-numeric:tabular-nums;color:var(--muted)}
 .hist{background:#14212a;border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px}
 .hist .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
@@ -145,7 +147,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Rehab • strength • mobility • swim • bike • run</div>
       </div>
-      <span class="version">v1.2 PWA</span>
+      <span class="version">v1.3 PWA</span>
     </div>
   </div>
 </header>
@@ -178,7 +180,7 @@ main{padding:14px 0 90px}
         <div class="quickcard" data-start="Lower Body"><div class="icon">🏋️</div><b>Rehab</b><small>Lower body</small></div>
         <div class="quickcard" data-start="Daily Prehab"><div class="icon">🧘</div><b>Prehab</b><small>Daily mobility</small></div>
         <div class="quickcard" data-start="CFT Upper-Back Reset"><div class="icon">💪</div><b>CFT</b><small>15-min reset</small></div>
-        <div class="quickcard" data-start="Daily Quick Routine"><div class="icon">⏱️</div><b>Daily quick</b><small>6-min guided</small></div>
+        <div class="quickcard" data-start="Daily Quick Routine"><div class="icon">⏱️</div><b>Daily quick</b><small>7:28 guided</small></div>
       </div>
       <div class="quickcards" style="margin-top:8px">
         <div class="quickcard" data-start="Swim"><div class="icon">🏊</div><b>Swim</b><small>Quick log</small></div>
@@ -214,13 +216,13 @@ main{padding:14px 0 90px}
     </div>
 
     <section id="quickRoutineTimer" class="quicktimer hidden">
-      <div class="small">DAILY QUICK ROUTINE • 12 × 30 SEC</div>
+      <div class="small">DAILY QUICK ROUTINE • 12 × 30 SEC • 8 SEC CHANGEOVERS</div>
       <div id="quickExercise" class="stepname">Clock Stretch</div>
       <div id="quickPosition" class="stepdetail">Right foot • 12 o'clock</div>
       <div id="quickClock" class="bigclock">0:30</div>
-      <div id="quickOverall" class="small">Overall 6:00 remaining • interval 1 of 12</div>
+      <div id="quickOverall" class="small">Overall 7:28 remaining • interval 1 of 12</div>
       <div class="progress" aria-hidden="true"><span id="quickProgress"></span></div>
-      <div id="quickNext" class="next">Next: Right foot • 1 o'clock</div>
+      <div id="quickNext" class="next">Next: 8-sec changeover → Right foot • 1 o'clock</div>
       <div class="actions" style="margin-top:10px">
         <button id="quickStart" class="primary">Start / Resume</button>
         <button id="quickPause">Pause</button>
@@ -309,7 +311,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.2 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.3 PWA • installable offline training app</div>
 </main>
 
 <script>
@@ -445,7 +447,7 @@ const summaries = {
   "Upper Body":"Invicta upper-body strength session.",
   "Whole Body":"Invicta whole-body strength session.",
   "Daily Prehab":"Daily mobility + isometric prehab.",
-  "Daily Quick Routine":"Guided 6-minute daily routine • 12 automatic 30-second intervals.",
+  "Daily Quick Routine":"Guided 7:28 daily routine • 12 × 30-second work intervals with 8-second changeovers.",
   "CFT Upper-Back Reset":"15-minute BodyCraft CFT accessory circuit • 2 rounds • 15–20 sec between exercises • 60–90 sec between rounds.",
   "Swim":"Quick-log a swim session.",
   "Bike":"Quick-log a bike session.",
@@ -467,8 +469,13 @@ let cftRemaining = 15*60;
 let timerId = null;
 let quickIndex = 0;
 let quickSeconds = 30;
+let quickPhase = "work";
 let quickTimerId = null;
 let quickCompleted = false;
+let quickCompletedSteps = new Set();
+const QUICK_WORK_SECONDS = 30;
+const QUICK_REST_SECONDS = 8;
+const QUICK_TOTAL_SECONDS = quickRoutineSteps.length * QUICK_WORK_SECONDS + (quickRoutineSteps.length - 1) * QUICK_REST_SECONDS;
 
 function esc(v){return String(v??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
 function key(session,i,j,f){return `${session}|${i}|${j}|${f}`}
@@ -549,7 +556,7 @@ function renderSession(){
   if(name==="CFT Upper-Back Reset"){
     $("sessionNotice").innerHTML="<b>How to run it:</b> 2-minute warm-up → exercises 1–5 → 15–20 sec between exercises → 60–90 sec after exercise 5 → repeat for round 2 → finish with a 1-minute doorway pec stretch or child's-pose reach. Stop for sharp pain, tingling, loss of strength or radiating arm pain.";
   } else if(name==="Daily Quick Routine"){
-    $("sessionNotice").innerHTML="<b>Guided routine:</b> every interval is 30 seconds. The timer advances automatically through 8 clock-stretch positions, 2 single-leg hip-thrust holds and 2 wall-supported hip lifts. Total timed work: 6:00.";
+    $("sessionNotice").innerHTML="<b>Guided routine:</b> every work interval is 30 seconds, followed by an 8-second changeover before the next position. The timer advances automatically through 8 clock-stretch positions, 2 single-leg hip-thrust holds and 2 wall-supported hip lifts. Work time: 6:00 • changeovers: 1:28 • total: 7:28.";
   } else if(name==="Daily Prehab"){
     $("sessionNotice").innerHTML="<b>Prehab:</b> move smoothly and use the prescribed holds. Keep this as supportive work rather than turning it into a hard conditioning session.";
   } else if(!endurance.has(name)){
@@ -596,6 +603,21 @@ function renderExercises(){
 
 function collectRows(){
   const name=$("session").value, data=sessionData(name), rows=[];
+  if(name==="Daily Quick Routine"){
+    [...quickCompletedSteps].sort((a,b)=>a-b).forEach(i=>{
+      const step=quickRoutineSteps[i];
+      rows.push({
+        exercise:step.exercise,
+        set:i+1,
+        target:"30 sec",
+        load:"",
+        done:step.detail+" • completed 30 sec",
+        rpe:"",
+        pain:""
+      });
+    });
+    return rows;
+  }
   data.forEach((e,i)=>{
     for(let j=0;j<e.sets;j++){
       const r={exercise:e.name,set:j+1,target:e.target,load:draft[key(name,i,j,"load")]||"",done:draft[key(name,i,j,"done")]||"",rpe:draft[key(name,i,j,"rpe")]||"",pain:draft[key(name,i,j,"pain")]||""};
@@ -622,7 +644,10 @@ $("save").addEventListener("click",()=>{
     rows:collectRows()
   };
   history.push(h);saveLocal();renderHome();clearCurrent();
-  $("status").textContent=`Saved ${name} for ${h.date}.`;
+  const quickCount=name==="Daily Quick Routine" ? h.rows.length : null;
+  $("status").textContent=name==="Daily Quick Routine"
+    ? `Saved Daily Quick Routine for ${h.date} • ${quickCount}/12 work intervals completed.`
+    : `Saved ${name} for ${h.date}.`;
   $("status").className="status good";
 });
 
@@ -727,39 +752,114 @@ function quickCue(){
 }
 function quickOverallRemaining(){
   if(quickCompleted) return 0;
-  return Math.max(0,(quickRoutineSteps.length-quickIndex-1)*30+quickSeconds);
+  if(quickPhase==="work"){
+    const futureWorks=quickRoutineSteps.length-quickIndex-1;
+    const futureRests=quickRoutineSteps.length-quickIndex-1;
+    return quickSeconds + futureWorks*QUICK_WORK_SECONDS + futureRests*QUICK_REST_SECONDS;
+  }
+  const nextIndex=quickIndex+1;
+  const futureWorks=quickRoutineSteps.length-nextIndex;
+  const futureRests=Math.max(0,quickRoutineSteps.length-nextIndex-1);
+  return quickSeconds + futureWorks*QUICK_WORK_SECONDS + futureRests*QUICK_REST_SECONDS;
 }
 function fmtShort(sec){
   const m=Math.floor(sec/60), s=String(sec%60).padStart(2,"0"); return `${m}:${s}`;
 }
+function quickElapsed(){
+  if(quickCompleted) return QUICK_TOTAL_SECONDS;
+  if(quickPhase==="work"){
+    return quickIndex*(QUICK_WORK_SECONDS+QUICK_REST_SECONDS)+(QUICK_WORK_SECONDS-quickSeconds);
+  }
+  return (quickIndex+1)*QUICK_WORK_SECONDS + quickIndex*QUICK_REST_SECONDS + (QUICK_REST_SECONDS-quickSeconds);
+}
 function renderQuickRoutine(){
+  const timerBox=$("quickRoutineTimer");
+  timerBox.classList.toggle("resting",!quickCompleted&&quickPhase==="rest");
   const step=quickRoutineSteps[Math.min(quickIndex,quickRoutineSteps.length-1)];
-  $("quickExercise").textContent=quickCompleted?"Routine complete ✓":step.exercise;
-  $("quickPosition").textContent=quickCompleted?"6 minutes completed":step.detail;
-  $("quickClock").textContent=quickCompleted?"0:00":`0:${String(quickSeconds).padStart(2,"0")}`;
-  const overall=quickOverallRemaining();
-  $("quickOverall").textContent=quickCompleted?"All 12 intervals complete":`Overall ${fmtShort(overall)} remaining • interval ${quickIndex+1} of ${quickRoutineSteps.length}`;
-  const elapsed=quickCompleted?360:(quickIndex*30+(30-quickSeconds));
-  $("quickProgress").style.width=`${Math.min(100,(elapsed/360)*100)}%`;
-  $("quickNext").textContent=quickCompleted?"Save the session below when you’re done.":(quickIndex<quickRoutineSteps.length-1?`Next: ${quickRoutineSteps[quickIndex+1].detail}`:"Next: finish");
-  $("quickRoutineList").innerHTML=quickRoutineSteps.map((x,i)=>`<div class="routine-step ${quickCompleted||i<quickIndex?"done":i===quickIndex?"current":""}"><b>${i+1}</b><span>${esc(x.exercise)}<br><small>${esc(x.detail)}</small></span><span class="t">0:30</span></div>`).join("");
+  const nextStep=quickRoutineSteps[Math.min(quickIndex+1,quickRoutineSteps.length-1)];
+
+  if(quickCompleted){
+    $("quickExercise").textContent="Routine complete ✓";
+    $("quickPosition").textContent="12 work intervals completed";
+    $("quickClock").textContent="0:00";
+    $("quickOverall").textContent="All 12 intervals complete • total 7:28";
+    $("quickNext").textContent="Tap Save session below to add all completed positions to History.";
+  } else if(quickPhase==="rest"){
+    $("quickExercise").textContent="Change position";
+    $("quickPosition").textContent=`Next: ${nextStep.detail}`;
+    $("quickClock").textContent=`0:${String(quickSeconds).padStart(2,"0")}`;
+    $("quickOverall").textContent=`Overall ${fmtShort(quickOverallRemaining())} remaining • 8-sec changeover`;
+    $("quickNext").textContent=`Get ready: ${nextStep.exercise} • ${nextStep.detail}`;
+  } else {
+    $("quickExercise").textContent=step.exercise;
+    $("quickPosition").textContent=step.detail;
+    $("quickClock").textContent=`0:${String(quickSeconds).padStart(2,"0")}`;
+    $("quickOverall").textContent=`Overall ${fmtShort(quickOverallRemaining())} remaining • interval ${quickIndex+1} of ${quickRoutineSteps.length}`;
+    $("quickNext").textContent=quickIndex<quickRoutineSteps.length-1
+      ? `Next: 8-sec changeover → ${quickRoutineSteps[quickIndex+1].detail}`
+      : "Next: finish";
+  }
+
+  $("quickProgress").style.width=`${Math.min(100,(quickElapsed()/QUICK_TOTAL_SECONDS)*100)}%`;
+  $("quickRoutineList").innerHTML=quickRoutineSteps.map((x,i)=>{
+    const done=quickCompletedSteps.has(i);
+    const current=!quickCompleted && ((quickPhase==="work"&&i===quickIndex)||(quickPhase==="rest"&&i===quickIndex+1));
+    return `<div class="routine-step ${done?"done":current?"current":""}"><b>${i+1}</b><span>${esc(x.exercise)}<br><small>${esc(x.detail)}</small></span><span class="t">0:30</span></div>`;
+  }).join("");
 }
 function quickStop(){clearInterval(quickTimerId);quickTimerId=null;}
 function quickAdvance(){
-  quickCue();
-  if(quickIndex>=quickRoutineSteps.length-1){
-    quickStop(); quickCompleted=true; quickSeconds=0; renderQuickRoutine();
-    $("status").textContent="Daily Quick Routine complete — 6:00 timed work finished."; $("status").className="status good";
+  if(quickPhase==="work"){
+    quickCompletedSteps.add(quickIndex);
+    quickCue();
+    if(quickIndex>=quickRoutineSteps.length-1){
+      quickStop();
+      quickCompleted=true;
+      quickSeconds=0;
+      renderQuickRoutine();
+      $("status").textContent="Daily Quick Routine complete — 12/12 intervals finished. Tap Save session to add it to History.";
+      $("status").className="status good";
+      return;
+    }
+    quickPhase="rest";
+    quickSeconds=QUICK_REST_SECONDS;
+    renderQuickRoutine();
     return;
   }
-  quickIndex++; quickSeconds=30; renderQuickRoutine();
+  quickCue();
+  quickIndex++;
+  quickPhase="work";
+  quickSeconds=QUICK_WORK_SECONDS;
+  renderQuickRoutine();
 }
 function quickPrevious(){
-  quickStop(); quickCompleted=false;
-  if(quickIndex>0) quickIndex--; quickSeconds=30; renderQuickRoutine();
+  quickStop();
+  quickCompleted=false;
+  if(quickPhase==="rest"){
+    quickPhase="work";
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickCompletedSteps.delete(quickIndex);
+  }else if(quickIndex>0){
+    quickCompletedSteps.delete(quickIndex);
+    quickIndex--;
+    quickPhase="work";
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickCompletedSteps.delete(quickIndex);
+  }else{
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickCompletedSteps.delete(0);
+  }
+  renderQuickRoutine();
 }
 $("quickStart").addEventListener("click",()=>{
-  if(quickCompleted){quickIndex=0;quickSeconds=30;quickCompleted=false;renderQuickRoutine();}
+  if(quickCompleted){
+    quickIndex=0;
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickPhase="work";
+    quickCompleted=false;
+    quickCompletedSteps.clear();
+    renderQuickRoutine();
+  }
   if(quickTimerId)return;
   quickCue();
   quickTimerId=setInterval(()=>{
@@ -768,9 +868,35 @@ $("quickStart").addEventListener("click",()=>{
   },1000);
 });
 $("quickPause").addEventListener("click",quickStop);
-$("quickSkip").addEventListener("click",()=>{quickStop();quickAdvance();});
+$("quickSkip").addEventListener("click",()=>{
+  quickStop();
+  if(quickCompleted) return;
+  if(quickPhase==="work"){
+    // Skip does not count the current work interval as completed.
+    if(quickIndex>=quickRoutineSteps.length-1){
+      quickCompleted=true;
+      quickSeconds=0;
+    }else{
+      quickPhase="rest";
+      quickSeconds=QUICK_REST_SECONDS;
+    }
+  }else{
+    quickIndex++;
+    quickPhase="work";
+    quickSeconds=QUICK_WORK_SECONDS;
+  }
+  renderQuickRoutine();
+});
 $("quickBack").addEventListener("click",quickPrevious);
-$("quickReset").addEventListener("click",()=>{quickStop();quickIndex=0;quickSeconds=30;quickCompleted=false;renderQuickRoutine();});
+$("quickReset").addEventListener("click",()=>{
+  quickStop();
+  quickIndex=0;
+  quickSeconds=QUICK_WORK_SECONDS;
+  quickPhase="work";
+  quickCompleted=false;
+  quickCompletedSteps.clear();
+  renderQuickRoutine();
+});
 
 function renderClock(){
   const m=String(Math.floor(cftRemaining/60)).padStart(2,"0"),s=String(cftRemaining%60).padStart(2,"0");
