@@ -93,6 +93,18 @@ main{padding:14px 0 90px}
   padding:10px 12px;background:rgba(16,29,38,.95);backdrop-filter:blur(9px);border:1px solid var(--line);border-radius:13px;margin-bottom:10px
 }
 .clock{font-size:1.55rem;font-weight:900;font-variant-numeric:tabular-nums}
+.quicktimer{padding:14px;background:linear-gradient(135deg,#173244,#14242f 60%,#183027);border:1px solid var(--line);border-radius:15px;margin-bottom:10px}
+.quicktimer .bigclock{font-size:3rem;font-weight:950;line-height:1;font-variant-numeric:tabular-nums;margin:6px 0}
+.quicktimer .stepname{font-size:1.08rem;font-weight:900}
+.quicktimer .stepdetail{font-size:1.2rem;font-weight:850;color:#d9f2ff;margin-top:3px}
+.quicktimer .next{font-size:.8rem;color:var(--muted);margin-top:6px}
+.progress{height:9px;border-radius:999px;background:#0e1820;border:1px solid #29404f;overflow:hidden;margin:11px 0}
+.progress>span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s linear}
+.routine-list{display:grid;gap:6px;margin-top:9px}
+.routine-step{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;padding:8px 9px;background:#101b23;border-radius:9px;font-size:.79rem}
+.routine-step.current{outline:2px solid #477b96;background:#17303f}
+.routine-step.done{opacity:.58}
+.routine-step .t{font-variant-numeric:tabular-nums;color:var(--muted)}
 .hist{background:#14212a;border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px}
 .hist .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .hist b{display:block}.hist small{display:block;margin-top:2px}
@@ -133,7 +145,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Rehab • strength • mobility • swim • bike • run</div>
       </div>
-      <span class="version">v1.1 PWA</span>
+      <span class="version">v1.2 PWA</span>
     </div>
   </div>
 </header>
@@ -166,6 +178,7 @@ main{padding:14px 0 90px}
         <div class="quickcard" data-start="Lower Body"><div class="icon">🏋️</div><b>Rehab</b><small>Lower body</small></div>
         <div class="quickcard" data-start="Daily Prehab"><div class="icon">🧘</div><b>Prehab</b><small>Daily mobility</small></div>
         <div class="quickcard" data-start="CFT Upper-Back Reset"><div class="icon">💪</div><b>CFT</b><small>15-min reset</small></div>
+        <div class="quickcard" data-start="Daily Quick Routine"><div class="icon">⏱️</div><b>Daily quick</b><small>6-min guided</small></div>
       </div>
       <div class="quickcards" style="margin-top:8px">
         <div class="quickcard" data-start="Swim"><div class="icon">🏊</div><b>Swim</b><small>Quick log</small></div>
@@ -199,6 +212,24 @@ main{padding:14px 0 90px}
         <button id="timerReset">Reset</button>
       </div>
     </div>
+
+    <section id="quickRoutineTimer" class="quicktimer hidden">
+      <div class="small">DAILY QUICK ROUTINE • 12 × 30 SEC</div>
+      <div id="quickExercise" class="stepname">Clock Stretch</div>
+      <div id="quickPosition" class="stepdetail">Right foot • 12 o'clock</div>
+      <div id="quickClock" class="bigclock">0:30</div>
+      <div id="quickOverall" class="small">Overall 6:00 remaining • interval 1 of 12</div>
+      <div class="progress" aria-hidden="true"><span id="quickProgress"></span></div>
+      <div id="quickNext" class="next">Next: Right foot • 1 o'clock</div>
+      <div class="actions" style="margin-top:10px">
+        <button id="quickStart" class="primary">Start / Resume</button>
+        <button id="quickPause">Pause</button>
+        <button id="quickBack">← Previous</button>
+        <button id="quickSkip">Next →</button>
+        <button id="quickReset">Reset</button>
+      </div>
+      <div id="quickRoutineList" class="routine-list"></div>
+    </section>
 
     <section id="sessionNotice" class="panel notice"></section>
     <div id="exercises"></div>
@@ -274,11 +305,11 @@ main{padding:14px 0 90px}
     </section>
     <section class="panel">
       <div class="kicker">Included in v1.0</div>
-      <p class="notice">Invicta Lower Body, Upper Body, Whole Body and Daily Prehab; BodyCraft CFT upper-back reset; swim/bike/run quick logging; unified history; CSV import/export.</p>
+      <p class="notice">Invicta Lower Body, Upper Body, Whole Body and Daily Prehab; guided Daily Quick Routine; BodyCraft CFT upper-back reset; swim/bike/run quick logging; unified history; CSV import/export.</p>
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.1 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.2 PWA • installable offline training app</div>
 </main>
 
 <script>
@@ -392,13 +423,29 @@ const cft = [
   }
 ];
 
+const quickRoutineSteps = [
+  {exercise:"Clock Stretch", detail:"Right foot • 12 o'clock"},
+  {exercise:"Clock Stretch", detail:"Right foot • 1 o'clock"},
+  {exercise:"Clock Stretch", detail:"Right foot • 2 o'clock"},
+  {exercise:"Clock Stretch", detail:"Right foot • 3 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 12 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 1 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 2 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 3 o'clock"},
+  {exercise:"Single-Leg Hip Thrust Isometric", detail:"Left • foot on foam roller"},
+  {exercise:"Single-Leg Hip Thrust Isometric", detail:"Right • foot on foam roller"},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Left • midfoot pressure into wall"},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Right • midfoot pressure into wall"}
+];
+
 const endurance = new Set(["Swim","Bike","Run"]);
-const programmeNames = [...Object.keys(rehab),"CFT Upper-Back Reset","Swim","Bike","Run"];
+const programmeNames = [...Object.keys(rehab),"Daily Quick Routine","CFT Upper-Back Reset","Swim","Bike","Run"];
 const summaries = {
   "Lower Body":"Invicta lower-body rehab strength session.",
   "Upper Body":"Invicta upper-body strength session.",
   "Whole Body":"Invicta whole-body strength session.",
   "Daily Prehab":"Daily mobility + isometric prehab.",
+  "Daily Quick Routine":"Guided 6-minute daily routine • 12 automatic 30-second intervals.",
   "CFT Upper-Back Reset":"15-minute BodyCraft CFT accessory circuit • 2 rounds • 15–20 sec between exercises • 60–90 sec between rounds.",
   "Swim":"Quick-log a swim session.",
   "Bike":"Quick-log a bike session.",
@@ -418,6 +465,10 @@ let history = [];
 let draft = {};
 let cftRemaining = 15*60;
 let timerId = null;
+let quickIndex = 0;
+let quickSeconds = 30;
+let quickTimerId = null;
+let quickCompleted = false;
 
 function esc(v){return String(v??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
 function key(session,i,j,f){return `${session}|${i}|${j}|${f}`}
@@ -441,7 +492,7 @@ function loadLocal(){
 function categoryOf(name){
   if(endurance.has(name))return "Endurance";
   if(name==="CFT Upper-Back Reset")return "CFT";
-  if(name==="Daily Prehab")return "Mobility";
+  if(name==="Daily Prehab"||name==="Daily Quick Routine")return "Mobility";
   return "Rehab";
 }
 function showView(id){
@@ -491,10 +542,14 @@ function renderSession(){
   const name=$("session").value;
   $("sessionSummary").textContent=summaries[name]||"";
   $("cftTimer").classList.toggle("hidden",name!=="CFT Upper-Back Reset");
+  $("quickRoutineTimer").classList.toggle("hidden",name!=="Daily Quick Routine");
+  if(name==="Daily Quick Routine") renderQuickRoutine();
   $("enduranceFields").classList.toggle("hidden",!endurance.has(name));
   $("sessionNotice").classList.toggle("hidden",endurance.has(name));
   if(name==="CFT Upper-Back Reset"){
     $("sessionNotice").innerHTML="<b>How to run it:</b> 2-minute warm-up → exercises 1–5 → 15–20 sec between exercises → 60–90 sec after exercise 5 → repeat for round 2 → finish with a 1-minute doorway pec stretch or child's-pose reach. Stop for sharp pain, tingling, loss of strength or radiating arm pain.";
+  } else if(name==="Daily Quick Routine"){
+    $("sessionNotice").innerHTML="<b>Guided routine:</b> every interval is 30 seconds. The timer advances automatically through 8 clock-stretch positions, 2 single-leg hip-thrust holds and 2 wall-supported hip lifts. Total timed work: 6:00.";
   } else if(name==="Daily Prehab"){
     $("sessionNotice").innerHTML="<b>Prehab:</b> move smoothly and use the prescribed holds. Keep this as supportive work rather than turning it into a hard conditioning session.";
   } else if(!endurance.has(name)){
@@ -660,6 +715,63 @@ $("importCsv").addEventListener("change",async ev=>{
   ev.target.value="";
 });
 
+function quickCue(){
+  if(navigator.vibrate) navigator.vibrate(180);
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx=new AudioCtx(), osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.frequency.value=880; gain.gain.value=.035; osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime+.09); osc.onended=()=>ctx.close();
+  }catch(e){}
+}
+function quickOverallRemaining(){
+  if(quickCompleted) return 0;
+  return Math.max(0,(quickRoutineSteps.length-quickIndex-1)*30+quickSeconds);
+}
+function fmtShort(sec){
+  const m=Math.floor(sec/60), s=String(sec%60).padStart(2,"0"); return `${m}:${s}`;
+}
+function renderQuickRoutine(){
+  const step=quickRoutineSteps[Math.min(quickIndex,quickRoutineSteps.length-1)];
+  $("quickExercise").textContent=quickCompleted?"Routine complete ✓":step.exercise;
+  $("quickPosition").textContent=quickCompleted?"6 minutes completed":step.detail;
+  $("quickClock").textContent=quickCompleted?"0:00":`0:${String(quickSeconds).padStart(2,"0")}`;
+  const overall=quickOverallRemaining();
+  $("quickOverall").textContent=quickCompleted?"All 12 intervals complete":`Overall ${fmtShort(overall)} remaining • interval ${quickIndex+1} of ${quickRoutineSteps.length}`;
+  const elapsed=quickCompleted?360:(quickIndex*30+(30-quickSeconds));
+  $("quickProgress").style.width=`${Math.min(100,(elapsed/360)*100)}%`;
+  $("quickNext").textContent=quickCompleted?"Save the session below when you’re done.":(quickIndex<quickRoutineSteps.length-1?`Next: ${quickRoutineSteps[quickIndex+1].detail}`:"Next: finish");
+  $("quickRoutineList").innerHTML=quickRoutineSteps.map((x,i)=>`<div class="routine-step ${quickCompleted||i<quickIndex?"done":i===quickIndex?"current":""}"><b>${i+1}</b><span>${esc(x.exercise)}<br><small>${esc(x.detail)}</small></span><span class="t">0:30</span></div>`).join("");
+}
+function quickStop(){clearInterval(quickTimerId);quickTimerId=null;}
+function quickAdvance(){
+  quickCue();
+  if(quickIndex>=quickRoutineSteps.length-1){
+    quickStop(); quickCompleted=true; quickSeconds=0; renderQuickRoutine();
+    $("status").textContent="Daily Quick Routine complete — 6:00 timed work finished."; $("status").className="status good";
+    return;
+  }
+  quickIndex++; quickSeconds=30; renderQuickRoutine();
+}
+function quickPrevious(){
+  quickStop(); quickCompleted=false;
+  if(quickIndex>0) quickIndex--; quickSeconds=30; renderQuickRoutine();
+}
+$("quickStart").addEventListener("click",()=>{
+  if(quickCompleted){quickIndex=0;quickSeconds=30;quickCompleted=false;renderQuickRoutine();}
+  if(quickTimerId)return;
+  quickCue();
+  quickTimerId=setInterval(()=>{
+    quickSeconds--;
+    if(quickSeconds<=0) quickAdvance(); else renderQuickRoutine();
+  },1000);
+});
+$("quickPause").addEventListener("click",quickStop);
+$("quickSkip").addEventListener("click",()=>{quickStop();quickAdvance();});
+$("quickBack").addEventListener("click",quickPrevious);
+$("quickReset").addEventListener("click",()=>{quickStop();quickIndex=0;quickSeconds=30;quickCompleted=false;renderQuickRoutine();});
+
 function renderClock(){
   const m=String(Math.floor(cftRemaining/60)).padStart(2,"0"),s=String(cftRemaining%60).padStart(2,"0");
   $("clock").textContent=`${m}:${s}`;
@@ -671,7 +783,7 @@ $("timerStart").addEventListener("click",()=>{
 $("timerPause").addEventListener("click",()=>{clearInterval(timerId);timerId=null});
 $("timerReset").addEventListener("click",()=>{clearInterval(timerId);timerId=null;cftRemaining=15*60;renderClock()});
 
-loadLocal();renderWeek();renderHome();renderSession();renderClock();
+loadLocal();renderWeek();renderHome();renderSession();renderClock();renderQuickRoutine();
 
 // PWA install + service worker
 let deferredInstallPrompt = null;
