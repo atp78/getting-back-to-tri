@@ -2,7 +2,14 @@
 
 Multi-mode, local-first Progressive Web App.
 
-Current release: **v1.8a PWA**.
+Current release: **v1.8a.1 PWA**.
+
+## v1.8a.1 — Google Identity Services loading fix
+- Google Identity Services now retries on demand when Connect Google Drive is tapped.
+- External Google requests bypass the PWA service-worker offline fallback.
+- The service worker handles same-origin app files only.
+- `index.html` is used as an offline fallback only for navigation requests.
+- Adds a direct Google Identity Services connectivity-test link in the Sync panel.
 
 ## v1.8a — manual cross-device sync
 
