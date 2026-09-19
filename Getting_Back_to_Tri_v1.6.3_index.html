@@ -1,0 +1,2262 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101a22">
+<title>Getting Back to Tri</title>
+<style>
+:root{
+  --bg:#0b1117; --bg2:#101a22; --card:#15212b; --card2:#1a2a36; --line:#29404f;
+  --text:#f3f7fa; --muted:#a8bac7; --accent:#65c6ff; --accent2:#173a4f;
+  --good:#67d59a; --warn:#ffd166; --danger:#ff8c8c; --run:#8fd18f; --swim:#72c7ff; --bike:#ffd27b;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#081017 0,#0d171f 28%,#0b1117 100%);line-height:1.45
+}
+button,input,select,textarea,a.btn{font:inherit}
+button,a.btn{
+  min-height:44px;border:1px solid var(--line);border-radius:11px;background:#20313d;color:var(--text);
+  padding:10px 13px;font-weight:750;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer
+}
+button.primary,a.btn.primary{background:var(--accent);border-color:var(--accent);color:#07131a}
+button.soft,a.btn.soft{background:var(--accent2);border-color:#24516c;color:#bde9ff}
+button.danger{color:#ffd3d3;border-color:#704141;background:#351f22}
+input,select,textarea{
+  width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;background:#0e1820;color:var(--text);
+  padding:10px 11px;margin-top:5px
+}
+textarea{min-height:92px;resize:vertical}
+label{font-size:.81rem;font-weight:750;color:#c6d4dd}
+small,.small{color:var(--muted)}
+.wrap{max-width:860px;margin:auto;padding:0 14px}
+header{
+  padding:22px 0 15px;background:linear-gradient(135deg,#142733,#0b151c 68%,#143227);
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:clamp(1.35rem,4.5vw,1.85rem);margin:0;line-height:1.05}
+.version{font-size:.73rem;padding:5px 8px;border:1px solid #396279;border-radius:999px;color:#bfeaff;background:#143044;white-space:nowrap}
+.subtitle{font-size:.86rem;color:var(--muted);margin-top:5px}
+main{padding:14px 0 90px}
+.nav{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:0 0 13px
+}
+.nav button{font-size:.78rem;padding:8px 5px;background:#111d25}
+.nav button.active{background:var(--accent2);border-color:#31657f;color:#c7eeff}
+.view.hidden,.hidden{display:none!important}
+.panel,.exercise,.stat,.hero{
+  background:rgba(21,33,43,.96);border:1px solid var(--line);border-radius:15px
+}
+.panel{padding:13px;margin-bottom:11px}
+.hero{padding:16px;margin-bottom:12px;background:linear-gradient(135deg,#173244,#14242f 58%,#183027)}
+.hero h2{font-size:1.1rem;margin:0 0 5px}
+.hero p{margin:0;color:#bed0da;font-size:.88rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{padding:11px;text-align:center}
+.stat b{display:block;font-size:1.25rem}
+.stat span{font-size:.72rem;color:var(--muted)}
+.section-title{font-size:1rem;margin:18px 2px 9px}
+.today{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pill,.badge{
+  display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:#1d303c;color:#bcd2df;
+  font-size:.72rem;border:1px solid #304b5b;margin:2px 3px 2px 0
+}
+.pill.swim{color:#c8edff;border-color:#315b70}.pill.bike{color:#ffe4aa;border-color:#66532d}.pill.run{color:#d7f6d7;border-color:#38623c}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.actions>*{flex:1 1 125px}
+.status{font-size:.8rem;color:var(--muted);margin-top:8px;min-height:1.1em}
+.status.good{color:var(--good)}.status.warn{color:var(--warn)}
+.exercise{overflow:hidden;margin-bottom:9px}
+.exhead{width:100%;border:0;border-radius:0;background:#15212b;text-align:left;padding:12px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.exname{font-weight:850}
+.exmeta{font-size:.73rem;color:var(--muted);margin-top:3px}
+.exbody{border-top:1px solid var(--line);padding:11px}
+.set{display:grid;grid-template-columns:30px 1fr 1fr;gap:7px;margin:8px 0}
+.set .num{padding-top:28px;text-align:center;font-weight:850;color:#a8c9d9}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:7px;grid-column:2/4}
+.demo{
+  display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:9px;border:1px solid #294250;background:#101c24;border-radius:11px;margin-bottom:9px
+}
+.demo .text{flex:1 1 180px;font-size:.79rem;color:var(--muted)}
+.cues{display:grid;gap:7px;margin-bottom:9px}
+.cue{font-size:.81rem;padding:9px 10px;background:#101b23;border-left:3px solid #39647b;border-radius:8px;color:#bfd0da}
+.cue b{color:#fff}
+.video{aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000;margin:8px 0}
+.video iframe{width:100%;height:100%;border:0}
+.timerbar{
+  position:sticky;top:82px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+  padding:10px 12px;background:rgba(16,29,38,.95);backdrop-filter:blur(9px);border:1px solid var(--line);border-radius:13px;margin-bottom:10px
+}
+.clock{font-size:1.55rem;font-weight:900;font-variant-numeric:tabular-nums}
+.quicktimer{padding:14px;background:linear-gradient(135deg,#173244,#14242f 60%,#183027);border:1px solid var(--line);border-radius:15px;margin-bottom:10px}
+.quicktimer .bigclock{font-size:3rem;font-weight:950;line-height:1;font-variant-numeric:tabular-nums;margin:6px 0}
+.quicktimer .stepname{font-size:1.08rem;font-weight:900}
+.quicktimer .stepdetail{font-size:1.2rem;font-weight:850;color:#d9f2ff;margin-top:3px}
+.quicktimer .next{font-size:.8rem;color:var(--muted);margin-top:6px}
+.progress{height:9px;border-radius:999px;background:#0e1820;border:1px solid #29404f;overflow:hidden;margin:11px 0}
+.progress>span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s linear}
+.routine-list{display:grid;gap:6px;margin-top:9px}
+.routine-step{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;padding:8px 9px;background:#101b23;border-radius:9px;font-size:.79rem}
+.routine-step.current{outline:2px solid #477b96;background:#17303f}
+.routine-step.done{opacity:.58}
+.quicktimer.resting{border-color:#756537;background:linear-gradient(135deg,#302a18,#18232b)}
+.quicktimer.resting .bigclock{color:#ffd166}
+.routine-step .t{font-variant-numeric:tabular-nums;color:var(--muted)}
+.hist{background:#14212a;border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px}
+.hist .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.hist b{display:block}.hist small{display:block;margin-top:2px}
+.hist .rows{font-size:.77rem;color:#b4c4ce;margin-top:8px;border-top:1px solid #263b49;padding-top:7px}
+.notice{font-size:.8rem;color:#b5c8d4}
+.week{display:grid;gap:7px}
+.day{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:start;padding:9px;background:#101b23;border-radius:10px}
+.day b{font-size:.79rem}.day span{font-size:.79rem;color:#b7c8d1}
+.quickcards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quickcard{padding:12px 7px;text-align:center;background:#111d25;border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.quickcard b{display:block;font-size:.88rem;margin-top:4px}
+.icon{font-size:1.45rem}
+.kicker{font-size:.7rem;font-weight:900;letter-spacing:.1em;color:#8ecfee;text-transform:uppercase}
+.hr{height:1px;background:var(--line);margin:12px 0}
+.footerNote{margin-top:18px;color:#8198a7;font-size:.73rem;text-align:center}
+
+.readiness-card{padding:14px;border-radius:14px;border:1px solid var(--line);background:#13212a;margin-bottom:11px}
+.readiness-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.readiness-badge{display:inline-flex;align-items:center;justify-content:center;min-width:86px;padding:7px 11px;border-radius:999px;font-weight:900;font-size:.78rem;letter-spacing:.04em;border:1px solid var(--line)}
+.readiness-badge.green{background:#173526;border-color:#2f7550;color:#bff2d1}
+.readiness-badge.amber{background:#3a3117;border-color:#76632a;color:#ffe284}
+.readiness-badge.red{background:#3a1d22;border-color:#7b3b46;color:#ffd0d5}
+.readiness-badge.neutral{background:#1b2a34;color:#b9cbd5}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.metric{background:#101b23;border:1px solid #263c49;border-radius:11px;padding:10px;min-width:0}
+.metric b{display:block;font-size:1.08rem}
+.metric span{display:block;font-size:.72rem;color:var(--muted);margin-top:2px}
+.health-entry{background:#14212a;border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px}
+.health-entry .metrics{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.health-entry .metrics span{font-size:.72rem;border:1px solid #2c4452;background:#101b23;border-radius:999px;padding:4px 7px;color:#bfd0da}
+.baseline-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pastebox{min-height:105px}
+.home-readiness{margin-top:11px}
+
+@media(max-width:520px){
+  .grid2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}
+  .set{grid-template-columns:25px 1fr 1fr}.quickcards{grid-template-columns:repeat(3,1fr)}
+  .timerbar{top:76px}.nav button{font-size:.73rem}
+}
+@media(max-width:365px){.nav{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr 1fr}}
+
+.library-exercise{border:1px solid var(--line);background:#111d25;border-radius:12px;padding:10px;margin-bottom:7px}
+.library-exercise-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.library-exercise .actions{margin-top:7px}
+.library-exercise small{color:var(--muted)}
+.check{display:flex!important;align-items:center;gap:8px;color:var(--text)}
+.check input{width:auto}
+</style>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" sizes="any" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="application-name" content="Getting Back to Tri">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div>
+        <h1>Getting Back to Tri</h1>
+        <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
+      </div>
+      <span class="version">v1.6.3 PWA</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="nav">
+    <button data-view="home" class="active">Home</button>
+    <button data-view="train">Train</button>
+    <button data-view="recovery">Recovery</button>
+    <button data-view="history">History</button>
+    <button data-view="data">Data</button>
+  </nav>
+
+  <section id="home" class="view">
+    <div class="hero">
+      <div class="kicker">Foundation phase</div>
+      <h2>Build resilience first. Triathlon follows.</h2>
+      <p>One place for your private exercise library, guided movement routines and endurance-session logging.</p>
+      <div class="today" id="todayPills"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="statWeek">0</b><span>sessions this week</span></div>
+      <div class="stat"><b id="statStrength">0</b><span>strength / exercise</span></div>
+      <div class="stat"><b id="statEndurance">0</b><span>swim / bike / run</span></div>
+    </div>
+
+    <section class="panel">
+      <div class="kicker">Start a session</div>
+      <div id="mySessionQuickWrap" class="hidden">
+        <div class="small" style="margin:8px 0 6px">MY LOCAL SESSIONS</div>
+        <div id="mySessionQuickCards" class="quickcards"></div>
+      </div>
+      <div class="quickcards" style="margin-top:9px">
+        <div class="quickcard" data-start="Daily Quick Routine"><div class="icon">⏱️</div><b>Daily quick</b><small>7:28 guided</small></div>
+        <div class="quickcard" data-start="Pre-Walk Warm-Up"><div class="icon">🚶</div><b>Pre-walk</b><small>4:12 guided</small></div>
+        <div class="quickcard" data-start="Circulation Reset"><div class="icon">💧</div><b>Circulation</b><small>6:25 guided</small></div>
+        <div class="quickcard" data-library-manager="1"><div class="icon">🗂️</div><b>My sessions</b><small>Manage local library</small></div>
+      </div>
+      <div class="quickcards" style="margin-top:8px">
+        <div class="quickcard" data-start="Swim"><div class="icon">🏊</div><b>Swim</b><small>Quick log</small></div>
+        <div class="quickcard" data-start="Bike"><div class="icon">🚴</div><b>Bike</b><small>Quick log</small></div>
+        <div class="quickcard" data-start="Run"><div class="icon">🏃</div><b>Run</b><small>Quick log</small></div>
+      </div>
+    </section>
+
+
+    <section id="homeReadiness" class="readiness-card home-readiness">
+      <div class="readiness-top">
+        <div>
+          <div class="kicker">Latest recovery</div>
+          <b id="homeReadinessTitle">No recovery snapshot yet</b>
+        </div>
+        <span id="homeReadinessBadge" class="readiness-badge neutral">SET UP</span>
+      </div>
+      <div id="homeReadinessText" class="small" style="margin-top:8px">Add your personal baseline and a daily Garmin snapshot in Recovery.</div>
+    </section>
+
+    <h3 class="section-title">My weekly plan</h3>
+    <section class="panel week" id="weekPlan"></section>
+  </section>
+
+  <section id="train" class="view hidden">
+    <section class="panel">
+      <div class="grid2">
+        <label>Session
+          <select id="session"></select>
+        </label>
+        <label>Date
+          <input id="date" type="date">
+        </label>
+      </div>
+      <div id="sessionSummary" class="status"></div>
+    </section>
+
+    <div id="sessionTimer" class="timerbar hidden">
+      <div><div class="small" id="sessionTimerLabel">SESSION TIMER</div><div id="clock" class="clock">15:00</div></div>
+      <div class="actions" style="flex:1 1 260px">
+        <button id="timerStart" class="primary">Start / Resume</button>
+        <button id="timerPause">Pause</button>
+        <button id="timerReset">Reset</button>
+      </div>
+    </div>
+
+    <section id="quickRoutineTimer" class="quicktimer hidden">
+      <div class="small">DAILY QUICK ROUTINE • 12 × 30 SEC • 8 SEC CHANGEOVERS</div>
+      <div id="quickExercise" class="stepname">Clock Stretch</div>
+      <div id="quickPosition" class="stepdetail">Right foot • 12 o'clock</div>
+      <div id="quickClock" class="bigclock">0:30</div>
+      <div id="quickOverall" class="small">Overall 7:28 remaining • interval 1 of 12</div>
+      <div class="progress" aria-hidden="true"><span id="quickProgress"></span></div>
+      <div id="quickNext" class="next">Next: 8-sec changeover → Right foot • 1 o'clock</div>
+      <div class="actions" style="margin-top:10px">
+        <button id="quickStart" class="primary">Start / Resume</button>
+        <button id="quickPause">Pause</button>
+        <button id="quickBack">← Previous</button>
+        <button id="quickSkip">Next →</button>
+        <button id="quickReset">Reset</button>
+      </div>
+      <div id="quickRoutineList" class="routine-list"></div>
+    </section>
+
+
+    <section id="preWalkTimer" class="quicktimer hidden">
+      <div class="small">PRE-WALK WARM-UP • 10 WORK INTERVALS • 8 SEC CHANGEOVERS</div>
+      <div id="preWalkExercise" class="stepname">Clock Stretch</div>
+      <div id="preWalkPosition" class="stepdetail">Right foot • 12 o'clock</div>
+      <div id="preWalkClock" class="bigclock">0:15</div>
+      <div id="preWalkOverall" class="small">Overall 4:12 remaining • interval 1 of 10</div>
+      <div class="progress" aria-hidden="true"><span id="preWalkProgress"></span></div>
+      <div id="preWalkNext" class="next">Next: 8-sec changeover → Right foot • 1 o'clock</div>
+      <div class="actions" style="margin-top:10px">
+        <button id="preWalkStart" class="primary">Start / Resume</button>
+        <button id="preWalkPause">Pause</button>
+        <button id="preWalkBack">← Previous</button>
+        <button id="preWalkSkip">Next →</button>
+        <button id="preWalkReset">Reset</button>
+      </div>
+      <div id="preWalkList" class="routine-list"></div>
+    </section>
+
+
+    <section id="circulationTimer" class="quicktimer hidden">
+      <div class="small">CIRCULATION RESET • 6 MOVEMENTS • 5 SEC CHANGEOVERS</div>
+
+      <div class="grid2" style="margin:10px 0">
+        <label>Use it for
+          <select id="circulationContext">
+            <option value="Morning">Morning</option>
+            <option value="After sitting">After sitting</option>
+            <option value="Recovery">Recovery</option>
+          </select>
+        </label>
+        <label>2-minute rhythmic stage
+          <select id="circulationMovement">
+            <option value="March in place">March in place</option>
+            <option value="Gentle rebounder">Gentle rebounder</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="circulationExercise" class="stepname">Diaphragmatic Breathing</div>
+      <div id="circulationPosition" class="stepdetail">Relax shoulders • slow nasal inhale • easy long exhale</div>
+      <div id="circulationClock" class="bigclock">1:00</div>
+      <div id="circulationOverall" class="small">Overall 6:25 remaining • movement 1 of 6</div>
+      <div class="progress" aria-hidden="true"><span id="circulationProgress"></span></div>
+      <div id="circulationNext" class="next">Next: 5-sec changeover → Ankle Pumps / Calf Raises</div>
+      <div class="actions" style="margin-top:10px">
+        <button id="circulationStart" class="primary">Start / Resume</button>
+        <button id="circulationPause">Pause</button>
+        <button id="circulationBack">← Previous</button>
+        <button id="circulationSkip">Next →</button>
+        <button id="circulationReset">Reset</button>
+      </div>
+      <div id="circulationList" class="routine-list"></div>
+
+      <div class="panel" style="margin-top:10px;padding:11px">
+        <div class="kicker">Technique demos</div>
+        <div class="small" style="margin:5px 0 9px">For the less-obvious movements. Videos need an internet connection; the timed routine itself still works offline.</div>
+
+        <div class="demo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=zKgRit_yN4c&t=12s">▶ Diaphragmatic breathing</a>
+          <div class="text">NHS Fife demonstration — belly/diaphragm breathing rather than lifting the shoulders.</div>
+        </div>
+
+        <div class="demo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://player.vimeo.com/video/419862653">▶ Ankle pumps</a>
+          <div class="text">Lancashire Teaching Hospitals physiotherapy demonstration.</div>
+        </div>
+
+        <div class="demo" id="rebounderDemo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=JRXUZwaXYHo">▶ Gentle rebounder / basic bounce</a>
+          <div class="text">Beginner low-impact bounce demonstration. Use it for movement technique only; no special “detox” effect is assumed.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sessionNotice" class="panel notice"></section>
+    <div id="exercises"></div>
+
+    <section id="enduranceFields" class="panel hidden">
+      <div class="grid2">
+        <label>Duration
+          <input id="duration" placeholder="e.g. 45 min">
+        </label>
+        <label>Distance
+          <input id="distance" placeholder="e.g. 2.0 km / 30 km">
+        </label>
+      </div>
+      <label style="display:block;margin-top:8px">Session detail
+        <textarea id="enduranceDetail" placeholder="Easy aerobic, intervals, drills, route, pace, HR notes…"></textarea>
+      </label>
+    </section>
+
+    <section class="panel">
+      <div class="grid2">
+        <label>Session RPE
+          <input id="sessionRpe" type="number" min="0" max="10" step=".5" placeholder="0–10">
+        </label>
+        <label>Symptoms / pain
+          <input id="sessionPain" type="number" min="0" max="10" step="1" placeholder="0–10">
+        </label>
+      </div>
+      <label style="display:block;margin-top:8px">Notes
+        <textarea id="notes" placeholder="How you felt, progression, symptoms or anything to review later…"></textarea>
+      </label>
+      <div class="actions" style="margin-top:9px">
+        <button id="save" class="primary">Save session</button>
+        <button id="clear">Clear current entries</button>
+      </div>
+      <div id="status" class="status" aria-live="polite"></div>
+    </section>
+  </section>
+
+
+  <section id="recovery" class="view hidden">
+    <section class="hero">
+      <div class="kicker">Recovery dashboard</div>
+      <h2>Use your own baseline, not generic cut-offs.</h2>
+      <p>Store Garmin recovery markers locally and compare each day with your normal range. This is a training aid, not a medical assessment.</p>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Personal baseline</div>
+      <h3 style="margin:6px 0 8px">Set your normal values</h3>
+      <div class="notice" style="margin-bottom:9px">These values stay on this device. Nothing here is uploaded to GitHub.</div>
+      <div class="baseline-grid">
+        <label>Overnight HRV (ms)
+          <input id="baseHrv" type="number" min="1" step="1" placeholder="e.g. 55">
+        </label>
+        <label>Resting HR (bpm)
+          <input id="baseRhr" type="number" min="20" max="120" step="1" placeholder="e.g. 50">
+        </label>
+        <label>Sleep score
+          <input id="baseSleepScore" type="number" min="0" max="100" step="1" placeholder="e.g. 75">
+        </label>
+        <label>Sleep duration (min)
+          <input id="baseSleepMinutes" type="number" min="0" max="900" step="1" placeholder="e.g. 420">
+        </label>
+        <label>Body Battery morning/high
+          <input id="baseBodyBattery" type="number" min="0" max="100" step="1" placeholder="e.g. 75">
+        </label>
+        <label>Stress average
+          <input id="baseStress" type="number" min="0" max="100" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="saveBaseline" class="primary">Save baseline</button>
+      </div>
+      <div id="baselineStatus" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Fast entry</div>
+      <h3 style="margin:6px 0 8px">Paste a Garmin / ChatGPT summary</h3>
+      <textarea id="healthPaste" class="pastebox" placeholder="Example: Sleep 7h05, score 85, HRV 54 ms, resting HR 47, Body Battery 96, stress 13, steps 286"></textarea>
+      <div class="actions" style="margin-top:8px">
+        <button id="parseHealth">Fill fields from text</button>
+        <button id="clearHealthPaste">Clear</button>
+      </div>
+      <div id="parseStatus" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Daily snapshot</div>
+      <div class="grid2">
+        <label>Date
+          <input id="healthDate" type="date">
+        </label>
+        <label>Sleep score
+          <input id="healthSleepScore" type="number" min="0" max="100" step="1" placeholder="0–100">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Sleep hours
+          <input id="healthSleepHours" type="number" min="0" max="14" step="1" placeholder="e.g. 7">
+        </label>
+        <label>Sleep minutes
+          <input id="healthSleepMins" type="number" min="0" max="59" step="1" placeholder="e.g. 5">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Overnight HRV (ms)
+          <input id="healthHrv" type="number" min="1" step="1" placeholder="ms">
+        </label>
+        <label>Resting HR (bpm)
+          <input id="healthRhr" type="number" min="20" max="120" step="1" placeholder="bpm">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Body Battery
+          <input id="healthBodyBattery" type="number" min="0" max="100" step="1" placeholder="0–100">
+        </label>
+        <label>Stress average
+          <input id="healthStress" type="number" min="0" max="100" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Steps
+          <input id="healthSteps" type="number" min="0" step="1" placeholder="optional">
+        </label>
+        <label>Awake minutes
+          <input id="healthAwake" type="number" min="0" max="600" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Deep sleep (min)
+          <input id="healthDeep" type="number" min="0" max="600" step="1" placeholder="optional">
+        </label>
+        <label>REM sleep (min)
+          <input id="healthRem" type="number" min="0" max="600" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Light sleep (min)
+          <input id="healthLight" type="number" min="0" max="800" step="1" placeholder="optional">
+        </label>
+        <label>Notes
+          <input id="healthNotes" placeholder="illness, medication, unusual stress…">
+        </label>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="previewReadiness">Preview readiness</button>
+        <button id="saveHealth" class="primary">Save snapshot</button>
+      </div>
+      <div id="healthStatus" class="status"></div>
+    </section>
+
+    <section id="readinessPreview" class="readiness-card">
+      <div class="readiness-top">
+        <div>
+          <div class="kicker">Readiness</div>
+          <b id="readinessTitle">Not enough data</b>
+        </div>
+        <span id="readinessBadge" class="readiness-badge neutral">SET UP</span>
+      </div>
+      <div id="readinessText" class="small" style="margin-top:8px">Save a baseline and enter today’s recovery markers.</div>
+      <div id="readinessMetrics" class="metric-grid" style="margin-top:10px"></div>
+    </section>
+
+    <section class="panel">
+      <div class="actions">
+        <button id="exportHealthCsv">Export recovery CSV</button>
+        <button id="deleteHealth" class="danger">Delete recovery history</button>
+      </div>
+    </section>
+
+    <div id="healthHistory"></div>
+  </section>
+
+  <section id="history" class="view hidden">
+    <section class="panel">
+      <div class="actions">
+        <button id="historyExport">Export CSV</button>
+        <button id="deleteAll" class="danger">Delete all history</button>
+      </div>
+      <div class="notice" style="margin-top:8px">Your browser copy is the working log. Keep a CSV backup periodically.</div>
+    </section>
+    <div id="historyList"></div>
+  </section>
+
+  <section id="data" class="view hidden">
+
+    <section class="panel" id="installPanel">
+      <div class="kicker">Install on this device</div>
+      <h3 style="margin:6px 0 8px">Use it like an app</h3>
+      <p class="notice">Once this PWA is hosted over HTTPS, Android Chrome can install it to your home screen and app drawer.</p>
+      <div class="actions">
+        <button id="installApp" class="primary" disabled>Install app</button>
+      </div>
+      <div id="installStatus" class="status">Install will become available when Android/Chrome detects the hosted PWA.</div>
+    </section>
+
+    <section class="panel" id="libraryManager">
+      <div class="kicker">Private exercise library</div>
+      <h3 style="margin:6px 0 8px">Sessions live on this device</h3>
+      <p class="notice">The public app contains no personal strength-session prescriptions. Create sessions here or import a private JSON backup. Do not upload your private library JSON to a public repository.</p>
+      <div id="libraryStatus" class="status">No local exercise library loaded yet.</div>
+      <div class="actions" style="margin-top:9px">
+        <button id="newLibrarySession" class="primary">New session</button>
+        <button id="exportLibrary">Export library JSON</button>
+        <label class="btn" for="importLibrary">Import library JSON</label>
+        <input id="importLibrary" type="file" accept=".json,application/json" class="hidden">
+      </div>
+
+      <div id="libraryEditor" class="hidden" style="margin-top:12px">
+        <div class="grid2">
+          <label>Edit session
+            <select id="librarySessionSelect"></select>
+          </label>
+          <label>Session name
+            <input id="libraryName" placeholder="e.g. Strength A">
+          </label>
+        </div>
+        <label style="display:block;margin-top:8px">Summary
+          <input id="librarySummary" placeholder="Short description">
+        </label>
+        <div class="grid2" style="margin-top:8px">
+          <label>Category
+            <select id="libraryCategory">
+              <option>Exercise</option>
+              <option>Mobility</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>Session timer (minutes)
+            <input id="libraryTimer" type="number" min="0" max="240" step="1" placeholder="0 = none">
+          </label>
+        </div>
+        <label class="check" style="margin-top:9px"><input id="libraryPinned" type="checkbox"> Show as a quick-start card on Home</label>
+        <div class="actions" style="margin-top:9px">
+          <button id="saveLibrarySession" class="primary">Save session details</button>
+          <button id="deleteLibrarySession" class="danger">Delete session</button>
+        </div>
+
+        <h3 class="section-title" style="margin-top:16px">Exercises</h3>
+        <div id="libraryExerciseList"></div>
+
+        <section class="health-entry" style="margin-top:9px">
+          <div class="kicker" id="exerciseEditorTitle">Add exercise</div>
+          <input id="libraryExerciseIndex" type="hidden" value="">
+          <div class="grid2" style="margin-top:7px">
+            <label>Exercise name
+              <input id="exerciseName" placeholder="Exercise name">
+            </label>
+            <label>Sets
+              <input id="exerciseSets" type="number" min="1" max="20" step="1" value="3">
+            </label>
+          </div>
+          <div class="grid2" style="margin-top:8px">
+            <label>Target
+              <input id="exerciseTarget" placeholder="e.g. 8–10 or 30 sec">
+            </label>
+            <label>Tag / note
+              <input id="exerciseTag" placeholder="e.g. each side">
+            </label>
+          </div>
+          <label style="display:block;margin-top:8px">Demo video URL (optional)
+            <input id="exerciseVideo" type="url" placeholder="https://…">
+          </label>
+          <label style="display:block;margin-top:8px">Demo search terms (optional)
+            <input id="exerciseSearch" placeholder="Used for YouTube search if no direct URL">
+          </label>
+          <label style="display:block;margin-top:8px">Technique cues (optional, one per line)
+            <textarea id="exerciseCues" placeholder="Cue 1&#10;Cue 2"></textarea>
+          </label>
+          <div class="actions" style="margin-top:9px">
+            <button id="saveExercise" class="primary">Add exercise</button>
+            <button id="cancelExerciseEdit">Clear</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel" id="weeklyPlanManager">
+      <div class="kicker">Private weekly plan</div>
+      <h3 style="margin:6px 0 8px">Optional Home-screen plan</h3>
+      <div id="weeklyPlanInputs"></div>
+      <div class="actions" style="margin-top:9px">
+        <button id="saveWeeklyPlan" class="primary">Save weekly plan</button>
+      </div>
+      <div id="weeklyPlanStatus" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Backup & migration</div>
+      <h3 style="margin:6px 0 8px">Keep your training history portable</h3>
+      <div class="actions">
+        <button id="exportCsv" class="primary">Export training CSV</button>
+        <button id="exportHealthCsvData">Export recovery CSV</button>
+        <label class="btn" for="importCsv">Import training CSV</label>
+        <input id="importCsv" type="file" accept=".csv,text/csv" class="hidden">
+      </div>
+      <div id="csvStatus" class="status">Training CSV remains compatible with earlier app exports.</div>
+    </section>
+    <section class="panel notice">
+      <b style="color:#fff">Storage:</b> training, recovery and exercise-library data are saved locally in this browser/PWA. Personal exercise prescriptions are not stored in the public GitHub source. Export CSV/JSON backups periodically.
+    </section>
+  </section>
+
+  <div class="footerNote">Getting Back to Tri v1.6.3 PWA • installable offline training app</div>
+</main>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const APP_MODE_STORAGE = "gbtt_app_mode";
+const APP_MODE_TRI = "tri";
+const LEGACY_STORAGE = "gettingBackToTri_v1_history";
+const LEGACY_HEALTH_STORAGE = "gettingBackToTri_v1_health";
+const LEGACY_BASELINE_STORAGE = "gettingBackToTri_v1_baseline";
+const OLD_STORAGE = "rehabTrainingLog";
+const STORAGE = "gbtt_tri_history_v1";
+const HEALTH_STORAGE = "gbtt_tri_health_v1";
+const BASELINE_STORAGE = "gbtt_tri_baseline_v1";
+const CIRCULATION_PREF_STORAGE = "gbtt_tri_circulation_pref_v1";
+const EXERCISE_LIBRARY_STORAGE = "gbtt_tri_exercise_library_v1";
+
+const quickRoutineSteps = [
+  {exercise:"Clock Stretch", detail:"Right foot • 12 o'clock"},
+  {exercise:"Clock Stretch", detail:"Right foot • 1 o'clock"},
+  {exercise:"Clock Stretch", detail:"Right foot • 2 o'clock"},
+  {exercise:"Clock Stretch", detail:"Right foot • 3 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 12 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 1 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 2 o'clock"},
+  {exercise:"Clock Stretch", detail:"Left foot • 3 o'clock"},
+  {exercise:"Single-Leg Hip Thrust Isometric", detail:"Left • foot on foam roller"},
+  {exercise:"Single-Leg Hip Thrust Isometric", detail:"Right • foot on foam roller"},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Left • midfoot pressure into wall"},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Right • midfoot pressure into wall"}
+];
+
+
+const preWalkSteps = [
+  {exercise:"Clock Stretch", detail:"Right foot • 12 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Right foot • 1 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Right foot • 2 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Right foot • 3 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 12 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 1 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 2 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 3 o'clock", seconds:15},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Left • midfoot pressure into wall", seconds:30},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Right • midfoot pressure into wall", seconds:30}
+];
+
+
+const circulationSteps = [
+  {exercise:"Diaphragmatic Breathing", detail:"Relax shoulders • slow nasal inhale • easy long exhale", seconds:60},
+  {exercise:"Ankle Pumps / Calf Raises", detail:"Easy rhythmic ankle movement • use support if standing", seconds:45},
+  {exercise:"Easy Marching", detail:"Comfortable rhythm • relaxed arms • light feet", seconds:45},
+  {exercise:"Shoulder Rolls + Arm Sweeps", detail:"Gentle range • no shrugging or forcing", seconds:45},
+  {exercise:"Rhythmic Movement", detail:"March in place", seconds:120},
+  {exercise:"Breathing + Shake-Out", detail:"Relaxed breathing • loosen hands, shoulders and legs", seconds:45}
+];
+
+const endurance = new Set(["Swim","Bike","Run"]);
+const systemSessions = ["Daily Quick Routine","Pre-Walk Warm-Up","Circulation Reset","Swim","Bike","Run"];
+const summaries = {
+  "Daily Quick Routine":"Guided 7:28 daily routine • 12 × 30-second work intervals with 8-second changeovers.",
+  "Pre-Walk Warm-Up":"Guided 4:12 activation routine before walking • 8 clock positions + 2 wall-supported hip lifts • 8-second changeovers.",
+  "Circulation Reset":"Guided 6:25 gentle movement routine • breathing, lower-leg muscle pump, marching, upper-body movement and an optional rebounder stage.",
+  "Swim":"Quick-log a swim session.",
+  "Bike":"Quick-log a bike session.",
+  "Run":"Quick-log a run session."
+};
+const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+let exerciseLibrary = {schema:"gbtt-exercise-library",version:1,sessions:[],weeklyPlan:{}};
+
+let history = [];
+let draft = {};
+let sessionTimerRemaining = 0;
+let sessionTimerSession = "";
+let timerId = null;
+let quickIndex = 0;
+let quickSeconds = 30;
+let quickPhase = "work";
+let quickTimerId = null;
+let quickCompleted = false;
+let quickCompletedSteps = new Set();
+const QUICK_WORK_SECONDS = 30;
+const QUICK_REST_SECONDS = 8;
+const QUICK_TOTAL_SECONDS = quickRoutineSteps.length * QUICK_WORK_SECONDS + (quickRoutineSteps.length - 1) * QUICK_REST_SECONDS;
+
+let preWalkIndex = 0;
+let preWalkSeconds = preWalkSteps[0].seconds;
+let preWalkPhase = "work";
+let preWalkTimerId = null;
+let preWalkCompleted = false;
+let preWalkCompletedSteps = new Set();
+const PREWALK_REST_SECONDS = 8;
+const PREWALK_TOTAL_SECONDS = preWalkSteps.reduce((sum,s)=>sum+s.seconds,0) + (preWalkSteps.length-1)*PREWALK_REST_SECONDS;
+
+let circulationIndex = 0;
+let circulationSeconds = circulationSteps[0].seconds;
+let circulationPhase = "work";
+let circulationTimerId = null;
+let circulationCompleted = false;
+let circulationCompletedSteps = new Set();
+const CIRCULATION_REST_SECONDS = 5;
+const CIRCULATION_TOTAL_SECONDS = circulationSteps.reduce((sum,s)=>sum+s.seconds,0) + (circulationSteps.length-1)*CIRCULATION_REST_SECONDS;
+
+let appMode = localStorage.getItem(APP_MODE_STORAGE) || APP_MODE_TRI;
+if(appMode !== APP_MODE_TRI) appMode = APP_MODE_TRI;
+localStorage.setItem(APP_MODE_STORAGE, appMode);
+
+
+
+let healthHistory = [];
+let baseline = {
+  hrv:null, rhr:null, sleepScore:null, sleepMinutes:null,
+  bodyBattery:null, stress:null
+};
+
+
+function esc(v){return String(v??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+function displayCategory(v){return v==="Rehab"?"Exercise":v}
+function key(session,i,j,f){return `${session}|${i}|${j}|${f}`}
+function localDate(d=new Date()){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-")}
+function weekStart(d=new Date()){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
+function saveLocal(){localStorage.setItem(STORAGE,JSON.stringify(history))}
+
+function normaliseExercise(x={}){
+  return {
+    name:String(x.name||"").trim(),
+    sets:Math.max(1,parseInt(x.sets||1,10)||1),
+    target:String(x.target||"").trim(),
+    tag:String(x.tag||"").trim(),
+    search:String(x.search||"").trim(),
+    video:String(x.video||"").trim(),
+    cues:Array.isArray(x.cues)?x.cues.map(v=>String(v)).filter(Boolean):[]
+  };
+}
+function normaliseSession(s={}){
+  const name=String(s.name||"").trim();
+  return {
+    id:String(s.id||name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||("session-"+Date.now())),
+    name,
+    category:["Exercise","Mobility","Other"].includes(s.category)?s.category:"Exercise",
+    summary:String(s.summary||"").trim(),
+    timerMinutes:Math.max(0,parseInt(s.timerMinutes||0,10)||0),
+    pinned:!!s.pinned,
+    exercises:Array.isArray(s.exercises)?s.exercises.map(normaliseExercise).filter(x=>x.name):[]
+  };
+}
+function normaliseLibrary(obj={}){
+  const sessions=Array.isArray(obj.sessions)?obj.sessions.map(normaliseSession).filter(s=>s.name):[];
+  const seen=new Set();
+  const unique=sessions.filter(s=>{
+    const k=s.name.toLowerCase();
+    if(seen.has(k)) return false;
+    seen.add(k);return true;
+  });
+  const weekly={};
+  dayNames.forEach(d=>weekly[d]=String(obj.weeklyPlan?.[d]||""));
+  return {schema:"gbtt-exercise-library",version:1,sessions:unique,weeklyPlan:weekly};
+}
+function loadExerciseLibrary(){
+  try{
+    exerciseLibrary=normaliseLibrary(JSON.parse(localStorage.getItem(EXERCISE_LIBRARY_STORAGE)||"{}"));
+  }catch(e){
+    exerciseLibrary=normaliseLibrary({});
+  }
+}
+function saveExerciseLibrary(){
+  localStorage.setItem(EXERCISE_LIBRARY_STORAGE,JSON.stringify(exerciseLibrary));
+}
+function librarySessionByName(name){
+  return exerciseLibrary.sessions.find(s=>s.name===name)||null;
+}
+function librarySessionById(id){
+  return exerciseLibrary.sessions.find(s=>s.id===id)||null;
+}
+function uniqueSessionName(base, ignoreId=""){
+  const root=(base||"New session").trim()||"New session";
+  let candidate=root, n=2;
+  const used=()=>exerciseLibrary.sessions.some(s=>s.id!==ignoreId&&s.name.toLowerCase()===candidate.toLowerCase());
+  while(used()) candidate=`${root} ${n++}`;
+  return candidate;
+}
+function refreshSessionSelect(preferred=""){
+  const select=$("session");
+  const current=preferred||select.value;
+  select.innerHTML="";
+  exerciseLibrary.sessions.forEach(s=>{
+    const o=document.createElement("option");o.value=s.name;o.textContent=s.name;select.appendChild(o);
+  });
+  systemSessions.forEach(name=>{
+    const o=document.createElement("option");o.value=name;o.textContent=name;select.appendChild(o);
+  });
+  const values=[...select.options].map(o=>o.value);
+  select.value=values.includes(current)?current:(exerciseLibrary.sessions[0]?.name||"Daily Quick Routine");
+}
+function renderMySessionQuickCards(){
+  const wrap=$("mySessionQuickWrap"),box=$("mySessionQuickCards");
+  if(!wrap||!box)return;
+  const pinned=exerciseLibrary.sessions.filter(s=>s.pinned);
+  wrap.classList.toggle("hidden",!pinned.length);
+  box.innerHTML=pinned.map(s=>`<div class="quickcard" data-local-start="${esc(s.name)}"><div class="icon">🏋️</div><b>${esc(s.name)}</b><small>${s.timerMinutes?esc(s.timerMinutes+" min timer"):esc(s.category)}</small></div>`).join("");
+}
+function renderWeeklyPlanInputs(){
+  const box=$("weeklyPlanInputs");if(!box)return;
+  box.innerHTML=dayNames.map(d=>`<label style="display:block;margin-top:7px">${esc(d)}<input data-plan-day="${esc(d)}" value="${esc(exerciseLibrary.weeklyPlan?.[d]||"")}" placeholder="Optional plan"></label>`).join("");
+}
+function renderLibraryManager(selectedId=""){
+  const status=$("libraryStatus");
+  if(status) status.textContent=`${exerciseLibrary.sessions.length} local session${exerciseLibrary.sessions.length===1?"":"s"} stored on this device.`;
+  const editor=$("libraryEditor");
+  const select=$("librarySessionSelect");
+  if(!editor||!select)return;
+
+  select.innerHTML=exerciseLibrary.sessions.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+  if(!exerciseLibrary.sessions.length){
+    editor.classList.add("hidden");
+    renderWeeklyPlanInputs();
+    renderMySessionQuickCards();
+    return;
+  }
+  editor.classList.remove("hidden");
+  const id=exerciseLibrary.sessions.some(s=>s.id===selectedId)?selectedId:(select.value||exerciseLibrary.sessions[0].id);
+  select.value=id;
+  fillLibraryEditor(id);
+  renderWeeklyPlanInputs();
+  renderMySessionQuickCards();
+}
+function fillLibraryEditor(id){
+  const s=librarySessionById(id);if(!s)return;
+  $("librarySessionSelect").value=s.id;
+  $("libraryName").value=s.name;
+  $("librarySummary").value=s.summary;
+  $("libraryCategory").value=s.category;
+  $("libraryTimer").value=s.timerMinutes||"";
+  $("libraryPinned").checked=!!s.pinned;
+  renderLibraryExerciseList(s);
+  clearExerciseEditor();
+}
+function renderLibraryExerciseList(s){
+  const box=$("libraryExerciseList");if(!box)return;
+  if(!s.exercises.length){
+    box.innerHTML='<div class="notice">No exercises yet. Add the first one below.</div>';return;
+  }
+  box.innerHTML=s.exercises.map((e,i)=>`
+    <article class="library-exercise">
+      <div class="library-exercise-top">
+        <div><b>${i+1}. ${esc(e.name)}</b><br><small>${esc(e.sets)} set${e.sets===1?"":"s"} • ${esc(e.target||"no target")}${e.tag?` • ${esc(e.tag)}`:""}</small></div>
+      </div>
+      <div class="actions">
+        <button data-lib-up="${i}" ${i===0?"disabled":""}>↑</button>
+        <button data-lib-down="${i}" ${i===s.exercises.length-1?"disabled":""}>↓</button>
+        <button data-lib-edit="${i}">Edit</button>
+        <button data-lib-delete="${i}" class="danger">Delete</button>
+      </div>
+    </article>`).join("");
+}
+function clearExerciseEditor(){
+  $("libraryExerciseIndex").value="";
+  $("exerciseEditorTitle").textContent="Add exercise";
+  $("exerciseName").value="";
+  $("exerciseSets").value="3";
+  $("exerciseTarget").value="";
+  $("exerciseTag").value="";
+  $("exerciseVideo").value="";
+  $("exerciseSearch").value="";
+  $("exerciseCues").value="";
+  $("saveExercise").textContent="Add exercise";
+}
+function editExercise(index){
+  const s=librarySessionById($("librarySessionSelect").value);if(!s||!s.exercises[index])return;
+  const e=s.exercises[index];
+  $("libraryExerciseIndex").value=String(index);
+  $("exerciseEditorTitle").textContent="Edit exercise";
+  $("exerciseName").value=e.name;
+  $("exerciseSets").value=e.sets;
+  $("exerciseTarget").value=e.target;
+  $("exerciseTag").value=e.tag;
+  $("exerciseVideo").value=e.video;
+  $("exerciseSearch").value=e.search;
+  $("exerciseCues").value=(e.cues||[]).join("\n");
+  $("saveExercise").textContent="Save exercise";
+  $("exerciseName").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function downloadLibraryJson(){
+  const payload=JSON.stringify(exerciseLibrary,null,2);
+  const blob=new Blob([payload],{type:"application/json;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="Getting_Back_to_Tri_Private_Exercise_Library.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+
+function loadLocal(){
+  try{history=JSON.parse(localStorage.getItem(STORAGE)||"[]");if(!Array.isArray(history))history=[]}catch(e){history=[]}
+
+  // v1.6 profile migration: preserve the existing Back-to-Tri history,
+  // but copy it into a profile-specific key ready for future app modes.
+  if(!history.length){
+    try{
+      const legacy=JSON.parse(localStorage.getItem(LEGACY_STORAGE)||"[]");
+      if(Array.isArray(legacy)&&legacy.length){
+        history=legacy;
+        saveLocal();
+      }
+    }catch(e){}
+  }
+
+  // Original RehabTrainingLog migration remains as a final fallback.
+  if(!history.length){
+    try{
+      const old=JSON.parse(localStorage.getItem(OLD_STORAGE)||"[]");
+      if(Array.isArray(old)&&old.length){
+        history=old.map(h=>({...h,category:"Rehab",duration:"",distance:"",detail:"",source:"Migrated from RehabTrainingLog"}));
+        saveLocal();
+        $("csvStatus").textContent=`Migrated ${history.length} session${history.length===1?"":"s"} from the older RehabTrainingLog browser data.`;
+        $("csvStatus").className="status good";
+      }
+    }catch(e){}
+  }
+}
+function categoryOf(name){
+  if(endurance.has(name))return "Endurance";
+  if(["Daily Quick Routine","Pre-Walk Warm-Up","Circulation Reset"].includes(name))return "Mobility";
+  return librarySessionByName(name)?.category||"Exercise";
+}
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("hidden",v.id!==id));
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+  if(id==="history")renderHistory();
+  if(id==="recovery"){renderHealthHistory();renderReadiness(currentHealthEntry());}
+  if(id==="home")renderHome();
+  if(id==="data")renderLibraryManager();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+
+
+function numOrNull(v){
+  if(v===null||v===undefined||v==="") return null;
+  const n=Number(v); return Number.isFinite(n)?n:null;
+}
+function clamp(n,min,max){return Math.min(max,Math.max(min,n))}
+function loadHealth(){
+  try{
+    const h=JSON.parse(localStorage.getItem(HEALTH_STORAGE)||"[]");
+    healthHistory=Array.isArray(h)?h:[];
+  }catch(e){healthHistory=[]}
+
+  if(!healthHistory.length){
+    try{
+      const legacy=JSON.parse(localStorage.getItem(LEGACY_HEALTH_STORAGE)||"[]");
+      if(Array.isArray(legacy)&&legacy.length){
+        healthHistory=legacy;
+        saveHealthLocal();
+      }
+    }catch(e){}
+  }
+
+  let baselineLoaded=false;
+  try{
+    const raw=localStorage.getItem(BASELINE_STORAGE);
+    if(raw){
+      const b=JSON.parse(raw);
+      baseline={...baseline,...b};
+      baselineLoaded=true;
+    }
+  }catch(e){}
+
+  if(!baselineLoaded){
+    try{
+      const raw=localStorage.getItem(LEGACY_BASELINE_STORAGE);
+      if(raw){
+        const b=JSON.parse(raw);
+        baseline={...baseline,...b};
+        saveBaselineLocal();
+      }
+    }catch(e){}
+  }
+
+  fillBaselineForm();
+}
+function saveHealthLocal(){localStorage.setItem(HEALTH_STORAGE,JSON.stringify(healthHistory))}
+function saveBaselineLocal(){localStorage.setItem(BASELINE_STORAGE,JSON.stringify(baseline))}
+function fillBaselineForm(){
+  const pairs=[
+    ["baseHrv","hrv"],["baseRhr","rhr"],["baseSleepScore","sleepScore"],
+    ["baseSleepMinutes","sleepMinutes"],["baseBodyBattery","bodyBattery"],["baseStress","stress"]
+  ];
+  pairs.forEach(([id,k])=>{if($(id)) $(id).value=baseline[k]??""});
+}
+function metricScore(current, base, mode){
+  if(current===null||base===null||!Number.isFinite(current)||!Number.isFinite(base)||base<=0) return null;
+  if(mode==="higher"){
+    const ratio=current/base;
+    if(ratio>=0.95) return 2;
+    if(ratio>=0.85) return 1;
+    return 0;
+  }
+  if(mode==="lower"){
+    const d=current-base;
+    if(d<=2) return 2;
+    if(d<=5) return 1;
+    return 0;
+  }
+  if(mode==="score"){
+    const d=current-base;
+    if(d>=-3) return 2;
+    if(d>=-10) return 1;
+    return 0;
+  }
+  if(mode==="minutes"){
+    const d=current-base;
+    if(d>=-15) return 2;
+    if(d>=-60) return 1;
+    return 0;
+  }
+  if(mode==="stress"){
+    const d=current-base;
+    if(d<=5) return 2;
+    if(d<=15) return 1;
+    return 0;
+  }
+  return null;
+}
+function readinessFrom(entry){
+  const tests=[
+    {key:"hrv",label:"HRV",value:entry.hrv,base:baseline.hrv,mode:"higher",unit:" ms"},
+    {key:"rhr",label:"Resting HR",value:entry.rhr,base:baseline.rhr,mode:"lower",unit:" bpm"},
+    {key:"sleepScore",label:"Sleep score",value:entry.sleepScore,base:baseline.sleepScore,mode:"score",unit:""},
+    {key:"sleepMinutes",label:"Sleep",value:entry.sleepMinutes,base:baseline.sleepMinutes,mode:"minutes",unit:" min"},
+    {key:"bodyBattery",label:"Body Battery",value:entry.bodyBattery,base:baseline.bodyBattery,mode:"higher",unit:""},
+    {key:"stress",label:"Stress",value:entry.stress,base:baseline.stress,mode:"stress",unit:""}
+  ];
+  const scored=tests.map(t=>({...t,score:metricScore(t.value,t.base,t.mode)})).filter(t=>t.score!==null);
+  if(scored.length<3){
+    return {status:"neutral",label:"SET UP",title:"Not enough data",text:"Enter at least three current markers with matching personal baseline values.",score:null,metrics:tests};
+  }
+  const avg=scored.reduce((s,x)=>s+x.score,0)/scored.length;
+  let status,label,title,text;
+  if(avg>=1.5){
+    status="green";label="GREEN";title="Recovery broadly on baseline";
+    text="Your available recovery markers are mostly close to your normal range. Keep the planned session appropriate to symptoms and RPE.";
+  }else if(avg>=0.8){
+    status="amber";label="AMBER";title="Some recovery markers are off baseline";
+    text="One or more markers are meaningfully away from your normal range. Keep intensity controlled and let symptoms/RPE guide the session.";
+  }else{
+    status="red";label="RED";title="Several recovery markers are well off baseline";
+    text="Recovery markers are collectively suppressed. Favour recovery, mobility or easy work rather than adding intensity.";
+  }
+  return {status,label,title,text,score:avg,metrics:tests};
+}
+function currentHealthEntry(){
+  const h=numOrNull($("healthSleepHours").value)||0;
+  const m=numOrNull($("healthSleepMins").value)||0;
+  const hasSleep=$("healthSleepHours").value!==""||$("healthSleepMins").value!=="";
+  return {
+    id:Date.now(),
+    date:$("healthDate").value||localDate(),
+    sleepScore:numOrNull($("healthSleepScore").value),
+    sleepMinutes:hasSleep ? h*60+m : null,
+    hrv:numOrNull($("healthHrv").value),
+    rhr:numOrNull($("healthRhr").value),
+    bodyBattery:numOrNull($("healthBodyBattery").value),
+    stress:numOrNull($("healthStress").value),
+    steps:numOrNull($("healthSteps").value),
+    awake:numOrNull($("healthAwake").value),
+    deep:numOrNull($("healthDeep").value),
+    rem:numOrNull($("healthRem").value),
+    light:numOrNull($("healthLight").value),
+    notes:$("healthNotes").value.trim()
+  };
+}
+function renderReadiness(entry){
+  const r=readinessFrom(entry);
+  $("readinessTitle").textContent=r.title;
+  $("readinessText").textContent=r.text;
+  $("readinessBadge").textContent=r.label;
+  $("readinessBadge").className=`readiness-badge ${r.status}`;
+  $("readinessMetrics").innerHTML=r.metrics.filter(x=>x.value!==null).map(x=>{
+    const score=metricScore(x.value,x.base,x.mode);
+    const state=score===null?"—":score===2?"✓":score===1?"~":"!";
+    const baseText=x.base===null?"baseline not set":`baseline ${x.base}${x.unit}`;
+    return `<div class="metric"><b>${esc(x.value)}${esc(x.unit)} <small>${state}</small></b><span>${esc(x.label)} • ${esc(baseText)}</span></div>`;
+  }).join("");
+  return r;
+}
+function renderHealthHistory(){
+  const box=$("healthHistory"); if(!box) return;
+  box.innerHTML="";
+  const items=[...healthHistory].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.id||0)-(a.id||0));
+  if(!items.length){box.innerHTML='<section class="panel notice">No recovery snapshots saved yet.</section>';renderHomeReadiness();return}
+  items.forEach(h=>{
+    const r=readinessFrom(h);
+    const metrics=[
+      h.sleepScore!==null&&h.sleepScore!==undefined?`Sleep ${h.sleepScore}`:"",
+      h.sleepMinutes!==null&&h.sleepMinutes!==undefined?`Sleep ${Math.floor(h.sleepMinutes/60)}h ${String(h.sleepMinutes%60).padStart(2,"0")}m`:"",
+      h.hrv!==null&&h.hrv!==undefined?`HRV ${h.hrv}ms`:"",
+      h.rhr!==null&&h.rhr!==undefined?`RHR ${h.rhr}`:"",
+      h.bodyBattery!==null&&h.bodyBattery!==undefined?`Battery ${h.bodyBattery}`:"",
+      h.stress!==null&&h.stress!==undefined?`Stress ${h.stress}`:"",
+      h.steps!==null&&h.steps!==undefined?`${h.steps.toLocaleString()} steps`:""
+    ].filter(Boolean);
+    const x=document.createElement("article");x.className="health-entry";
+    x.innerHTML=`<div class="readiness-top"><div><b>${esc(h.date)}</b><small>${esc(r.title)}</small></div><span class="readiness-badge ${r.status}">${esc(r.label)}</span></div>
+      <div class="metrics">${metrics.map(m=>`<span>${esc(m)}</span>`).join("")}</div>
+      ${h.notes?`<div class="small" style="margin-top:7px">${esc(h.notes)}</div>`:""}`;
+    box.appendChild(x);
+  });
+  renderHomeReadiness();
+}
+function renderHomeReadiness(){
+  if(!$("homeReadinessBadge")) return;
+  const latest=[...healthHistory].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.id||0)-(a.id||0))[0];
+  if(!latest){
+    $("homeReadinessBadge").textContent="SET UP";
+    $("homeReadinessBadge").className="readiness-badge neutral";
+    $("homeReadinessTitle").textContent="No recovery snapshot yet";
+    $("homeReadinessText").textContent="Add your personal baseline and a daily Garmin snapshot in Recovery.";
+    return;
+  }
+  const r=readinessFrom(latest);
+  $("homeReadinessBadge").textContent=r.label;
+  $("homeReadinessBadge").className=`readiness-badge ${r.status}`;
+  $("homeReadinessTitle").textContent=`${latest.date} • ${r.title}`;
+  $("homeReadinessText").textContent=r.text;
+}
+function clearHealthForm(){
+  ["healthSleepScore","healthSleepHours","healthSleepMins","healthHrv","healthRhr","healthBodyBattery","healthStress","healthSteps","healthAwake","healthDeep","healthRem","healthLight","healthNotes"].forEach(id=>$(id).value="");
+}
+function parseMinutesText(text, label){
+  const patterns=[
+    new RegExp(label+String.raw`[^0-9]{0,12}(\d+)\s*h(?:ours?)?\s*(\d{1,2})?\s*m?`,"i"),
+    new RegExp(label+String.raw`[^0-9]{0,12}(\d+)\s*h\s*(\d{1,2})`,"i")
+  ];
+  for(const p of patterns){
+    const m=text.match(p); if(m) return {h:Number(m[1]),m:Number(m[2]||0)};
+  }
+  return null;
+}
+function parseHealthText(){
+  const t=$("healthPaste").value;
+  if(!t.trim()){ $("parseStatus").textContent="Paste a Garmin or ChatGPT summary first.";return }
+  const grab=(patterns)=>{
+    for(const p of patterns){const m=t.match(p);if(m)return Number(String(m[1]).replace(/,/g,""))}
+    return null;
+  };
+  const score=grab([/sleep\s*score\D{0,12}(\d{1,3})/i,/score\D{0,8}(\d{1,3})/i]);
+  const hrv=grab([/(?:overnight\s*)?hrv(?:\s*(?:avg|average))?\D{0,10}(\d{2,3})\s*ms/i]);
+  const rhr=grab([/resting\s*(?:heart\s*rate|hr)\D{0,10}(\d{2,3})/i]);
+  const battery=grab([/body\s*battery(?:\s*(?:high|morning))?\D{0,10}(\d{1,3})/i]);
+  const stress=grab([/stress(?:\s*(?:avg|average|overall))?\D{0,10}(\d{1,3})/i]);
+  const steps=grab([/steps\D{0,10}([\d,]+)/i,/([\d,]+)\s*steps/i]);
+  let sleep=parseMinutesText(t,"sleep(?: duration)?");
+  if(!sleep){
+    const m=t.match(/(?:sleep|duration)\D{0,12}(\d+)\s*h\s*(\d{1,2})\s*(?:m|min)?/i);
+    if(m) sleep={h:Number(m[1]),m:Number(m[2]||0)};
+  }
+  const deep=grab([/deep(?: sleep)?\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+  const rem=grab([/\brem(?: sleep)?\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+  const light=grab([/light(?: sleep)?\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+  const awake=grab([/awake\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+
+  if(score!==null)$("healthSleepScore").value=clamp(score,0,100);
+  if(hrv!==null)$("healthHrv").value=hrv;
+  if(rhr!==null)$("healthRhr").value=rhr;
+  if(battery!==null)$("healthBodyBattery").value=clamp(battery,0,100);
+  if(stress!==null)$("healthStress").value=clamp(stress,0,100);
+  if(steps!==null)$("healthSteps").value=Math.max(0,steps);
+  if(sleep){$("healthSleepHours").value=sleep.h;$("healthSleepMins").value=clamp(sleep.m,0,59)}
+  if(deep!==null)$("healthDeep").value=deep;
+  if(rem!==null)$("healthRem").value=rem;
+  if(light!==null)$("healthLight").value=light;
+  if(awake!==null)$("healthAwake").value=awake;
+
+  const found=[score,hrv,rhr,battery,stress,steps,sleep].filter(x=>x!==null).length;
+  $("parseStatus").textContent=found?`Filled ${found} recovery field${found===1?"":"s"} from the pasted text.`:"No recognised recovery values found. You can still enter them manually.";
+  $("parseStatus").className=found?"status good":"status warn";
+  renderReadiness(currentHealthEntry());
+}
+function healthCsv(){
+  const rows=[["Date","Readiness","Sleep score","Sleep minutes","HRV ms","Resting HR bpm","Body Battery","Stress","Steps","Deep min","REM min","Light min","Awake min","Notes"]];
+  [...healthHistory].sort((a,b)=>(a.date||"").localeCompare(b.date||"")).forEach(h=>{
+    const r=readinessFrom(h);
+    rows.push([h.date,r.label,h.sleepScore??"",h.sleepMinutes??"",h.hrv??"",h.rhr??"",h.bodyBattery??"",h.stress??"",h.steps??"",h.deep??"",h.rem??"",h.light??"",h.awake??"",h.notes||""]);
+  });
+  return rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
+}
+function downloadHealthCsv(){
+  const blob=new Blob([healthCsv()],{type:"text/csv;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="Getting_Back_to_Tri_Recovery_Log.csv";a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+
+function renderWeek(){
+  const box=$("weekPlan");
+  box.innerHTML=dayNames.map(d=>{
+    const p=exerciseLibrary.weeklyPlan?.[d]||"";
+    return `<div class="day"><b>${esc(d)}</b><span>${p?esc(p):"—"}</span></div>`;
+  }).join("");
+}
+function renderHome(){
+  const ws=weekStart(), next=new Date(ws);next.setDate(next.getDate()+7);
+  const weekHist=history.filter(h=>{const d=new Date(h.date+"T12:00:00");return d>=ws&&d<next});
+  $("statWeek").textContent=weekHist.length;
+  $("statStrength").textContent=weekHist.filter(h=>["Rehab","Exercise","CFT","Mobility","Other"].includes(h.category||categoryOf(h.session))).length;
+  $("statEndurance").textContent=weekHist.filter(h=>(h.category||categoryOf(h.session))==="Endurance").length;
+  renderHomeReadiness();
+  renderMySessionQuickCards();
+
+  const todayName=dayNames[new Date().getDay()];
+  const plan=exerciseLibrary.weeklyPlan?.[todayName]||"";
+  const parts=plan?plan.split(" + ").filter(Boolean):[];
+  $("todayPills").innerHTML=`<span class="pill">Today: ${esc(todayName)}</span>`+
+    (parts.length?parts.map(x=>{
+      const cl=/swim/i.test(x)?"swim":/bike/i.test(x)?"bike":/run/i.test(x)?"run":"";
+      return `<span class="pill ${cl}">${esc(x)}</span>`
+    }).join(""):'<span class="pill">No plan set</span>');
+}
+document.querySelectorAll("[data-start]").forEach(x=>x.addEventListener("click",()=>{
+  $("session").value=x.dataset.start;
+  renderSession();
+  showView("train");
+}));
+document.querySelector("[data-library-manager]")?.addEventListener("click",()=>{
+  showView("data");
+  setTimeout(()=>$("libraryManager")?.scrollIntoView({behavior:"smooth",block:"start"}),50);
+});
+$("mySessionQuickCards").addEventListener("click",e=>{
+  const card=e.target.closest("[data-local-start]");
+  if(!card)return;
+  refreshSessionSelect(card.dataset.localStart);
+  renderSession();
+  showView("train");
+});
+
+refreshSessionSelect();
+$("date").value=localDate();
+$("session").addEventListener("change",()=>{resetSessionTimerForSelection();renderSession()});
+
+function sessionData(name){
+  return librarySessionByName(name)?.exercises||[];
+}
+function resetSessionTimerForSelection(){
+  clearInterval(timerId);timerId=null;
+  const cfg=librarySessionByName($("session").value);
+  sessionTimerSession=cfg?.name||"";
+  sessionTimerRemaining=(cfg?.timerMinutes||0)*60;
+  renderClock();
+}
+function renderSession(){
+  const name=$("session").value;
+  const cfg=librarySessionByName(name);
+  $("sessionSummary").textContent=cfg?.summary||summaries[name]||"";
+  const timerMinutes=cfg?.timerMinutes||0;
+  $("sessionTimer").classList.toggle("hidden",timerMinutes<=0);
+  if(timerMinutes>0){
+    $("sessionTimerLabel").textContent=`${name.toUpperCase()} • SESSION TIMER`;
+    if(sessionTimerSession!==name) resetSessionTimerForSelection();
+  }
+  $("quickRoutineTimer").classList.toggle("hidden",name!=="Daily Quick Routine");
+  if(name==="Daily Quick Routine") renderQuickRoutine();
+  $("preWalkTimer").classList.toggle("hidden",name!=="Pre-Walk Warm-Up");
+  if(name==="Pre-Walk Warm-Up") renderPreWalk();
+  $("circulationTimer").classList.toggle("hidden",name!=="Circulation Reset");
+  if(name==="Circulation Reset") renderCirculation();
+  $("enduranceFields").classList.toggle("hidden",!endurance.has(name));
+  $("sessionNotice").classList.toggle("hidden",endurance.has(name));
+
+  if(name==="Daily Quick Routine"){
+    $("sessionNotice").innerHTML="<b>Guided routine:</b> every work interval is 30 seconds, followed by an 8-second changeover before the next position. The timer advances automatically through the routine. Work time: 6:00 • changeovers: 1:28 • total: 7:28.";
+  } else if(name==="Pre-Walk Warm-Up"){
+    $("sessionNotice").innerHTML="<b>Pre-walk activation:</b> a short routine before a brisk walk, particularly after sitting. Keep it comfortable rather than turning it into a workout; stop if symptoms increase.";
+  } else if(name==="Circulation Reset"){
+    $("sessionNotice").innerHTML="<b>Circulation Reset:</b> gentle breathing and rhythmic muscle movement intended to support normal circulation and lymphatic flow after waking or sitting. The rebounder is optional — marching works too. This is a movement/wellbeing routine, not a detox or treatment for a medical condition.";
+  } else if(cfg){
+    $("sessionNotice").innerHTML="<b>My local session:</b> exercise names, order, targets and technique notes are stored only in this browser/PWA. Adjust or stop if symptoms make a movement unsuitable.";
+  }
+  renderExercises();
+}
+function renderExercises(){
+  const name=$("session").value;
+  const data=sessionData(name);
+  const box=$("exercises"); box.innerHTML="";
+  if(!data.length)return;
+  data.forEach((e,i)=>{
+    const card=document.createElement("article");card.className="exercise";
+    const head=document.createElement("button");head.className="exhead";head.type="button";
+    head.innerHTML=`<div><div class="exname">${i+1}. ${esc(e.name)}</div><div class="exmeta">${e.sets} set${e.sets>1?"s":""} • target ${esc(e.target)}${e.tag?` • ${esc(e.tag)}`:""}</div></div><span>⌄</span>`;
+    const body=document.createElement("div");body.className="exbody"+(i===0?"":" hidden");
+    let media="";
+    const searchUrl="https://www.youtube.com/results?search_query="+encodeURIComponent(e.search||e.name);
+    if(e.cues?.length){
+      media+=`<div class="cues">${e.cues.map(c=>`<div class="cue">${esc(c)}</div>`).join("")}</div>`;
+    }
+    if(e.video){
+      media+=`<div class="demo"><a class="btn soft" target="_blank" rel="noopener" href="${esc(e.video)}">▶ Saved demo</a><div class="text">Link stored in your private local exercise library.</div></div>`;
+    }else{
+      media+=`<div class="demo"><a class="btn soft" target="_blank" rel="noopener" href="${searchUrl}">▶ Find a demo</a><div class="text">Search based on the exercise name or your saved search terms.</div></div>`;
+    }
+    body.innerHTML=media;
+    for(let j=0;j<e.sets;j++){
+      const set=document.createElement("div");set.className="set";
+      set.innerHTML=`<div class="num">${j+1}</div>
+        <label>Load kg<input data-k="${esc(key(name,i,j,"load"))}" type="number" min="0" step=".5" inputmode="decimal" placeholder="—" value="${esc(draft[key(name,i,j,"load")]||"")}"></label>
+        <label>Reps / time<input data-k="${esc(key(name,i,j,"done"))}" placeholder="${esc(e.target)}" value="${esc(draft[key(name,i,j,"done")]||"")}"></label>
+        <div class="mini">
+          <label>Set RPE<input data-k="${esc(key(name,i,j,"rpe"))}" type="number" min="0" max="10" step=".5" placeholder="0–10" value="${esc(draft[key(name,i,j,"rpe")]||"")}"></label>
+          <label>Pain<input data-k="${esc(key(name,i,j,"pain"))}" type="number" min="0" max="10" step="1" placeholder="0–10" value="${esc(draft[key(name,i,j,"pain")]||"")}"></label>
+        </div>`;
+      body.appendChild(set);
+    }
+    head.addEventListener("click",()=>body.classList.toggle("hidden"));
+    card.append(head,body);box.appendChild(card);
+  });
+  box.querySelectorAll("[data-k]").forEach(inp=>inp.addEventListener("input",()=>draft[inp.dataset.k]=inp.value));
+}
+
+function collectRows(){
+  const name=$("session").value, data=sessionData(name), rows=[];
+  if(name==="Daily Quick Routine"){
+    [...quickCompletedSteps].sort((a,b)=>a-b).forEach(i=>{
+      const step=quickRoutineSteps[i];
+      rows.push({
+        exercise:step.exercise,
+        set:i+1,
+        target:"30 sec",
+        load:"",
+        done:step.detail+" • completed 30 sec",
+        rpe:"",
+        pain:""
+      });
+    });
+    return rows;
+  }
+  if(name==="Pre-Walk Warm-Up"){
+    [...preWalkCompletedSteps].sort((a,b)=>a-b).forEach(i=>{
+      const step=preWalkSteps[i];
+      rows.push({
+        exercise:step.exercise,
+        set:i+1,
+        target:`${step.seconds} sec`,
+        load:"",
+        done:step.detail+` • completed ${step.seconds} sec`,
+        rpe:"",
+        pain:""
+      });
+    });
+    return rows;
+  }
+  if(name==="Circulation Reset"){
+    const movement=$("circulationMovement").value;
+    [...circulationCompletedSteps].sort((a,b)=>a-b).forEach(i=>{
+      const step=circulationStep(i);
+      rows.push({
+        exercise:step.exercise,
+        set:i+1,
+        target:`${step.seconds} sec`,
+        load:"",
+        done:step.detail+` • completed ${step.seconds} sec`,
+        rpe:"",
+        pain:""
+      });
+    });
+    return rows;
+  }
+  data.forEach((e,i)=>{
+    for(let j=0;j<e.sets;j++){
+      const r={exercise:e.name,set:j+1,target:e.target,load:draft[key(name,i,j,"load")]||"",done:draft[key(name,i,j,"done")]||"",rpe:draft[key(name,i,j,"rpe")]||"",pain:draft[key(name,i,j,"pain")]||""};
+      if(r.load||r.done||r.rpe||r.pain)rows.push(r);
+    }
+  });
+  return rows;
+}
+function clearCurrent(){
+  const name=$("session").value;
+  Object.keys(draft).filter(k=>k.startsWith(name+"|")).forEach(k=>delete draft[k]);
+  $("sessionRpe").value="";$("sessionPain").value="";$("notes").value="";
+  $("duration").value="";$("distance").value="";$("enduranceDetail").value="";
+  renderExercises();
+}
+$("clear").addEventListener("click",()=>{clearCurrent();$("status").textContent="Current entries cleared."});
+$("save").addEventListener("click",()=>{
+  const name=$("session").value;
+  if(!$("date").value){$("status").textContent="Choose a date first.";return}
+  const h={
+    id:Date.now(),date:$("date").value,session:name,category:categoryOf(name),
+    sessionRpe:$("sessionRpe").value,sessionPain:$("sessionPain").value,notes:$("notes").value.trim(),
+    duration:$("duration").value.trim(),distance:$("distance").value.trim(),
+    detail:name==="Circulation Reset"
+      ? `${$("circulationContext").value} • rhythmic stage: ${$("circulationMovement").value}`
+      : $("enduranceDetail").value.trim(),
+    rows:collectRows()
+  };
+  history.push(h);saveLocal();renderHome();clearCurrent();
+  const quickCount=name==="Daily Quick Routine" ? h.rows.length : null;
+  const preWalkCount=name==="Pre-Walk Warm-Up" ? h.rows.length : null;
+  const circulationCount=name==="Circulation Reset" ? h.rows.length : null;
+  $("status").textContent=name==="Daily Quick Routine"
+    ? `Saved Daily Quick Routine for ${h.date} • ${quickCount}/12 work intervals completed.`
+    : name==="Pre-Walk Warm-Up"
+      ? `Saved Pre-Walk Warm-Up for ${h.date} • ${preWalkCount}/10 work intervals completed.`
+      : name==="Circulation Reset"
+        ? `Saved Circulation Reset for ${h.date} • ${circulationCount}/6 movements completed.`
+        : `Saved ${name} for ${h.date}.`;
+  $("status").className="status good";
+});
+
+function renderHistory(){
+  const box=$("historyList");box.innerHTML="";
+  if(!history.length){box.innerHTML='<section class="panel notice">No saved sessions yet.</section>';return}
+  [...history].sort((a,b)=>(b.date||"").localeCompare(a.date||"") || (b.id||0)-(a.id||0)).forEach(h=>{
+    const cat=h.category||categoryOf(h.session);
+    const x=document.createElement("article");x.className="hist";
+    const extra=[h.duration&&`Duration ${h.duration}`,h.distance&&`Distance ${h.distance}`,h.sessionRpe&&`RPE ${h.sessionRpe}`,h.sessionPain&&`Symptoms ${h.sessionPain}/10`].filter(Boolean).join(" • ");
+    const rowText=(h.rows||[]).map(r=>`${esc(r.exercise)} S${esc(r.set)}${r.load?` · ${esc(r.load)}kg`:""}${r.done?` · ${esc(r.done)}`:""}${r.rpe?` · RPE ${esc(r.rpe)}`:""}${r.pain?` · pain ${esc(r.pain)}`:""}`).join("<br>");
+    x.innerHTML=`<div class="top"><div><b>${esc(h.session)}</b><small>${esc(h.date)} • ${esc(cat)}</small></div><span class="badge">${esc(cat)}</span></div>
+      ${extra?`<div class="small" style="margin-top:7px">${esc(extra)}</div>`:""}
+      ${h.detail?`<div class="small" style="margin-top:5px">${esc(h.detail)}</div>`:""}
+      ${h.notes?`<div class="small" style="margin-top:5px"><b style="display:inline;color:#dce8ee">Notes:</b> ${esc(h.notes)}</div>`:""}
+      ${rowText?`<div class="rows">${rowText}</div>`:""}`;
+    box.appendChild(x);
+  });
+}
+
+$("saveBaseline").addEventListener("click",()=>{
+  baseline={
+    hrv:numOrNull($("baseHrv").value),
+    rhr:numOrNull($("baseRhr").value),
+    sleepScore:numOrNull($("baseSleepScore").value),
+    sleepMinutes:numOrNull($("baseSleepMinutes").value),
+    bodyBattery:numOrNull($("baseBodyBattery").value),
+    stress:numOrNull($("baseStress").value)
+  };
+  saveBaselineLocal();
+  $("baselineStatus").textContent="Personal baseline saved on this device.";
+  $("baselineStatus").className="status good";
+  renderReadiness(currentHealthEntry());
+  renderHealthHistory();
+});
+$("parseHealth").addEventListener("click",parseHealthText);
+$("clearHealthPaste").addEventListener("click",()=>{$("healthPaste").value="";$("parseStatus").textContent=""});
+$("previewReadiness").addEventListener("click",()=>renderReadiness(currentHealthEntry()));
+$("saveHealth").addEventListener("click",()=>{
+  const h=currentHealthEntry();
+  const meaningful=["sleepScore","sleepMinutes","hrv","rhr","bodyBattery","stress","steps"].some(k=>h[k]!==null);
+  if(!meaningful){
+    $("healthStatus").textContent="Enter at least one recovery value before saving.";
+    $("healthStatus").className="status warn";
+    return;
+  }
+  const existing=healthHistory.findIndex(x=>x.date===h.date);
+  if(existing>=0) healthHistory.splice(existing,1,h); else healthHistory.push(h);
+  saveHealthLocal();
+  const r=readinessFrom(h);
+  $("healthStatus").textContent=`Saved ${h.date} recovery snapshot • ${r.label}.`;
+  $("healthStatus").className="status good";
+  renderHealthHistory();
+  renderHome();
+});
+$("exportHealthCsv").addEventListener("click",downloadHealthCsv);
+$("exportHealthCsvData").addEventListener("click",downloadHealthCsv);
+$("deleteHealth").addEventListener("click",e=>{
+  if(e.currentTarget.dataset.confirm!=="1"){
+    e.currentTarget.dataset.confirm="1";e.currentTarget.textContent="Tap again to confirm";return;
+  }
+  healthHistory=[];saveHealthLocal();renderHealthHistory();renderHome();
+  e.currentTarget.dataset.confirm="0";e.currentTarget.textContent="Delete recovery history";
+});
+
+
+$("newLibrarySession").addEventListener("click",()=>{
+  const name=uniqueSessionName("New session");
+  const s=normaliseSession({name,category:"Exercise",summary:"",timerMinutes:0,pinned:false,exercises:[]});
+  exerciseLibrary.sessions.push(s);
+  saveExerciseLibrary();
+  refreshSessionSelect(s.name);
+  renderLibraryManager(s.id);
+  renderHome();renderWeek();
+});
+$("librarySessionSelect").addEventListener("change",()=>fillLibraryEditor($("librarySessionSelect").value));
+$("saveLibrarySession").addEventListener("click",()=>{
+  const s=librarySessionById($("librarySessionSelect").value);if(!s)return;
+  const oldName=s.name;
+  s.name=uniqueSessionName($("libraryName").value,s.id);
+  s.summary=$("librarySummary").value.trim();
+  s.category=$("libraryCategory").value;
+  s.timerMinutes=Math.max(0,parseInt($("libraryTimer").value||0,10)||0);
+  s.pinned=$("libraryPinned").checked;
+  saveExerciseLibrary();
+  refreshSessionSelect(s.name);
+  renderLibraryManager(s.id);
+  renderHome();renderWeek();
+  $("libraryStatus").textContent=`Saved ${s.name}${oldName!==s.name?` (renamed from ${oldName})`:""}.`;
+  $("libraryStatus").className="status good";
+});
+$("deleteLibrarySession").addEventListener("click",e=>{
+  const id=$("librarySessionSelect").value;
+  const s=librarySessionById(id);if(!s)return;
+  if(e.currentTarget.dataset.confirm!=="1"){
+    e.currentTarget.dataset.confirm="1";e.currentTarget.textContent=`Delete ${s.name}? Tap again`;return;
+  }
+  exerciseLibrary.sessions=exerciseLibrary.sessions.filter(x=>x.id!==id);
+  saveExerciseLibrary();refreshSessionSelect();renderLibraryManager();renderHome();renderWeek();
+  e.currentTarget.dataset.confirm="0";e.currentTarget.textContent="Delete session";
+});
+$("saveExercise").addEventListener("click",()=>{
+  const s=librarySessionById($("librarySessionSelect").value);if(!s)return;
+  const e=normaliseExercise({
+    name:$("exerciseName").value,
+    sets:$("exerciseSets").value,
+    target:$("exerciseTarget").value,
+    tag:$("exerciseTag").value,
+    video:$("exerciseVideo").value,
+    search:$("exerciseSearch").value,
+    cues:$("exerciseCues").value.split(/\n+/).map(x=>x.trim()).filter(Boolean)
+  });
+  if(!e.name){
+    $("libraryStatus").textContent="Give the exercise a name first.";
+    $("libraryStatus").className="status warn";return;
+  }
+  const idx=$("libraryExerciseIndex").value;
+  if(idx==="") s.exercises.push(e); else s.exercises[Number(idx)]=e;
+  saveExerciseLibrary();renderLibraryExerciseList(s);clearExerciseEditor();
+  refreshSessionSelect(s.name);renderSession();
+  $("libraryStatus").textContent=`Saved exercise in ${s.name}.`;
+  $("libraryStatus").className="status good";
+});
+$("cancelExerciseEdit").addEventListener("click",clearExerciseEditor);
+$("libraryExerciseList").addEventListener("click",e=>{
+  const s=librarySessionById($("librarySessionSelect").value);if(!s)return;
+  const up=e.target.closest("[data-lib-up]");
+  const down=e.target.closest("[data-lib-down]");
+  const edit=e.target.closest("[data-lib-edit]");
+  const del=e.target.closest("[data-lib-delete]");
+  if(up){
+    const i=Number(up.dataset.libUp);if(i>0)[s.exercises[i-1],s.exercises[i]]=[s.exercises[i],s.exercises[i-1]];
+  }else if(down){
+    const i=Number(down.dataset.libDown);if(i<s.exercises.length-1)[s.exercises[i+1],s.exercises[i]]=[s.exercises[i],s.exercises[i+1]];
+  }else if(edit){
+    editExercise(Number(edit.dataset.libEdit));return;
+  }else if(del){
+    s.exercises.splice(Number(del.dataset.libDelete),1);
+  }else return;
+  saveExerciseLibrary();renderLibraryExerciseList(s);renderSession();
+});
+$("exportLibrary").addEventListener("click",downloadLibraryJson);
+$("importLibrary").addEventListener("change",async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{
+    const parsed=JSON.parse(await file.text());
+    if(parsed.schema && parsed.schema!=="gbtt-exercise-library") throw new Error("Unsupported library format");
+    exerciseLibrary=normaliseLibrary(parsed);
+    saveExerciseLibrary();refreshSessionSelect();renderLibraryManager();renderWeek();renderHome();resetSessionTimerForSelection();renderSession();
+    $("libraryStatus").textContent=`Imported ${exerciseLibrary.sessions.length} local session${exerciseLibrary.sessions.length===1?"":"s"}.`;
+    $("libraryStatus").className="status good";
+  }catch(err){
+    $("libraryStatus").textContent="Could not import that exercise-library JSON.";
+    $("libraryStatus").className="status warn";
+  }
+  e.target.value="";
+});
+$("saveWeeklyPlan").addEventListener("click",()=>{
+  document.querySelectorAll("[data-plan-day]").forEach(inp=>exerciseLibrary.weeklyPlan[inp.dataset.planDay]=inp.value.trim());
+  saveExerciseLibrary();renderWeek();renderHome();
+  $("weeklyPlanStatus").textContent="Weekly plan saved locally.";
+  $("weeklyPlanStatus").className="status good";
+});
+
+$("deleteAll").addEventListener("click",e=>{
+  if(e.currentTarget.dataset.confirm!=="1"){
+    e.currentTarget.dataset.confirm="1";e.currentTarget.textContent="Tap again to confirm";return;
+  }
+  history=[];saveLocal();renderHistory();renderHome();
+  e.currentTarget.dataset.confirm="0";e.currentTarget.textContent="Delete all history";
+});
+
+function csvCell(v){return '"'+String(v??"").replace(/"/g,'""')+'"'}
+function toCsv(){
+  const out=[["Date","Category","Session","Exercise","Set","Target","Load kg","Completed reps/time","Set RPE","Pain","Session RPE","Session pain","Duration","Distance","Session detail","Notes"]];
+  history.forEach(h=>{
+    const base=[h.date,h.category||categoryOf(h.session),h.session];
+    if(!h.rows?.length){
+      out.push([...base,"","","","","","",h.sessionRpe||"",h.sessionPain||"",h.duration||"",h.distance||"",h.detail||"",h.notes||""]);
+    }else{
+      h.rows.forEach(r=>out.push([...base,r.exercise||"",r.set||"",r.target||"",r.load||"",r.done||"",r.rpe||"",r.pain||"",h.sessionRpe||"",h.sessionPain||"",h.duration||"",h.distance||"",h.detail||"",h.notes||""]));
+    }
+  });
+  return out.map(r=>r.map(csvCell).join(",")).join("\r\n");
+}
+function downloadCsv(){
+  const blob=new Blob([toCsv()],{type:"text/csv;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="Getting_Back_to_Tri_Training_Log.csv";a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+$("exportCsv").addEventListener("click",downloadCsv);
+$("historyExport").addEventListener("click",downloadCsv);
+
+function parseCsv(text){
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i],n=text[i+1];
+    if(q&&c=='"'&&n=='"'){cell+='"';i++}
+    else if(c=='"'){q=!q}
+    else if(!q&&c==","){row.push(cell);cell=""}
+    else if(!q&&(c=="\n"||c=="\r")){if(c=="\r"&&n=="\n")i++;row.push(cell);if(row.some(x=>x!==""))rows.push(row);row=[];cell=""}
+    else cell+=c;
+  }
+  row.push(cell);if(row.some(x=>x!==""))rows.push(row);
+  return rows;
+}
+$("importCsv").addEventListener("change",async ev=>{
+  const f=ev.target.files?.[0];if(!f)return;
+  try{
+    const rows=parseCsv(await f.text());
+    if(rows.length<2)throw new Error("No session rows found");
+    const header=rows[0],idx=n=>header.indexOf(n);
+    const val=(r,n)=>{const i=idx(n);return i>=0?(r[i]||""):""};
+    const map=new Map();
+    for(const r of rows.slice(1)){
+      const d=val(r,"Date"),s=val(r,"Session");if(!d||!s)continue;
+      const cat=val(r,"Category")||categoryOf(s);
+      const k=[d,s,val(r,"Session RPE"),val(r,"Session pain"),val(r,"Duration"),val(r,"Distance"),val(r,"Notes")].join("|");
+      if(!map.has(k))map.set(k,{
+        id:Date.now()+map.size,date:d,session:s,category:cat,sessionRpe:val(r,"Session RPE"),
+        sessionPain:val(r,"Session pain"),duration:val(r,"Duration"),distance:val(r,"Distance"),
+        detail:val(r,"Session detail"),notes:val(r,"Notes"),rows:[]
+      });
+      const ex=val(r,"Exercise");
+      if(ex)map.get(k).rows.push({exercise:ex,set:val(r,"Set"),target:val(r,"Target"),load:val(r,"Load kg"),done:val(r,"Completed reps/time"),rpe:val(r,"Set RPE"),pain:val(r,"Pain")});
+    }
+    history=[...map.values()];saveLocal();renderHome();
+    $("csvStatus").textContent=`Imported ${history.length} session${history.length===1?"":"s"} from CSV.`;
+    $("csvStatus").className="status good";
+  }catch(err){
+    $("csvStatus").textContent="Could not import that CSV. Check that it is a Getting Back to Tri or RehabTrainingLog export.";
+    $("csvStatus").className="status warn";
+  }
+  ev.target.value="";
+});
+
+function quickCue(){
+  if(navigator.vibrate) navigator.vibrate(180);
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx=new AudioCtx(), osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.frequency.value=880; gain.gain.value=.035; osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime+.09); osc.onended=()=>ctx.close();
+  }catch(e){}
+}
+function quickOverallRemaining(){
+  if(quickCompleted) return 0;
+  if(quickPhase==="work"){
+    const futureWorks=quickRoutineSteps.length-quickIndex-1;
+    const futureRests=quickRoutineSteps.length-quickIndex-1;
+    return quickSeconds + futureWorks*QUICK_WORK_SECONDS + futureRests*QUICK_REST_SECONDS;
+  }
+  const nextIndex=quickIndex+1;
+  const futureWorks=quickRoutineSteps.length-nextIndex;
+  const futureRests=Math.max(0,quickRoutineSteps.length-nextIndex-1);
+  return quickSeconds + futureWorks*QUICK_WORK_SECONDS + futureRests*QUICK_REST_SECONDS;
+}
+function fmtShort(sec){
+  const m=Math.floor(sec/60), s=String(sec%60).padStart(2,"0"); return `${m}:${s}`;
+}
+function quickElapsed(){
+  if(quickCompleted) return QUICK_TOTAL_SECONDS;
+  if(quickPhase==="work"){
+    return quickIndex*(QUICK_WORK_SECONDS+QUICK_REST_SECONDS)+(QUICK_WORK_SECONDS-quickSeconds);
+  }
+  return (quickIndex+1)*QUICK_WORK_SECONDS + quickIndex*QUICK_REST_SECONDS + (QUICK_REST_SECONDS-quickSeconds);
+}
+function renderQuickRoutine(){
+  const timerBox=$("quickRoutineTimer");
+  timerBox.classList.toggle("resting",!quickCompleted&&quickPhase==="rest");
+  const step=quickRoutineSteps[Math.min(quickIndex,quickRoutineSteps.length-1)];
+  const nextStep=quickRoutineSteps[Math.min(quickIndex+1,quickRoutineSteps.length-1)];
+
+  if(quickCompleted){
+    $("quickExercise").textContent="Routine complete ✓";
+    $("quickPosition").textContent="12 work intervals completed";
+    $("quickClock").textContent="0:00";
+    $("quickOverall").textContent="All 12 intervals complete • total 7:28";
+    $("quickNext").textContent="Tap Save session below to add all completed positions to History.";
+  } else if(quickPhase==="rest"){
+    $("quickExercise").textContent="Change position";
+    $("quickPosition").textContent=`Next: ${nextStep.detail}`;
+    $("quickClock").textContent=`0:${String(quickSeconds).padStart(2,"0")}`;
+    $("quickOverall").textContent=`Overall ${fmtShort(quickOverallRemaining())} remaining • 8-sec changeover`;
+    $("quickNext").textContent=`Get ready: ${nextStep.exercise} • ${nextStep.detail}`;
+  } else {
+    $("quickExercise").textContent=step.exercise;
+    $("quickPosition").textContent=step.detail;
+    $("quickClock").textContent=`0:${String(quickSeconds).padStart(2,"0")}`;
+    $("quickOverall").textContent=`Overall ${fmtShort(quickOverallRemaining())} remaining • interval ${quickIndex+1} of ${quickRoutineSteps.length}`;
+    $("quickNext").textContent=quickIndex<quickRoutineSteps.length-1
+      ? `Next: 8-sec changeover → ${quickRoutineSteps[quickIndex+1].detail}`
+      : "Next: finish";
+  }
+
+  $("quickProgress").style.width=`${Math.min(100,(quickElapsed()/QUICK_TOTAL_SECONDS)*100)}%`;
+  $("quickRoutineList").innerHTML=quickRoutineSteps.map((x,i)=>{
+    const done=quickCompletedSteps.has(i);
+    const current=!quickCompleted && ((quickPhase==="work"&&i===quickIndex)||(quickPhase==="rest"&&i===quickIndex+1));
+    return `<div class="routine-step ${done?"done":current?"current":""}"><b>${i+1}</b><span>${esc(x.exercise)}<br><small>${esc(x.detail)}</small></span><span class="t">0:30</span></div>`;
+  }).join("");
+}
+function quickStop(){clearInterval(quickTimerId);quickTimerId=null;}
+function quickAdvance(){
+  if(quickPhase==="work"){
+    quickCompletedSteps.add(quickIndex);
+    quickCue();
+    if(quickIndex>=quickRoutineSteps.length-1){
+      quickStop();
+      quickCompleted=true;
+      quickSeconds=0;
+      renderQuickRoutine();
+      $("status").textContent="Daily Quick Routine complete — 12/12 intervals finished. Tap Save session to add it to History.";
+      $("status").className="status good";
+      return;
+    }
+    quickPhase="rest";
+    quickSeconds=QUICK_REST_SECONDS;
+    renderQuickRoutine();
+    return;
+  }
+  quickCue();
+  quickIndex++;
+  quickPhase="work";
+  quickSeconds=QUICK_WORK_SECONDS;
+  renderQuickRoutine();
+}
+function quickPrevious(){
+  quickStop();
+  quickCompleted=false;
+  if(quickPhase==="rest"){
+    quickPhase="work";
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickCompletedSteps.delete(quickIndex);
+  }else if(quickIndex>0){
+    quickCompletedSteps.delete(quickIndex);
+    quickIndex--;
+    quickPhase="work";
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickCompletedSteps.delete(quickIndex);
+  }else{
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickCompletedSteps.delete(0);
+  }
+  renderQuickRoutine();
+}
+$("quickStart").addEventListener("click",()=>{
+  if(quickCompleted){
+    quickIndex=0;
+    quickSeconds=QUICK_WORK_SECONDS;
+    quickPhase="work";
+    quickCompleted=false;
+    quickCompletedSteps.clear();
+    renderQuickRoutine();
+  }
+  if(quickTimerId)return;
+  quickCue();
+  quickTimerId=setInterval(()=>{
+    quickSeconds--;
+    if(quickSeconds<=0) quickAdvance(); else renderQuickRoutine();
+  },1000);
+});
+$("quickPause").addEventListener("click",quickStop);
+$("quickSkip").addEventListener("click",()=>{
+  quickStop();
+  if(quickCompleted) return;
+  if(quickPhase==="work"){
+    // Skip does not count the current work interval as completed.
+    if(quickIndex>=quickRoutineSteps.length-1){
+      quickCompleted=true;
+      quickSeconds=0;
+    }else{
+      quickPhase="rest";
+      quickSeconds=QUICK_REST_SECONDS;
+    }
+  }else{
+    quickIndex++;
+    quickPhase="work";
+    quickSeconds=QUICK_WORK_SECONDS;
+  }
+  renderQuickRoutine();
+});
+$("quickBack").addEventListener("click",quickPrevious);
+$("quickReset").addEventListener("click",()=>{
+  quickStop();
+  quickIndex=0;
+  quickSeconds=QUICK_WORK_SECONDS;
+  quickPhase="work";
+  quickCompleted=false;
+  quickCompletedSteps.clear();
+  renderQuickRoutine();
+});
+
+
+function preWalkCue(){
+  quickCue();
+}
+function preWalkOverallRemaining(){
+  if(preWalkCompleted) return 0;
+  if(preWalkPhase==="work"){
+    const futureWork=preWalkSteps.slice(preWalkIndex+1).reduce((sum,s)=>sum+s.seconds,0);
+    const futureRests=preWalkSteps.length-preWalkIndex-1;
+    return preWalkSeconds + futureWork + futureRests*PREWALK_REST_SECONDS;
+  }
+  const nextIndex=preWalkIndex+1;
+  const futureWork=preWalkSteps.slice(nextIndex).reduce((sum,s)=>sum+s.seconds,0);
+  const futureRests=Math.max(0,preWalkSteps.length-nextIndex-1);
+  return preWalkSeconds + futureWork + futureRests*PREWALK_REST_SECONDS;
+}
+function preWalkElapsed(){
+  if(preWalkCompleted) return PREWALK_TOTAL_SECONDS;
+  let elapsed=0;
+  for(let i=0;i<preWalkIndex;i++){
+    elapsed+=preWalkSteps[i].seconds+PREWALK_REST_SECONDS;
+  }
+  if(preWalkPhase==="work"){
+    elapsed+=preWalkSteps[preWalkIndex].seconds-preWalkSeconds;
+  }else{
+    elapsed+=preWalkSteps[preWalkIndex].seconds+(PREWALK_REST_SECONDS-preWalkSeconds);
+  }
+  return elapsed;
+}
+function renderPreWalk(){
+  const timerBox=$("preWalkTimer");
+  timerBox.classList.toggle("resting",!preWalkCompleted&&preWalkPhase==="rest");
+  const step=preWalkSteps[Math.min(preWalkIndex,preWalkSteps.length-1)];
+  const nextStep=preWalkSteps[Math.min(preWalkIndex+1,preWalkSteps.length-1)];
+
+  if(preWalkCompleted){
+    $("preWalkExercise").textContent="Warm-up complete ✓";
+    $("preWalkPosition").textContent="Ready to walk";
+    $("preWalkClock").textContent="0:00";
+    $("preWalkOverall").textContent="All 10 intervals complete • total 4:12";
+    $("preWalkNext").textContent="Tap Save session below to add the completed warm-up to History.";
+  } else if(preWalkPhase==="rest"){
+    $("preWalkExercise").textContent="Change position";
+    $("preWalkPosition").textContent=`Next: ${nextStep.detail}`;
+    $("preWalkClock").textContent=`0:${String(preWalkSeconds).padStart(2,"0")}`;
+    $("preWalkOverall").textContent=`Overall ${fmtShort(preWalkOverallRemaining())} remaining • 8-sec changeover`;
+    $("preWalkNext").textContent=`Get ready: ${nextStep.exercise} • ${nextStep.detail}`;
+  } else {
+    $("preWalkExercise").textContent=step.exercise;
+    $("preWalkPosition").textContent=step.detail;
+    $("preWalkClock").textContent=`0:${String(preWalkSeconds).padStart(2,"0")}`;
+    $("preWalkOverall").textContent=`Overall ${fmtShort(preWalkOverallRemaining())} remaining • interval ${preWalkIndex+1} of ${preWalkSteps.length}`;
+    $("preWalkNext").textContent=preWalkIndex<preWalkSteps.length-1
+      ? `Next: 8-sec changeover → ${preWalkSteps[preWalkIndex+1].detail}`
+      : "Next: finish";
+  }
+
+  $("preWalkProgress").style.width=`${Math.min(100,(preWalkElapsed()/PREWALK_TOTAL_SECONDS)*100)}%`;
+  $("preWalkList").innerHTML=preWalkSteps.map((x,i)=>{
+    const done=preWalkCompletedSteps.has(i);
+    const current=!preWalkCompleted && ((preWalkPhase==="work"&&i===preWalkIndex)||(preWalkPhase==="rest"&&i===preWalkIndex+1));
+    return `<div class="routine-step ${done?"done":current?"current":""}"><b>${i+1}</b><span>${esc(x.exercise)}<br><small>${esc(x.detail)}</small></span><span class="t">0:${String(x.seconds).padStart(2,"0")}</span></div>`;
+  }).join("");
+}
+function preWalkStop(){clearInterval(preWalkTimerId);preWalkTimerId=null;}
+function preWalkAdvance(){
+  if(preWalkPhase==="work"){
+    preWalkCompletedSteps.add(preWalkIndex);
+    preWalkCue();
+    if(preWalkIndex>=preWalkSteps.length-1){
+      preWalkStop();
+      preWalkCompleted=true;
+      preWalkSeconds=0;
+      renderPreWalk();
+      $("status").textContent="Pre-Walk Warm-Up complete — 10/10 intervals finished. Tap Save session to add it to History.";
+      $("status").className="status good";
+      return;
+    }
+    preWalkPhase="rest";
+    preWalkSeconds=PREWALK_REST_SECONDS;
+    renderPreWalk();
+    return;
+  }
+  preWalkCue();
+  preWalkIndex++;
+  preWalkPhase="work";
+  preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+  renderPreWalk();
+}
+function preWalkPrevious(){
+  preWalkStop();
+  preWalkCompleted=false;
+  if(preWalkPhase==="rest"){
+    preWalkPhase="work";
+    preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+    preWalkCompletedSteps.delete(preWalkIndex);
+  }else if(preWalkIndex>0){
+    preWalkCompletedSteps.delete(preWalkIndex);
+    preWalkIndex--;
+    preWalkPhase="work";
+    preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+    preWalkCompletedSteps.delete(preWalkIndex);
+  }else{
+    preWalkSeconds=preWalkSteps[0].seconds;
+    preWalkCompletedSteps.delete(0);
+  }
+  renderPreWalk();
+}
+$("preWalkStart").addEventListener("click",()=>{
+  if(preWalkCompleted){
+    preWalkIndex=0;
+    preWalkSeconds=preWalkSteps[0].seconds;
+    preWalkPhase="work";
+    preWalkCompleted=false;
+    preWalkCompletedSteps.clear();
+    renderPreWalk();
+  }
+  if(preWalkTimerId)return;
+  preWalkCue();
+  preWalkTimerId=setInterval(()=>{
+    preWalkSeconds--;
+    if(preWalkSeconds<=0) preWalkAdvance(); else renderPreWalk();
+  },1000);
+});
+$("preWalkPause").addEventListener("click",preWalkStop);
+$("preWalkSkip").addEventListener("click",()=>{
+  preWalkStop();
+  if(preWalkCompleted) return;
+  if(preWalkPhase==="work"){
+    if(preWalkIndex>=preWalkSteps.length-1){
+      preWalkCompleted=true;
+      preWalkSeconds=0;
+    }else{
+      preWalkPhase="rest";
+      preWalkSeconds=PREWALK_REST_SECONDS;
+    }
+  }else{
+    preWalkIndex++;
+    preWalkPhase="work";
+    preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+  }
+  renderPreWalk();
+});
+$("preWalkBack").addEventListener("click",preWalkPrevious);
+$("preWalkReset").addEventListener("click",()=>{
+  preWalkStop();
+  preWalkIndex=0;
+  preWalkSeconds=preWalkSteps[0].seconds;
+  preWalkPhase="work";
+  preWalkCompleted=false;
+  preWalkCompletedSteps.clear();
+  renderPreWalk();
+});
+
+
+function circulationStep(i){
+  const base={...circulationSteps[i]};
+  if(i===4){
+    base.detail=$("circulationMovement")?.value || "March in place";
+  }
+  return base;
+}
+function saveCirculationPreference(){
+  const pref={
+    context:$("circulationContext").value,
+    movement:$("circulationMovement").value
+  };
+  localStorage.setItem(CIRCULATION_PREF_STORAGE,JSON.stringify(pref));
+}
+function loadCirculationPreference(){
+  try{
+    const pref=JSON.parse(localStorage.getItem(CIRCULATION_PREF_STORAGE)||"{}");
+    if(pref.context && [...$("circulationContext").options].some(o=>o.value===pref.context)) $("circulationContext").value=pref.context;
+    if(pref.movement && [...$("circulationMovement").options].some(o=>o.value===pref.movement)) $("circulationMovement").value=pref.movement;
+  }catch(e){}
+}
+function circulationCue(){ quickCue(); }
+function circulationOverallRemaining(){
+  if(circulationCompleted) return 0;
+  if(circulationPhase==="work"){
+    const futureWork=circulationSteps.slice(circulationIndex+1).reduce((sum,s)=>sum+s.seconds,0);
+    const futureRests=circulationSteps.length-circulationIndex-1;
+    return circulationSeconds + futureWork + futureRests*CIRCULATION_REST_SECONDS;
+  }
+  const nextIndex=circulationIndex+1;
+  const futureWork=circulationSteps.slice(nextIndex).reduce((sum,s)=>sum+s.seconds,0);
+  const futureRests=Math.max(0,circulationSteps.length-nextIndex-1);
+  return circulationSeconds + futureWork + futureRests*CIRCULATION_REST_SECONDS;
+}
+function circulationElapsed(){
+  if(circulationCompleted) return CIRCULATION_TOTAL_SECONDS;
+  let elapsed=0;
+  for(let i=0;i<circulationIndex;i++){
+    elapsed+=circulationSteps[i].seconds+CIRCULATION_REST_SECONDS;
+  }
+  if(circulationPhase==="work"){
+    elapsed+=circulationSteps[circulationIndex].seconds-circulationSeconds;
+  }else{
+    elapsed+=circulationSteps[circulationIndex].seconds+(CIRCULATION_REST_SECONDS-circulationSeconds);
+  }
+  return elapsed;
+}
+function renderCirculation(){
+  const timerBox=$("circulationTimer");
+  timerBox.classList.toggle("resting",!circulationCompleted&&circulationPhase==="rest");
+  if($("rebounderDemo")) $("rebounderDemo").classList.toggle("hidden",$("circulationMovement").value!=="Gentle rebounder");
+  const step=circulationStep(Math.min(circulationIndex,circulationSteps.length-1));
+  const nextStep=circulationStep(Math.min(circulationIndex+1,circulationSteps.length-1));
+
+  if(circulationCompleted){
+    $("circulationExercise").textContent="Reset complete ✓";
+    $("circulationPosition").textContent="Finish feeling loose, not fatigued";
+    $("circulationClock").textContent="0:00";
+    $("circulationOverall").textContent="All 6 movements complete • total 6:25";
+    $("circulationNext").textContent="Tap Save session below to add the routine to History.";
+  } else if(circulationPhase==="rest"){
+    $("circulationExercise").textContent="Change movement";
+    $("circulationPosition").textContent=`Next: ${nextStep.exercise}`;
+    $("circulationClock").textContent=`0:${String(circulationSeconds).padStart(2,"0")}`;
+    $("circulationOverall").textContent=`Overall ${fmtShort(circulationOverallRemaining())} remaining • 5-sec changeover`;
+    $("circulationNext").textContent=`Get ready: ${nextStep.detail}`;
+  } else {
+    $("circulationExercise").textContent=step.exercise;
+    $("circulationPosition").textContent=step.detail;
+    $("circulationClock").textContent=fmtShort(circulationSeconds);
+    $("circulationOverall").textContent=`Overall ${fmtShort(circulationOverallRemaining())} remaining • movement ${circulationIndex+1} of ${circulationSteps.length}`;
+    $("circulationNext").textContent=circulationIndex<circulationSteps.length-1
+      ? `Next: 5-sec changeover → ${circulationStep(circulationIndex+1).exercise}`
+      : "Next: finish";
+  }
+
+  $("circulationProgress").style.width=`${Math.min(100,(circulationElapsed()/CIRCULATION_TOTAL_SECONDS)*100)}%`;
+  $("circulationList").innerHTML=circulationSteps.map((x,i)=>{
+    const stepView=circulationStep(i);
+    const done=circulationCompletedSteps.has(i);
+    const current=!circulationCompleted && ((circulationPhase==="work"&&i===circulationIndex)||(circulationPhase==="rest"&&i===circulationIndex+1));
+    return `<div class="routine-step ${done?"done":current?"current":""}"><b>${i+1}</b><span>${esc(stepView.exercise)}<br><small>${esc(stepView.detail)}</small></span><span class="t">${fmtShort(stepView.seconds)}</span></div>`;
+  }).join("");
+}
+function circulationStop(){clearInterval(circulationTimerId);circulationTimerId=null;}
+function circulationAdvance(){
+  if(circulationPhase==="work"){
+    circulationCompletedSteps.add(circulationIndex);
+    circulationCue();
+    if(circulationIndex>=circulationSteps.length-1){
+      circulationStop();
+      circulationCompleted=true;
+      circulationSeconds=0;
+      renderCirculation();
+      $("status").textContent="Circulation Reset complete — 6/6 movements finished. Tap Save session to add it to History.";
+      $("status").className="status good";
+      return;
+    }
+    circulationPhase="rest";
+    circulationSeconds=CIRCULATION_REST_SECONDS;
+    renderCirculation();
+    return;
+  }
+  circulationCue();
+  circulationIndex++;
+  circulationPhase="work";
+  circulationSeconds=circulationSteps[circulationIndex].seconds;
+  renderCirculation();
+}
+function circulationPrevious(){
+  circulationStop();
+  circulationCompleted=false;
+  if(circulationPhase==="rest"){
+    circulationPhase="work";
+    circulationSeconds=circulationSteps[circulationIndex].seconds;
+    circulationCompletedSteps.delete(circulationIndex);
+  }else if(circulationIndex>0){
+    circulationCompletedSteps.delete(circulationIndex);
+    circulationIndex--;
+    circulationPhase="work";
+    circulationSeconds=circulationSteps[circulationIndex].seconds;
+    circulationCompletedSteps.delete(circulationIndex);
+  }else{
+    circulationSeconds=circulationSteps[0].seconds;
+    circulationCompletedSteps.delete(0);
+  }
+  renderCirculation();
+}
+$("circulationStart").addEventListener("click",()=>{
+  saveCirculationPreference();
+  if(circulationCompleted){
+    circulationIndex=0;
+    circulationSeconds=circulationSteps[0].seconds;
+    circulationPhase="work";
+    circulationCompleted=false;
+    circulationCompletedSteps.clear();
+    renderCirculation();
+  }
+  if(circulationTimerId)return;
+  circulationCue();
+  circulationTimerId=setInterval(()=>{
+    circulationSeconds--;
+    if(circulationSeconds<=0) circulationAdvance(); else renderCirculation();
+  },1000);
+});
+$("circulationPause").addEventListener("click",circulationStop);
+$("circulationSkip").addEventListener("click",()=>{
+  circulationStop();
+  if(circulationCompleted) return;
+  if(circulationPhase==="work"){
+    if(circulationIndex>=circulationSteps.length-1){
+      circulationCompleted=true;
+      circulationSeconds=0;
+    }else{
+      circulationPhase="rest";
+      circulationSeconds=CIRCULATION_REST_SECONDS;
+    }
+  }else{
+    circulationIndex++;
+    circulationPhase="work";
+    circulationSeconds=circulationSteps[circulationIndex].seconds;
+  }
+  renderCirculation();
+});
+$("circulationBack").addEventListener("click",circulationPrevious);
+$("circulationReset").addEventListener("click",()=>{
+  circulationStop();
+  circulationIndex=0;
+  circulationSeconds=circulationSteps[0].seconds;
+  circulationPhase="work";
+  circulationCompleted=false;
+  circulationCompletedSteps.clear();
+  renderCirculation();
+});
+$("circulationMovement").addEventListener("change",()=>{saveCirculationPreference();renderCirculation()});
+$("circulationContext").addEventListener("change",saveCirculationPreference);
+
+
+function renderClock(){
+  const total=Math.max(0,sessionTimerRemaining||0);
+  const m=String(Math.floor(total/60)).padStart(2,"0"),s=String(total%60).padStart(2,"0");
+  $("clock").textContent=`${m}:${s}`;
+}
+$("timerStart").addEventListener("click",()=>{
+  const cfg=librarySessionByName($("session").value);
+  if(!cfg?.timerMinutes)return;
+  if(sessionTimerSession!==cfg.name) resetSessionTimerForSelection();
+  if(timerId||sessionTimerRemaining<=0)return;
+  timerId=setInterval(()=>{
+    sessionTimerRemaining--;renderClock();
+    if(sessionTimerRemaining<=0){
+      clearInterval(timerId);timerId=null;
+      if(navigator.vibrate)navigator.vibrate([250,100,250]);
+      alert(`${cfg.name} timer complete.`);
+    }
+  },1000);
+});
+$("timerPause").addEventListener("click",()=>{clearInterval(timerId);timerId=null});
+$("timerReset").addEventListener("click",()=>resetSessionTimerForSelection());
+
+loadExerciseLibrary();loadLocal();loadHealth();loadCirculationPreference();
+refreshSessionSelect();renderLibraryManager();renderWeeklyPlanInputs();renderWeek();renderHome();
+resetSessionTimerForSelection();renderSession();renderClock();renderHealthHistory();
+$("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();renderPreWalk();renderCirculation();
+
+// PWA install + service worker
+let deferredInstallPrompt = null;
+const installBtn = $("installApp");
+const installStatus = $("installStatus");
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  if (installBtn) installBtn.disabled = false;
+  if (installStatus) {
+    installStatus.textContent = "Ready to install.";
+    installStatus.className = "status good";
+  }
+});
+
+if (installBtn) {
+  installBtn.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) {
+      installStatus.textContent = "If Chrome does not show Install yet, use ⋮ → Add to Home screen / Install app.";
+      installStatus.className = "status warn";
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    const result = await deferredInstallPrompt.userChoice;
+    installStatus.textContent = result.outcome === "accepted" ? "Installation started." : "Installation cancelled.";
+    deferredInstallPrompt = null;
+    installBtn.disabled = true;
+  });
+}
+
+window.addEventListener("appinstalled", () => {
+  if (installStatus) {
+    installStatus.textContent = "Installed on this device.";
+    installStatus.className = "status good";
+  }
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .catch(err => console.warn("Service worker registration failed:", err));
+  });
+}
+
+})();
+</script>
+</body>
+</html>
