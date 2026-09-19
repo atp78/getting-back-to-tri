@@ -2,7 +2,20 @@
 
 Multi-mode, local-first Progressive Web App.
 
-Current release: **v1.8b PWA**.
+Current release: **v1.8c PWA**.
+
+## v1.8c — split Workout Library and Personal Data
+- Replaces the single active cloud sync JSON with two files inside `My Drive / Getting Back to Tri`:
+  - `Getting_Back_to_Tri_Workout_Library.json`
+  - `Getting_Back_to_Tri_Personal_Data.json`
+- Workout Library contains reusable session definitions only.
+- Personal Data contains training history, recovery data/baseline, Morning Movement data/settings, circulation preferences and the weekly plan.
+- Detects the old combined `Getting_Back_to_Tri_Sync.json` and offers a one-time split migration.
+- The old combined JSON is kept unchanged as a safety copy.
+- Pull/Push All remains available, with separate conflict checks for each cloud file.
+- Individual Pull/Push controls are available for the Workout Library and Personal Data.
+- Library export is now shareable and excludes recorded history, recovery data and weekly plan.
+- Importing a workout library preserves the receiving device's existing weekly plan.
 
 ## v1.8b — dedicated Google Drive folder
 - Creates/uses `My Drive / Getting Back to Tri`.
