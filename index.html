@@ -43,7 +43,7 @@ h1{font-size:clamp(1.35rem,4.5vw,1.85rem);margin:0;line-height:1.05}
 .subtitle{font-size:.86rem;color:var(--muted);margin-top:5px}
 main{padding:14px 0 90px}
 .nav{
-  display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:0 0 13px
+  display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:0 0 13px
 }
 .nav button{font-size:.78rem;padding:8px 5px;background:#111d25}
 .nav button.active{background:var(--accent2);border-color:#31657f;color:#c7eeff}
@@ -190,6 +190,239 @@ main{padding:14px 0 90px}
 .sync-steps{margin:9px 0 0;padding-left:20px;color:var(--muted);font-size:.78rem;line-height:1.45}
 .sync-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.72rem;word-break:break-all}
 @media(max-width:620px){.sync-meta{grid-template-columns:1fr}.sync-card{padding:13px}}
+
+/* v1.9 weekly printable planner */
+.planner-preview-shell{
+  overflow:auto;
+  padding:4px 0 14px;
+}
+.planner-sheet{
+  width:100%;
+  max-width:210mm;
+  min-height:270mm;
+  margin:0 auto;
+  background:#fff;
+  color:#111;
+  border-radius:4px;
+  padding:10mm;
+  box-shadow:0 12px 38px rgba(0,0,0,.34);
+  font-family:Arial,Helvetica,sans-serif;
+}
+.planner-print-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12mm;
+  border-bottom:2px solid #111;
+  padding-bottom:4mm;
+}
+.planner-print-brand{
+  font-size:8.5pt;
+  font-weight:800;
+  letter-spacing:.16em;
+}
+.planner-sheet h1{
+  color:#111;
+  font-size:22pt;
+  margin:1.5mm 0 1mm;
+  line-height:1;
+}
+.planner-print-range{
+  font-size:10pt;
+}
+.planner-print-weekbox{
+  border:1.5px solid #111;
+  min-width:45mm;
+  padding:3mm 4mm;
+  text-align:center;
+}
+.planner-print-weekbox span,
+.planner-summary span,
+.planner-progress-box span{
+  display:block;
+  font-size:7.5pt;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+.planner-print-weekbox b{
+  display:block;
+  margin-top:1mm;
+  font-size:11pt;
+}
+.planner-focus-line{
+  display:grid;
+  grid-template-columns:35mm 1fr;
+  gap:4mm;
+  align-items:center;
+  padding:3mm 0;
+  border-bottom:1px solid #888;
+  font-size:9pt;
+}
+.planner-focus-line b{
+  font-size:7.5pt;
+  letter-spacing:.08em;
+}
+.planner-summary{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:2mm;
+  padding:3mm 0;
+}
+.planner-summary>div{
+  border:1px solid #777;
+  text-align:center;
+  padding:2mm 1.5mm;
+}
+.planner-summary b{
+  display:block;
+  font-size:14pt;
+  margin-top:.5mm;
+}
+.planner-print-days{
+  border-top:1.5px solid #111;
+}
+.planner-print-day{
+  display:grid;
+  grid-template-columns:34mm 1fr;
+  gap:5mm;
+  min-height:24mm;
+  padding:3mm 0;
+  border-bottom:1px solid #aaa;
+  break-inside:avoid;
+}
+.planner-day-name{
+  font-size:12pt;
+  font-weight:800;
+}
+.planner-day-date{
+  font-size:8.5pt;
+  margin-top:1mm;
+  color:#444;
+}
+.planner-check-list{
+  display:grid;
+  gap:2mm;
+  align-content:start;
+}
+.planner-check-line{
+  display:flex;
+  align-items:flex-start;
+  gap:2.5mm;
+  font-size:10.5pt;
+  line-height:1.25;
+}
+.planner-box{
+  width:4.5mm;
+  height:4.5mm;
+  min-width:4.5mm;
+  border:1.4px solid #111;
+  margin-top:.2mm;
+}
+.planner-rest{
+  font-size:9.5pt;
+  font-style:italic;
+  color:#555;
+  padding-top:1mm;
+}
+.planner-tag{
+  display:inline-block;
+  margin-left:2mm;
+  padding:.3mm 1.2mm;
+  border:1px solid #777;
+  border-radius:2mm;
+  font-size:6.5pt;
+  font-weight:700;
+  letter-spacing:.04em;
+  vertical-align:1px;
+}
+.planner-bottom{
+  display:grid;
+  grid-template-columns:58mm 1fr;
+  gap:6mm;
+  margin-top:4mm;
+}
+.planner-progress-box{
+  border:1.5px solid #111;
+  padding:3mm;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2mm;
+}
+.planner-progress-box>div{
+  text-align:center;
+}
+.planner-progress-box b{
+  display:block;
+  margin-top:2mm;
+  font-size:12pt;
+}
+.planner-notes{
+  font-size:7.5pt;
+  font-weight:800;
+  letter-spacing:.06em;
+}
+.planner-notes div{
+  height:7mm;
+  border-bottom:1px solid #777;
+}
+.planner-print-footer{
+  display:flex;
+  justify-content:space-between;
+  gap:8mm;
+  margin-top:4mm;
+  padding-top:2mm;
+  border-top:1px solid #999;
+  font-size:7pt;
+  color:#555;
+}
+@media(max-width:620px){
+  .nav{grid-template-columns:repeat(3,1fr)}
+  .planner-sheet{padding:6mm}
+  .planner-print-header{gap:5mm}
+  .planner-summary{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@page{
+  size:A4 portrait;
+  margin:8mm;
+}
+@media print{
+  html,body{
+    background:#fff!important;
+    color:#000!important;
+    width:210mm;
+    height:auto;
+    margin:0!important;
+    padding:0!important;
+  }
+  body *{
+    visibility:hidden!important;
+  }
+  #plannerPrintSheet,
+  #plannerPrintSheet *{
+    visibility:visible!important;
+  }
+  #plannerPrintSheet{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    width:194mm!important;
+    max-width:none!important;
+    min-height:281mm!important;
+    margin:0!important;
+    padding:6mm!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    background:#fff!important;
+    color:#000!important;
+  }
+  #plannerPrintSheet .planner-print-day{
+    min-height:23mm;
+  }
+  #plannerPrintSheet .planner-bottom{
+    margin-top:3mm;
+  }
+}
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -229,7 +462,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <div class="header-actions"><span class="version">v1.8c.1 PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
+      <div class="header-actions"><span class="version">v1.9 PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
     </div>
   </div>
 </header>
@@ -238,6 +471,7 @@ main{padding:14px 0 90px}
   <nav class="nav">
     <button data-view="home" class="active">Home</button>
     <button data-view="train">Train</button>
+    <button data-view="planner">Planner</button>
     <button data-view="recovery">Recovery</button>
     <button data-view="history">History</button>
     <button data-view="data">Data</button>
@@ -290,6 +524,9 @@ main{padding:14px 0 90px}
 
     <h3 class="section-title">My weekly plan</h3>
     <section class="panel week" id="weekPlan"></section>
+    <div class="actions" style="margin-top:-3px;margin-bottom:12px">
+      <button data-open-planner="1">🗓️ Open printable weekly planner</button>
+    </div>
   </section>
 
   <section id="train" class="view hidden">
@@ -591,6 +828,82 @@ main{padding:14px 0 90px}
     <div id="historyList"></div>
   </section>
 
+
+  <section id="planner" class="view hidden">
+    <section class="panel planner-controls">
+      <div class="kicker">v1.9 • Weekly planner</div>
+      <h2 style="margin:6px 0 5px">A4 printable training checklist</h2>
+      <p class="notice">The print sheet uses your synced Weekly Plan as a repeating Monday–Sunday template. A day such as “Lower Body + Swim” becomes two separate tick boxes.</p>
+
+      <div class="grid2" style="margin-top:10px">
+        <label>Week commencing
+          <input id="plannerWeekStart" type="date">
+        </label>
+        <label>This week's focus (optional)
+          <input id="plannerFocus" placeholder="e.g. Consistency, not intensity">
+        </label>
+      </div>
+
+      <div class="actions" style="margin-top:10px">
+        <button id="plannerPreviousWeek">← Previous week</button>
+        <button id="plannerThisWeek">This week</button>
+        <button id="plannerNextWeek">Next week →</button>
+      </div>
+      <div class="actions" style="margin-top:8px">
+        <button id="plannerEditPlan">Edit weekly plan</button>
+        <button id="plannerPrint" class="primary">🖨️ Print / Save PDF</button>
+      </div>
+      <div id="plannerStatus" class="status"></div>
+    </section>
+
+    <div class="planner-preview-shell">
+      <section id="plannerPrintSheet" class="planner-sheet" aria-label="Printable weekly training plan">
+        <div class="planner-print-header">
+          <div>
+            <div class="planner-print-brand">GETTING BACK TO TRI</div>
+            <h1>Weekly Training Plan</h1>
+            <div id="plannerDateRange" class="planner-print-range"></div>
+          </div>
+          <div class="planner-print-weekbox">
+            <span>WEEK COMMENCING</span>
+            <b id="plannerWeekCommencingPrint"></b>
+          </div>
+        </div>
+
+        <div id="plannerFocusPrintWrap" class="planner-focus-line hidden">
+          <b>THIS WEEK'S FOCUS</b>
+          <span id="plannerFocusPrint"></span>
+        </div>
+
+        <div class="planner-summary">
+          <div><span>PLANNED</span><b id="plannerCountTotal">0</b></div>
+          <div><span>SWIM</span><b id="plannerCountSwim">0</b></div>
+          <div><span>BIKE</span><b id="plannerCountBike">0</b></div>
+          <div><span>RUN</span><b id="plannerCountRun">0</b></div>
+          <div><span>STRENGTH / MOBILITY</span><b id="plannerCountOther">0</b></div>
+        </div>
+
+        <div id="plannerPrintDays" class="planner-print-days"></div>
+
+        <div class="planner-bottom">
+          <div class="planner-progress-box">
+            <div><span>COMPLETED</span><b>_____ / <span id="plannerCompletedTarget">0</span></b></div>
+            <div><span>REMAINING</span><b>_____</b></div>
+          </div>
+          <div class="planner-notes">
+            <b>NOTES / ADJUSTMENTS</b>
+            <div></div><div></div><div></div>
+          </div>
+        </div>
+
+        <div class="planner-print-footer">
+          <span>Consistency • recovery • build resilience</span>
+          <span id="plannerGenerated"></span>
+        </div>
+      </section>
+    </div>
+  </section>
+
   <section id="data" class="view hidden">
 
     <section class="panel" id="installPanel">
@@ -710,7 +1023,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.8c.1.1 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.9 PWA • installable offline training app</div>
 </main>
 
 
@@ -722,7 +1035,7 @@ main{padding:14px 0 90px}
         <div class="subtitle">Gentle movement • simple logging • your own pace</div>
       </div>
       <div class="header-actions">
-        <span class="version">v1.7</span>
+        <span class="version">v1.9</span>
         <button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button>
       </div>
     </div>
@@ -850,7 +1163,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8c.1.1 PWA</div>
+  <div class="footerNote">Morning Movement • Getting Back to Tri v1.9 PWA</div>
 </main>
 
 
@@ -1081,6 +1394,8 @@ const summaries = {
   "Run":"Quick-log a run session."
 };
 const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const PLANNER_DAY_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const PLANNER_STORAGE = "gbtt_weekly_planner_print_v1";
 let exerciseLibrary = {schema:"gbtt-exercise-library",version:1,sessions:[],weeklyPlan:{}};
 
 let history = [];
@@ -1385,6 +1700,7 @@ function showView(id){
   if(id==="history")renderHistory();
   if(id==="recovery"){renderHealthHistory();renderReadiness(currentHealthEntry());}
   if(id==="home")renderHome();
+  if(id==="planner")renderPlanner();
   if(id==="data")renderLibraryManager();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -2789,6 +3105,136 @@ function downloadHealthCsv(){
   setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
 
+
+function plannerParseItems(value){
+  const raw=String(value||"").trim();
+  if(!raw)return [];
+  return raw.split(/\s+\+\s+|[;\n]+/g).map(x=>x.trim()).filter(Boolean);
+}
+function plannerIsRest(item){
+  return /^(?:rest|rest day|recovery|recovery day|off|day off|no session|none)$/i.test(String(item||"").trim());
+}
+function plannerType(item){
+  const x=String(item||"");
+  if(/\bswim/i.test(x))return "Swim";
+  if(/\bbike|cycling|cycle|turbo/i.test(x))return "Bike";
+  if(/\brun|running/i.test(x))return "Run";
+  return "Strength / Mobility";
+}
+function plannerDateFromInput(){
+  const value=$("plannerWeekStart")?.value;
+  if(value){
+    const d=new Date(value+"T12:00:00");
+    if(!Number.isNaN(d.getTime()))return weekStart(d);
+  }
+  return weekStart();
+}
+function plannerIsoMonday(d){
+  const ws=weekStart(d);
+  return localDate(ws);
+}
+function plannerPrettyDate(d,withYear=false){
+  return new Intl.DateTimeFormat("en-GB",{
+    weekday:"short",day:"numeric",month:"short",...(withYear?{year:"numeric"}:{})
+  }).format(d);
+}
+function plannerLongDate(d){
+  return new Intl.DateTimeFormat("en-GB",{day:"numeric",month:"long",year:"numeric"}).format(d);
+}
+function plannerWeekEnd(ws){
+  const d=new Date(ws);d.setDate(d.getDate()+6);return d;
+}
+function loadPlannerPrefs(){
+  try{
+    const p=JSON.parse(localStorage.getItem(PLANNER_STORAGE)||"{}");
+    if($("plannerFocus")&&!$("plannerFocus").value)$("plannerFocus").value=String(p.focus||"");
+  }catch(e){}
+}
+function savePlannerPrefs(){
+  try{
+    localStorage.setItem(PLANNER_STORAGE,JSON.stringify({
+      focus:$("plannerFocus")?.value.trim()||""
+    }));
+  }catch(e){}
+}
+function plannerSessionStats(){
+  const stats={total:0,swim:0,bike:0,run:0,other:0};
+  PLANNER_DAY_ORDER.forEach(day=>{
+    plannerParseItems(exerciseLibrary.weeklyPlan?.[day]||"").forEach(item=>{
+      if(plannerIsRest(item))return;
+      stats.total++;
+      const type=plannerType(item);
+      if(type==="Swim")stats.swim++;
+      else if(type==="Bike")stats.bike++;
+      else if(type==="Run")stats.run++;
+      else stats.other++;
+    });
+  });
+  return stats;
+}
+function renderPlanner(){
+  if(!$("plannerWeekStart"))return;
+  if(!$("plannerWeekStart").value)$("plannerWeekStart").value=plannerIsoMonday(new Date());
+  loadPlannerPrefs();
+
+  const ws=plannerDateFromInput(),we=plannerWeekEnd(ws);
+  const focus=$("plannerFocus").value.trim();
+  const stats=plannerSessionStats();
+
+  $("plannerWeekStart").value=plannerIsoMonday(ws);
+  $("plannerWeekCommencingPrint").textContent=plannerLongDate(ws);
+  $("plannerDateRange").textContent=`${plannerPrettyDate(ws)} – ${plannerPrettyDate(we,true)}`;
+
+  $("plannerFocusPrint").textContent=focus;
+  $("plannerFocusPrintWrap").classList.toggle("hidden",!focus);
+
+  $("plannerCountTotal").textContent=stats.total;
+  $("plannerCountSwim").textContent=stats.swim;
+  $("plannerCountBike").textContent=stats.bike;
+  $("plannerCountRun").textContent=stats.run;
+  $("plannerCountOther").textContent=stats.other;
+  $("plannerCompletedTarget").textContent=stats.total;
+
+  $("plannerPrintDays").innerHTML=PLANNER_DAY_ORDER.map((day,index)=>{
+    const date=new Date(ws);date.setDate(date.getDate()+index);
+    const items=plannerParseItems(exerciseLibrary.weeklyPlan?.[day]||"");
+    const active=items.filter(item=>!plannerIsRest(item));
+    const restOnly=items.length&&!active.length;
+    let body="";
+    if(active.length){
+      body=active.map(item=>{
+        const type=plannerType(item);
+        return `<div class="planner-check-line"><span class="planner-box" aria-hidden="true"></span><span>${esc(item)}<span class="planner-tag">${esc(type)}</span></span></div>`;
+      }).join("");
+      const rests=items.filter(plannerIsRest);
+      if(rests.length)body+=`<div class="planner-rest">${rests.map(esc).join(" • ")}</div>`;
+    }else{
+      body=`<div class="planner-rest">${restOnly?esc(items.join(" • ")):"Rest / no planned session"}</div>`;
+    }
+    return `<div class="planner-print-day">
+      <div><div class="planner-day-name">${esc(day)}</div><div class="planner-day-date">${esc(plannerPrettyDate(date,true))}</div></div>
+      <div class="planner-check-list">${body}</div>
+    </div>`;
+  }).join("");
+
+  $("plannerGenerated").textContent=`Printed ${plannerLongDate(new Date())}`;
+  $("plannerStatus").textContent=stats.total
+    ?`${stats.total} planned session${stats.total===1?"":"s"} across the week.`
+    :"No planned sessions yet — edit your Weekly Plan or print a blank week.";
+  $("plannerStatus").className=stats.total?"status good":"status warn";
+}
+function plannerShiftWeek(days){
+  const d=plannerDateFromInput();
+  d.setDate(d.getDate()+days);
+  $("plannerWeekStart").value=plannerIsoMonday(d);
+  renderPlanner();
+}
+function plannerPrint(){
+  savePlannerPrefs();
+  renderPlanner();
+  window.print();
+}
+
 function renderWeek(){
   const box=$("weekPlan");
   box.innerHTML=dayNames.map(d=>{
@@ -2819,6 +3265,7 @@ document.querySelectorAll("[data-start]").forEach(x=>x.addEventListener("click",
   renderSession();
   showView("train");
 }));
+document.querySelector("[data-open-planner]")?.addEventListener("click",()=>showView("planner"));
 document.querySelector("[data-library-manager]")?.addEventListener("click",()=>{
   showView("data");
   setTimeout(()=>$("libraryManager")?.scrollIntoView({behavior:"smooth",block:"start"}),50);
@@ -3160,10 +3607,28 @@ $("importLibrary").addEventListener("change",async e=>{
   }
   e.target.value="";
 });
+
+$("plannerWeekStart").addEventListener("change",renderPlanner);
+$("plannerFocus").addEventListener("input",()=>{
+  savePlannerPrefs();
+  renderPlanner();
+});
+$("plannerPreviousWeek").addEventListener("click",()=>plannerShiftWeek(-7));
+$("plannerNextWeek").addEventListener("click",()=>plannerShiftWeek(7));
+$("plannerThisWeek").addEventListener("click",()=>{
+  $("plannerWeekStart").value=plannerIsoMonday(new Date());
+  renderPlanner();
+});
+$("plannerPrint").addEventListener("click",plannerPrint);
+$("plannerEditPlan").addEventListener("click",()=>{
+  showView("data");
+  setTimeout(()=>$("weeklyPlanManager")?.scrollIntoView({behavior:"smooth",block:"start"}),60);
+});
+
 $("saveWeeklyPlan").addEventListener("click",()=>{
   document.querySelectorAll("[data-plan-day]").forEach(inp=>exerciseLibrary.weeklyPlan[inp.dataset.planDay]=inp.value.trim());
-  saveExerciseLibrary();renderWeek();renderHome();
-  $("weeklyPlanStatus").textContent="Weekly plan saved locally.";
+  saveExerciseLibrary();renderWeek();renderHome();renderPlanner();
+  $("weeklyPlanStatus").textContent="Weekly plan saved locally and updated in the printable planner.";
   $("weeklyPlanStatus").className="status good";
 });
 
@@ -3754,7 +4219,7 @@ $("timerPause").addEventListener("click",()=>{clearInterval(timerId);timerId=nul
 $("timerReset").addEventListener("click",()=>resetSessionTimerForSelection());
 
 loadExerciseLibrary();loadLocal();loadHealth();loadCirculationPreference();
-refreshSessionSelect();renderLibraryManager();renderWeeklyPlanInputs();renderWeek();renderHome();
+refreshSessionSelect();renderLibraryManager();renderWeeklyPlanInputs();renderWeek();renderHome();renderPlanner();
 resetSessionTimerForSelection();renderSession();renderClock();renderHealthHistory();
 $("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();renderPreWalk();renderCirculation();
 loadMorning();renderMorning();renderMorningHistory();

@@ -2,7 +2,22 @@
 
 Multi-mode, local-first Progressive Web App.
 
-Current release: **v1.8c.1 PWA**.
+Current release: **v1.9 PWA**.
+
+## v1.9 — A4 printable weekly training planner
+
+Adds a dedicated **Planner** view and a printer-friendly A4 portrait weekly checklist.
+
+- Uses the synced Weekly Plan as the repeating plan template.
+- Select any week; dates are rendered Monday through Sunday.
+- Splits plan text such as `Lower Body + Swim` into separate physical tick boxes.
+- Shows planned totals for Swim, Bike, Run and Strength / Mobility.
+- Includes optional `This week's focus`.
+- Includes handwritten `Completed / Planned`, `Remaining` and `Notes / Adjustments` areas.
+- `Print / Save PDF` uses the browser's standard print dialog and an A4-specific print stylesheet.
+- A Home shortcut opens the planner directly.
+- The Planner does not auto-tick completed app sessions in v1.9; the wall sheet remains a simple physical checklist.
+- Weekly Plan remains a separate synced Drive file, providing a clean base for future planner enhancements.
 
 ## v1.8c.1 — purpose-specific cloud files
 
