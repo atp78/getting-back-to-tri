@@ -1,10 +1,11 @@
-const CACHE_NAME = "getting-back-to-tri-v1-9";
+const CACHE_NAME = "getting-back-to-tri-v1-9-2";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./service-worker.js",
-  "./icon.svg"
+  "./icon.svg",
+  "./qrcode-lite.js"
 ];
 
 self.addEventListener("install", event => {

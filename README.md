@@ -2,7 +2,34 @@
 
 Multi-mode, local-first Progressive Web App.
 
-Current release: **v1.9 PWA**.
+Current release: **v1.9.2 PWA**.
+
+## v1.9.2 — richer printable planner + session QR deep links
+
+- Adds planned duration in minutes for each weekly-plan session.
+- Adds ★ key-session markers.
+- Adds a three-part end-of-week review strip:
+  - Best session
+  - What got missed?
+  - Change next week
+- Adds a locally generated QR code beside each recognised planned session.
+- QR links deep-link directly to the selected workout in the app:
+  - private Workout Library sessions use their stable session ID
+  - built-in Swim / Bike / Run and guided routines open directly
+  - Morning Movement can link directly into Morning mode
+- Adds a Planner details editor with:
+  - planned minutes
+  - key-session toggle
+  - automatic or manual `Open in app` target
+- Planner metadata syncs inside `Getting_Back_to_Tri_Weekly_Plan.json`.
+- The QR generator is bundled locally/offline using Kazuhiko Arase's MIT-licensed QRCode for JavaScript implementation.
+- A QR is omitted rather than misleading the user if a plan entry cannot be matched and no manual app target is selected.
+
+## v1.9.1 — printout branding
+
+- Adds the existing Getting Back to Tri app logo to the A4 weekly planner.
+- Uses the same `icon.svg` already shipped with the PWA, so there is no extra image dependency.
+- Logo is sized specifically for A4 printing and remains visible in the print-only layout.
 
 ## v1.9 — A4 printable weekly training planner
 

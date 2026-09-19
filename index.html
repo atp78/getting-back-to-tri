@@ -216,6 +216,18 @@ main{padding:14px 0 90px}
   border-bottom:2px solid #111;
   padding-bottom:4mm;
 }
+.planner-print-lockup{
+  display:flex;
+  align-items:center;
+  gap:4mm;
+}
+.planner-print-logo{
+  display:block;
+  width:18mm;
+  height:18mm;
+  object-fit:contain;
+  flex:0 0 18mm;
+}
 .planner-print-brand{
   font-size:8.5pt;
   font-weight:800;
@@ -379,6 +391,7 @@ main{padding:14px 0 90px}
   .nav{grid-template-columns:repeat(3,1fr)}
   .planner-sheet{padding:6mm}
   .planner-print-header{gap:5mm}
+  .planner-print-logo{width:14mm;height:14mm;flex-basis:14mm}
   .planner-summary{grid-template-columns:repeat(5,minmax(0,1fr))}
 }
 @page{
@@ -416,11 +429,166 @@ main{padding:14px 0 90px}
     background:#fff!important;
     color:#000!important;
   }
+  #plannerPrintSheet .planner-print-logo{
+    width:18mm!important;
+    height:18mm!important;
+    flex-basis:18mm!important;
+  }
   #plannerPrintSheet .planner-print-day{
     min-height:23mm;
   }
   #plannerPrintSheet .planner-bottom{
     margin-top:3mm;
+  }
+}
+
+/* v1.9.2 planner enhancements */
+.planner-detail-editor{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px;
+  background:rgba(255,255,255,.025);
+}
+.planner-meta-row{
+  display:grid;
+  grid-template-columns:minmax(130px,1.4fr) 105px 88px minmax(150px,1fr);
+  gap:8px;
+  align-items:end;
+  padding:9px 0;
+  border-bottom:1px solid var(--line);
+}
+.planner-meta-row:last-child{border-bottom:0}
+.planner-meta-name b{display:block}
+.planner-meta-name span{display:block;color:var(--muted);font-size:.72rem;margin-top:2px}
+.planner-meta-row input[type="number"]{min-width:0}
+.planner-key-toggle{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:0 8px;
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+.planner-key-toggle input{width:auto}
+.planner-link-hint{
+  display:block;
+  color:var(--muted);
+  font-size:.68rem;
+  margin-top:3px;
+}
+
+.planner-summary small{
+  display:block;
+  min-height:8px;
+  margin-top:.5mm;
+  font-size:6.5pt;
+  font-weight:700;
+}
+.planner-check-line{
+  display:grid;
+  grid-template-columns:4.5mm minmax(0,1fr) 12mm;
+  align-items:center;
+  gap:2.2mm;
+  min-height:12mm;
+}
+.planner-session-main{
+  min-width:0;
+}
+.planner-session-title{
+  font-size:10.3pt;
+  line-height:1.2;
+}
+.planner-key-star{
+  font-size:12pt;
+  font-weight:900;
+  margin-right:1.2mm;
+  vertical-align:-.2mm;
+}
+.planner-session-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1.5mm;
+  align-items:center;
+  margin-top:1mm;
+}
+.planner-duration{
+  display:inline-block;
+  padding:.3mm 1.4mm;
+  border:1px solid #777;
+  border-radius:2mm;
+  font-size:6.5pt;
+  font-weight:700;
+  white-space:nowrap;
+}
+.planner-qr-wrap{
+  width:12mm;
+  min-width:12mm;
+  text-align:center;
+  align-self:center;
+}
+.planner-qr{
+  width:11mm;
+  height:11mm;
+  margin:0 auto;
+  background:#fff;
+}
+.planner-qr svg{
+  display:block;
+  width:11mm;
+  height:11mm;
+}
+.planner-qr-label{
+  display:block;
+  font-size:4.8pt;
+  font-weight:800;
+  letter-spacing:.04em;
+  margin-top:.3mm;
+}
+.planner-qr-empty{
+  width:12mm;
+  min-width:12mm;
+}
+.planner-review-strip{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:3mm;
+  margin-top:3mm;
+}
+.planner-review-strip>div{
+  min-height:16mm;
+  border:1px solid #888;
+  padding:2mm;
+}
+.planner-review-strip b{
+  display:block;
+  font-size:6.5pt;
+  letter-spacing:.06em;
+}
+.planner-review-strip span{
+  display:block;
+  height:8mm;
+  margin-top:2mm;
+  border-bottom:1px solid #888;
+}
+@media(max-width:720px){
+  .planner-meta-row{grid-template-columns:1fr 1fr}
+  .planner-meta-name{grid-column:1/-1}
+}
+@media print{
+  #plannerPrintSheet .planner-print-day{
+    min-height:18mm;
+  }
+  #plannerPrintSheet .planner-check-line{
+    min-height:11.5mm;
+  }
+  #plannerPrintSheet .planner-qr,
+  #plannerPrintSheet .planner-qr svg{
+    width:11mm!important;
+    height:11mm!important;
+  }
+  #plannerPrintSheet .planner-review-strip{
+    break-inside:avoid;
   }
 }
 </style>
@@ -462,7 +630,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <div class="header-actions"><span class="version">v1.9 PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
+      <div class="header-actions"><span class="version">v1.9.2 PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
     </div>
   </div>
 </header>
@@ -831,7 +999,7 @@ main{padding:14px 0 90px}
 
   <section id="planner" class="view hidden">
     <section class="panel planner-controls">
-      <div class="kicker">v1.9 • Weekly planner</div>
+      <div class="kicker">v1.9.2 • Weekly planner</div>
       <h2 style="margin:6px 0 5px">A4 printable training checklist</h2>
       <p class="notice">The print sheet uses your synced Weekly Plan as a repeating Monday–Sunday template. A day such as “Lower Body + Swim” becomes two separate tick boxes.</p>
 
@@ -853,16 +1021,27 @@ main{padding:14px 0 90px}
         <button id="plannerEditPlan">Edit weekly plan</button>
         <button id="plannerPrint" class="primary">🖨️ Print / Save PDF</button>
       </div>
+
+      <details class="planner-detail-editor" style="margin-top:10px">
+        <summary><b>Session details • duration • key sessions • QR links</b></summary>
+        <p class="small" style="margin:8px 0">Set planned minutes, mark the important sessions with ★, and check where each QR will open. Changes are saved locally and sync with the Weekly Plan file.</p>
+        <div id="plannerMetaEditor"></div>
+        <div id="plannerMetaStatus" class="status"></div>
+      </details>
+
       <div id="plannerStatus" class="status"></div>
     </section>
 
     <div class="planner-preview-shell">
       <section id="plannerPrintSheet" class="planner-sheet" aria-label="Printable weekly training plan">
         <div class="planner-print-header">
-          <div>
-            <div class="planner-print-brand">GETTING BACK TO TRI</div>
-            <h1>Weekly Training Plan</h1>
-            <div id="plannerDateRange" class="planner-print-range"></div>
+          <div class="planner-print-lockup">
+            <img class="planner-print-logo" src="./icon.svg" alt="Getting Back to Tri">
+            <div>
+              <div class="planner-print-brand">GETTING BACK TO TRI</div>
+              <h1>Weekly Training Plan</h1>
+              <div id="plannerDateRange" class="planner-print-range"></div>
+            </div>
           </div>
           <div class="planner-print-weekbox">
             <span>WEEK COMMENCING</span>
@@ -876,7 +1055,7 @@ main{padding:14px 0 90px}
         </div>
 
         <div class="planner-summary">
-          <div><span>PLANNED</span><b id="plannerCountTotal">0</b></div>
+          <div><span>PLANNED</span><b id="plannerCountTotal">0</b><small id="plannerTimeTotal"></small></div>
           <div><span>SWIM</span><b id="plannerCountSwim">0</b></div>
           <div><span>BIKE</span><b id="plannerCountBike">0</b></div>
           <div><span>RUN</span><b id="plannerCountRun">0</b></div>
@@ -894,6 +1073,12 @@ main{padding:14px 0 90px}
             <b>NOTES / ADJUSTMENTS</b>
             <div></div><div></div><div></div>
           </div>
+        </div>
+
+        <div class="planner-review-strip">
+          <div><b>BEST SESSION</b><span></span></div>
+          <div><b>WHAT GOT MISSED?</b><span></span></div>
+          <div><b>CHANGE NEXT WEEK</b><span></span></div>
         </div>
 
         <div class="planner-print-footer">
@@ -1023,7 +1208,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.9 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.9.2 PWA • installable offline training app</div>
 </main>
 
 
@@ -1035,7 +1220,7 @@ main{padding:14px 0 90px}
         <div class="subtitle">Gentle movement • simple logging • your own pace</div>
       </div>
       <div class="header-actions">
-        <span class="version">v1.9</span>
+        <span class="version">v1.9.2</span>
         <button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button>
       </div>
     </div>
@@ -1163,7 +1348,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Morning Movement • Getting Back to Tri v1.9 PWA</div>
+  <div class="footerNote">Morning Movement • Getting Back to Tri v1.9.2 PWA</div>
 </main>
 
 
@@ -1280,6 +1465,7 @@ main{padding:14px 0 90px}
 
 <script id="googleGisScript" src="https://accounts.google.com/gsi/client" async defer></script>
 
+<script src="./qrcode-lite.js"></script>
 <script>
 (() => {
 const $ = id => document.getElementById(id);
@@ -1920,7 +2106,8 @@ function buildWeeklyPlanPayload(sourcePlan=null){
     version:1,
     updatedAt:new Date().toISOString(),
     sourceDevice:sourceDevice(),
-    plan:sourcePlan||currentWeeklyPlan()
+    plan:sourcePlan||currentWeeklyPlan(),
+    plannerMeta:plannerSyncMeta()
   };
 }
 function validateWeeklyPlanPayload(payload){
@@ -1929,6 +2116,7 @@ function validateWeeklyPlanPayload(payload){
 function applyWeeklyPlanPayload(payload){
   if(!validateWeeklyPlanPayload(payload))throw new Error("The Weekly Plan cloud file is not compatible.");
   applyWeeklyPlan(payload.plan);
+  if(payload.plannerMeta&&typeof payload.plannerMeta==="object")applyPlannerSyncMeta(payload.plannerMeta);
 }
 
 /* v1.8c source validator, used only for migration. */
@@ -3144,25 +3332,218 @@ function plannerLongDate(d){
 function plannerWeekEnd(ws){
   const d=new Date(ws);d.setDate(d.getDate()+6);return d;
 }
+function plannerPrefs(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(PLANNER_STORAGE)||"{}");
+    return {
+      focus:String(raw.focus||""),
+      itemMeta:raw.itemMeta&&typeof raw.itemMeta==="object"?raw.itemMeta:{}
+    };
+  }catch(e){
+    return {focus:"",itemMeta:{}};
+  }
+}
 function loadPlannerPrefs(){
+  const p=plannerPrefs();
+  if($("plannerFocus")&&!$("plannerFocus").value)$("plannerFocus").value=p.focus;
+  return p;
+}
+function savePlannerPrefs(next=null){
   try{
-    const p=JSON.parse(localStorage.getItem(PLANNER_STORAGE)||"{}");
-    if($("plannerFocus")&&!$("plannerFocus").value)$("plannerFocus").value=String(p.focus||"");
+    const current=plannerPrefs();
+    const value=next&&typeof next==="object"?{...current,...next}:current;
+    value.focus=$("plannerFocus")?.value.trim()??value.focus??"";
+    value.itemMeta=value.itemMeta&&typeof value.itemMeta==="object"?value.itemMeta:{};
+    localStorage.setItem(PLANNER_STORAGE,JSON.stringify(value));
   }catch(e){}
 }
-function savePlannerPrefs(){
-  try{
-    localStorage.setItem(PLANNER_STORAGE,JSON.stringify({
-      focus:$("plannerFocus")?.value.trim()||""
-    }));
-  }catch(e){}
+function plannerSyncMeta(){
+  const p=plannerPrefs();
+  return {itemMeta:p.itemMeta||{}};
 }
-function plannerSessionStats(){
-  const stats={total:0,swim:0,bike:0,run:0,other:0};
+function applyPlannerSyncMeta(meta){
+  const current=plannerPrefs();
+  current.itemMeta=meta&&meta.itemMeta&&typeof meta.itemMeta==="object"?meta.itemMeta:{};
+  savePlannerPrefs(current);
+}
+function plannerItemKey(day,item,index){
+  const clean=String(item||"").trim().toLowerCase().replace(/\s+/g," ");
+  return `${day}|${clean}|${index}`;
+}
+function plannerItemEntries(){
+  const result=[];
   PLANNER_DAY_ORDER.forEach(day=>{
+    let activeIndex=0;
     plannerParseItems(exerciseLibrary.weeklyPlan?.[day]||"").forEach(item=>{
       if(plannerIsRest(item))return;
+      const index=activeIndex++;
+      result.push({day,item,index,key:plannerItemKey(day,item,index)});
+    });
+  });
+  return result;
+}
+function plannerDefaultDuration(item){
+  const matched=plannerResolveSession(item,null,true);
+  if(matched?.kind==="library"){
+    const cfg=librarySessionById(matched.id);
+    if(cfg?.timerMinutes>0)return cfg.timerMinutes;
+  }
+  const fixed={
+    "Daily Quick Routine":Math.ceil(QUICK_TOTAL_SECONDS/60),
+    "Pre-Walk Warm-Up":Math.ceil(PREWALK_TOTAL_SECONDS/60),
+    "Circulation Reset":Math.ceil(CIRCULATION_TOTAL_SECONDS/60),
+    "Morning Movement":Math.ceil(MORNING_TOTAL_SECONDS/60)
+  };
+  return fixed[matched?.name]||0;
+}
+function plannerMetaFor(day,item,index){
+  const p=plannerPrefs(),key=plannerItemKey(day,item,index);
+  const saved=p.itemMeta?.[key]||{};
+  const hasDuration=Object.prototype.hasOwnProperty.call(saved,"durationMin");
+  return {
+    durationMin:hasDuration?Math.max(0,Number(saved.durationMin)||0):plannerDefaultDuration(item),
+    keySession:!!saved.keySession,
+    linkSession:String(saved.linkSession||"__auto__")
+  };
+}
+function plannerSetMeta(key,patch){
+  const p=plannerPrefs();
+  p.itemMeta=p.itemMeta||{};
+  p.itemMeta[key]={...(p.itemMeta[key]||{}),...patch};
+  savePlannerPrefs(p);
+}
+function plannerAllLinkOptions(){
+  const options=[
+    {value:"__auto__",label:"Auto match"},
+    {value:"__none__",label:"No QR link"},
+    {value:"Morning Movement",label:"Morning Movement"}
+  ];
+  systemSessions.forEach(name=>options.push({value:name,label:name}));
+  exerciseLibrary.sessions.forEach(s=>options.push({value:s.name,label:s.name}));
+  const seen=new Set();
+  return options.filter(o=>{
+    const k=o.value.toLowerCase();
+    if(seen.has(k))return false;
+    seen.add(k);return true;
+  });
+}
+function plannerResolveNamedSession(name){
+  const wanted=String(name||"").trim();
+  if(!wanted||wanted==="__none__")return null;
+  if(wanted==="Morning Movement")return {kind:"morning",name:"Morning Movement"};
+  const lib=exerciseLibrary.sessions.find(s=>s.name.toLowerCase()===wanted.toLowerCase());
+  if(lib)return {kind:"library",name:lib.name,id:lib.id};
+  const sys=systemSessions.find(s=>s.toLowerCase()===wanted.toLowerCase());
+  if(sys)return {kind:"system",name:sys};
+  return null;
+}
+function plannerResolveSession(item,meta=null,ignoreOverride=false){
+  if(!ignoreOverride&&meta?.linkSession&&meta.linkSession!=="__auto__"){
+    return plannerResolveNamedSession(meta.linkSession);
+  }
+
+  const text=String(item||"").trim();
+  if(!text)return null;
+
+  const exact=plannerResolveNamedSession(text);
+  if(exact)return exact;
+
+  const hay=text.toLowerCase();
+  const candidates=[
+    {kind:"morning",name:"Morning Movement"},
+    ...systemSessions.map(name=>({kind:"system",name})),
+    ...exerciseLibrary.sessions.map(s=>({kind:"library",name:s.name,id:s.id}))
+  ].sort((a,b)=>b.name.length-a.name.length);
+
+  return candidates.find(c=>hay.includes(c.name.toLowerCase()))||null;
+}
+function plannerAppBaseUrl(){
+  const u=new URL("./",location.href);
+  u.search="";u.hash="";
+  return u;
+}
+function plannerSessionUrl(match){
+  if(!match)return "";
+  const u=plannerAppBaseUrl();
+  if(match.kind==="morning"){
+    u.searchParams.set("open","morning");
+  }else{
+    u.searchParams.set("open","train");
+    if(match.kind==="library"&&match.id)u.searchParams.set("sid",match.id);
+    else u.searchParams.set("session",match.name);
+  }
+  return u.toString();
+}
+function plannerQrSvg(text){
+  if(!text||!globalThis.GBTT_QRCode||!globalThis.GBTT_QRErrorCorrectLevel)return "";
+  try{
+    const qr=new GBTT_QRCode(-1,GBTT_QRErrorCorrectLevel.L);
+    qr.addData(text);
+    qr.make();
+    const n=qr.getModuleCount(),quiet=4,total=n+quiet*2;
+    let path="";
+    for(let r=0;r<n;r++){
+      for(let c=0;c<n;c++){
+        if(qr.isDark(r,c))path+=`M${c+quiet} ${r+quiet}h1v1h-1z`;
+      }
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges" aria-hidden="true"><rect width="${total}" height="${total}" fill="#fff"/><path d="${path}" fill="#000"/></svg>`;
+  }catch(e){
+    return "";
+  }
+}
+function plannerRenderQRCodes(){
+  document.querySelectorAll("[data-planner-qr-url]").forEach(el=>{
+    const url=el.dataset.plannerQrUrl||"";
+    el.innerHTML=plannerQrSvg(url);
+  });
+}
+function plannerDurationText(minutes){
+  const m=Math.max(0,Math.round(Number(minutes)||0));
+  if(!m)return "";
+  if(m<60)return `${m} min`;
+  const h=Math.floor(m/60),rem=m%60;
+  return rem?`${h}h ${rem}m`:`${h}h`;
+}
+function renderPlannerMetaEditor(){
+  const box=$("plannerMetaEditor");
+  if(!box)return;
+  const entries=plannerItemEntries();
+  const linkOptions=plannerAllLinkOptions();
+
+  if(!entries.length){
+    box.innerHTML='<div class="notice">Add sessions to your Weekly Plan first.</div>';
+    return;
+  }
+
+  box.innerHTML=entries.map(entry=>{
+    const meta=plannerMetaFor(entry.day,entry.item,entry.index);
+    const resolved=plannerResolveSession(entry.item,meta);
+    const options=linkOptions.map(o=>`<option value="${esc(o.value)}"${o.value===meta.linkSession?" selected":""}>${esc(o.label)}</option>`).join("");
+    const hint=resolved?`QR opens: ${resolved.name}`:"No matching app session — choose one manually or no QR will print.";
+    return `<div class="planner-meta-row" data-planner-meta-key="${esc(entry.key)}">
+      <div class="planner-meta-name"><b>${esc(entry.item)}</b><span>${esc(entry.day)}</span></div>
+      <label>Minutes
+        <input type="number" min="0" max="600" step="5" inputmode="numeric" data-planner-duration value="${meta.durationMin||""}" placeholder="e.g. 45">
+      </label>
+      <label class="planner-key-toggle"><input type="checkbox" data-planner-key${meta.keySession?" checked":""}> ★ Key</label>
+      <label>Open in app
+        <select data-planner-link>${options}</select>
+        <span class="planner-link-hint">${esc(hint)}</span>
+      </label>
+    </div>`;
+  }).join("");
+}
+function plannerSessionStats(){
+  const stats={total:0,swim:0,bike:0,run:0,other:0,duration:0,keySessions:0};
+  PLANNER_DAY_ORDER.forEach(day=>{
+    let activeIndex=0;
+    plannerParseItems(exerciseLibrary.weeklyPlan?.[day]||"").forEach(item=>{
+      if(plannerIsRest(item))return;
+      const meta=plannerMetaFor(day,item,activeIndex++);
       stats.total++;
+      stats.duration+=Math.max(0,Number(meta.durationMin)||0);
+      if(meta.keySession)stats.keySessions++;
       const type=plannerType(item);
       if(type==="Swim")stats.swim++;
       else if(type==="Bike")stats.bike++;
@@ -3189,6 +3570,7 @@ function renderPlanner(){
   $("plannerFocusPrintWrap").classList.toggle("hidden",!focus);
 
   $("plannerCountTotal").textContent=stats.total;
+  $("plannerTimeTotal").textContent=stats.duration?plannerDurationText(stats.duration):"";
   $("plannerCountSwim").textContent=stats.swim;
   $("plannerCountBike").textContent=stats.bike;
   $("plannerCountRun").textContent=stats.run;
@@ -3200,26 +3582,50 @@ function renderPlanner(){
     const items=plannerParseItems(exerciseLibrary.weeklyPlan?.[day]||"");
     const active=items.filter(item=>!plannerIsRest(item));
     const restOnly=items.length&&!active.length;
-    let body="";
+    let body="",activeIndex=0;
+
     if(active.length){
       body=active.map(item=>{
+        const meta=plannerMetaFor(day,item,activeIndex++);
         const type=plannerType(item);
-        return `<div class="planner-check-line"><span class="planner-box" aria-hidden="true"></span><span>${esc(item)}<span class="planner-tag">${esc(type)}</span></span></div>`;
+        const matched=plannerResolveSession(item,meta);
+        const url=plannerSessionUrl(matched);
+        const qr=url
+          ?`<div class="planner-qr-wrap"><div class="planner-qr" data-planner-qr-url="${esc(url)}"></div><span class="planner-qr-label">OPEN</span></div>`
+          :`<div class="planner-qr-empty"></div>`;
+        const duration=meta.durationMin?`<span class="planner-duration">${esc(plannerDurationText(meta.durationMin))}</span>`:"";
+        const star=meta.keySession?'<span class="planner-key-star" title="Key session">★</span>':"";
+
+        return `<div class="planner-check-line">
+          <span class="planner-box" aria-hidden="true"></span>
+          <div class="planner-session-main">
+            <div class="planner-session-title">${star}${esc(item)}</div>
+            <div class="planner-session-meta"><span class="planner-tag">${esc(type)}</span>${duration}</div>
+          </div>
+          ${qr}
+        </div>`;
       }).join("");
+
       const rests=items.filter(plannerIsRest);
       if(rests.length)body+=`<div class="planner-rest">${rests.map(esc).join(" • ")}</div>`;
     }else{
       body=`<div class="planner-rest">${restOnly?esc(items.join(" • ")):"Rest / no planned session"}</div>`;
     }
+
     return `<div class="planner-print-day">
       <div><div class="planner-day-name">${esc(day)}</div><div class="planner-day-date">${esc(plannerPrettyDate(date,true))}</div></div>
       <div class="planner-check-list">${body}</div>
     </div>`;
   }).join("");
 
+  renderPlannerMetaEditor();
+  plannerRenderQRCodes();
+
   $("plannerGenerated").textContent=`Printed ${plannerLongDate(new Date())}`;
+  const timePart=stats.duration?` • ${plannerDurationText(stats.duration)} planned`:"";
+  const keyPart=stats.keySessions?` • ${stats.keySessions} key ★`:"";
   $("plannerStatus").textContent=stats.total
-    ?`${stats.total} planned session${stats.total===1?"":"s"} across the week.`
+    ?`${stats.total} planned session${stats.total===1?"":"s"}${timePart}${keyPart}.`
     :"No planned sessions yet — edit your Weekly Plan or print a blank week.";
   $("plannerStatus").className=stats.total?"status good":"status warn";
 }
@@ -3608,6 +4014,22 @@ $("importLibrary").addEventListener("change",async e=>{
   e.target.value="";
 });
 
+$("plannerMetaEditor").addEventListener("change",e=>{
+  const row=e.target.closest("[data-planner-meta-key]");
+  if(!row)return;
+  const key=row.dataset.plannerMetaKey;
+  const durationEl=row.querySelector("[data-planner-duration]");
+  const keyEl=row.querySelector("[data-planner-key]");
+  const linkEl=row.querySelector("[data-planner-link]");
+  plannerSetMeta(key,{
+    durationMin:Math.max(0,Number(durationEl?.value)||0),
+    keySession:!!keyEl?.checked,
+    linkSession:String(linkEl?.value||"__auto__")
+  });
+  $("plannerMetaStatus").textContent="Planner details saved locally. Push Weekly Plan / Push all when you want them on your other device.";
+  $("plannerMetaStatus").className="status good";
+  renderPlanner();
+});
 $("plannerWeekStart").addEventListener("change",renderPlanner);
 $("plannerFocus").addEventListener("input",()=>{
   savePlannerPrefs();
@@ -4218,6 +4640,61 @@ $("timerStart").addEventListener("click",()=>{
 $("timerPause").addEventListener("click",()=>{clearInterval(timerId);timerId=null});
 $("timerReset").addEventListener("click",()=>resetSessionTimerForSelection());
 
+
+function clearPlannerDeepLink(){
+  try{
+    const u=new URL(location.href);
+    ["open","sid","session"].forEach(k=>u.searchParams.delete(k));
+    const q=u.searchParams.toString();
+    history.replaceState(null,"",u.pathname+(q?`?${q}`:"")+u.hash);
+  }catch(e){}
+}
+function handlePlannerDeepLink(){
+  try{
+    const params=new URLSearchParams(location.search);
+    const open=params.get("open");
+    if(!open)return false;
+
+    if(open==="morning"){
+      activateMode(MODE_MORNING,false);
+      showMorningView("morningToday");
+      clearPlannerDeepLink();
+      return true;
+    }
+
+    if(open==="train"){
+      let target=null;
+      const sid=params.get("sid");
+      const requested=params.get("session");
+
+      if(sid)target=librarySessionById(sid)?.name||null;
+      if(!target&&requested){
+        const lib=exerciseLibrary.sessions.find(s=>s.name.toLowerCase()===requested.toLowerCase());
+        target=lib?.name||systemSessions.find(s=>s.toLowerCase()===requested.toLowerCase())||null;
+      }
+
+      activateMode(MODE_TRI,false);
+      if(target){
+        refreshSessionSelect(target);
+        $("session").value=target;
+        resetSessionTimerForSelection();
+        renderSession();
+        renderClock();
+        showView("train");
+        $("status").textContent=`Opened from weekly planner: ${target}`;
+        $("status").className="status good";
+      }else{
+        showView("train");
+        $("status").textContent="The planner QR opened the app, but that session is not available on this device. Sync/import the Workout Library and try again.";
+        $("status").className="status warn";
+      }
+      clearPlannerDeepLink();
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
 loadExerciseLibrary();loadLocal();loadHealth();loadCirculationPreference();
 refreshSessionSelect();renderLibraryManager();renderWeeklyPlanInputs();renderWeek();renderHome();renderPlanner();
 resetSessionTimerForSelection();renderSession();renderClock();renderHealthHistory();
@@ -4225,8 +4702,11 @@ $("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQu
 loadMorning();renderMorning();renderMorningHistory();
 loadDriveConfig();deviceId();
 const initialMode=localStorage.getItem(MODE_SELECTION_STORAGE);
-if([MODE_TRI,MODE_MORNING].includes(initialMode)) activateMode(initialMode,false);
-else showModeChooser();
+const openedFromPlannerQR=handlePlannerDeepLink();
+if(!openedFromPlannerQR){
+  if([MODE_TRI,MODE_MORNING].includes(initialMode)) activateMode(initialMode,false);
+  else showModeChooser();
+}
 
 // PWA install + service worker
 let deferredInstallPrompt = null;
