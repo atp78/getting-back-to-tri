@@ -166,7 +166,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Rehab • strength • mobility • swim • bike • run</div>
       </div>
-      <span class="version">v1.5 PWA</span>
+      <span class="version">v1.6.1 PWA</span>
     </div>
   </div>
 </header>
@@ -202,6 +202,7 @@ main{padding:14px 0 90px}
         <div class="quickcard" data-start="CFT Upper-Back Reset"><div class="icon">💪</div><b>CFT</b><small>15-min reset</small></div>
         <div class="quickcard" data-start="Daily Quick Routine"><div class="icon">⏱️</div><b>Daily quick</b><small>7:28 guided</small></div>
         <div class="quickcard" data-start="Pre-Walk Warm-Up"><div class="icon">🚶</div><b>Pre-walk</b><small>4:12 guided</small></div>
+        <div class="quickcard" data-start="Circulation Reset"><div class="icon">💧</div><b>Circulation</b><small>6:25 guided</small></div>
       </div>
       <div class="quickcards" style="margin-top:8px">
         <div class="quickcard" data-start="Swim"><div class="icon">🏊</div><b>Swim</b><small>Quick log</small></div>
@@ -283,6 +284,62 @@ main{padding:14px 0 90px}
         <button id="preWalkReset">Reset</button>
       </div>
       <div id="preWalkList" class="routine-list"></div>
+    </section>
+
+
+    <section id="circulationTimer" class="quicktimer hidden">
+      <div class="small">CIRCULATION RESET • 6 MOVEMENTS • 5 SEC CHANGEOVERS</div>
+
+      <div class="grid2" style="margin:10px 0">
+        <label>Use it for
+          <select id="circulationContext">
+            <option value="Morning">Morning</option>
+            <option value="After sitting">After sitting</option>
+            <option value="Recovery">Recovery</option>
+          </select>
+        </label>
+        <label>2-minute rhythmic stage
+          <select id="circulationMovement">
+            <option value="March in place">March in place</option>
+            <option value="Gentle rebounder">Gentle rebounder</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="circulationExercise" class="stepname">Diaphragmatic Breathing</div>
+      <div id="circulationPosition" class="stepdetail">Relax shoulders • slow nasal inhale • easy long exhale</div>
+      <div id="circulationClock" class="bigclock">1:00</div>
+      <div id="circulationOverall" class="small">Overall 6:25 remaining • movement 1 of 6</div>
+      <div class="progress" aria-hidden="true"><span id="circulationProgress"></span></div>
+      <div id="circulationNext" class="next">Next: 5-sec changeover → Ankle Pumps / Calf Raises</div>
+      <div class="actions" style="margin-top:10px">
+        <button id="circulationStart" class="primary">Start / Resume</button>
+        <button id="circulationPause">Pause</button>
+        <button id="circulationBack">← Previous</button>
+        <button id="circulationSkip">Next →</button>
+        <button id="circulationReset">Reset</button>
+      </div>
+      <div id="circulationList" class="routine-list"></div>
+
+      <div class="panel" style="margin-top:10px;padding:11px">
+        <div class="kicker">Technique demos</div>
+        <div class="small" style="margin:5px 0 9px">For the less-obvious movements. Videos need an internet connection; the timed routine itself still works offline.</div>
+
+        <div class="demo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=zKgRit_yN4c&t=12s">▶ Diaphragmatic breathing</a>
+          <div class="text">NHS Fife demonstration — belly/diaphragm breathing rather than lifting the shoulders.</div>
+        </div>
+
+        <div class="demo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://player.vimeo.com/video/419862653">▶ Ankle pumps</a>
+          <div class="text">Lancashire Teaching Hospitals physiotherapy demonstration.</div>
+        </div>
+
+        <div class="demo" id="rebounderDemo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=JRXUZwaXYHo">▶ Gentle rebounder / basic bounce</a>
+          <div class="text">Beginner low-impact bounce demonstration. Use it for movement technique only; no special “detox” effect is assumed.</div>
+        </div>
+      </div>
     </section>
 
     <section id="sessionNotice" class="panel notice"></section>
@@ -496,20 +553,26 @@ main{padding:14px 0 90px}
     </section>
     <section class="panel">
       <div class="kicker">Included in v1.0</div>
-      <p class="notice">Invicta Lower Body, Upper Body, Whole Body and Daily Prehab; guided Daily Quick Routine; guided Pre-Walk Warm-Up; BodyCraft CFT upper-back reset; swim/bike/run logging; recovery dashboard with personal baselines and readiness; training + recovery CSV export.</p>
+      <p class="notice">Invicta Lower Body, Upper Body, Whole Body and Daily Prehab; guided Daily Quick Routine; guided Pre-Walk Warm-Up; guided Circulation Reset; BodyCraft CFT upper-back reset; swim/bike/run logging; recovery dashboard with personal baselines and readiness; training + recovery CSV export.</p>
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.5 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.6.1.1 PWA • installable offline training app</div>
 </main>
 
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-const STORAGE = "gettingBackToTri_v1_history";
+const APP_MODE_STORAGE = "gbtt_app_mode";
+const APP_MODE_TRI = "tri";
+const LEGACY_STORAGE = "gettingBackToTri_v1_history";
+const LEGACY_HEALTH_STORAGE = "gettingBackToTri_v1_health";
+const LEGACY_BASELINE_STORAGE = "gettingBackToTri_v1_baseline";
 const OLD_STORAGE = "rehabTrainingLog";
-const HEALTH_STORAGE = "gettingBackToTri_v1_health";
-const BASELINE_STORAGE = "gettingBackToTri_v1_baseline";
+const STORAGE = "gbtt_tri_history_v1";
+const HEALTH_STORAGE = "gbtt_tri_health_v1";
+const BASELINE_STORAGE = "gbtt_tri_baseline_v1";
+const CIRCULATION_PREF_STORAGE = "gbtt_tri_circulation_pref_v1";
 
 const rehab = {
   "Lower Body":[
@@ -645,8 +708,18 @@ const preWalkSteps = [
   {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Right • midfoot pressure into wall", seconds:30}
 ];
 
+
+const circulationSteps = [
+  {exercise:"Diaphragmatic Breathing", detail:"Relax shoulders • slow nasal inhale • easy long exhale", seconds:60},
+  {exercise:"Ankle Pumps / Calf Raises", detail:"Easy rhythmic ankle movement • use support if standing", seconds:45},
+  {exercise:"Easy Marching", detail:"Comfortable rhythm • relaxed arms • light feet", seconds:45},
+  {exercise:"Shoulder Rolls + Arm Sweeps", detail:"Gentle range • no shrugging or forcing", seconds:45},
+  {exercise:"Rhythmic Movement", detail:"March in place", seconds:120},
+  {exercise:"Breathing + Shake-Out", detail:"Relaxed breathing • loosen hands, shoulders and legs", seconds:45}
+];
+
 const endurance = new Set(["Swim","Bike","Run"]);
-const programmeNames = [...Object.keys(rehab),"Daily Quick Routine","Pre-Walk Warm-Up","CFT Upper-Back Reset","Swim","Bike","Run"];
+const programmeNames = [...Object.keys(rehab),"Daily Quick Routine","Pre-Walk Warm-Up","Circulation Reset","CFT Upper-Back Reset","Swim","Bike","Run"];
 const summaries = {
   "Lower Body":"Invicta lower-body rehab strength session.",
   "Upper Body":"Invicta upper-body strength session.",
@@ -654,6 +727,7 @@ const summaries = {
   "Daily Prehab":"Daily mobility + isometric prehab.",
   "Daily Quick Routine":"Guided 7:28 daily routine • 12 × 30-second work intervals with 8-second changeovers.",
   "Pre-Walk Warm-Up":"Guided 4:12 activation routine before walking • 8 clock positions + 2 wall-supported hip lifts • 8-second changeovers.",
+  "Circulation Reset":"Guided 6:25 gentle movement routine • breathing, lower-leg muscle pump, marching, upper-body movement and an optional rebounder stage.",
   "CFT Upper-Back Reset":"15-minute BodyCraft CFT accessory circuit • 2 rounds • 15–20 sec between exercises • 60–90 sec between rounds.",
   "Swim":"Quick-log a swim session.",
   "Bike":"Quick-log a bike session.",
@@ -692,6 +766,20 @@ let preWalkCompletedSteps = new Set();
 const PREWALK_REST_SECONDS = 8;
 const PREWALK_TOTAL_SECONDS = preWalkSteps.reduce((sum,s)=>sum+s.seconds,0) + (preWalkSteps.length-1)*PREWALK_REST_SECONDS;
 
+let circulationIndex = 0;
+let circulationSeconds = circulationSteps[0].seconds;
+let circulationPhase = "work";
+let circulationTimerId = null;
+let circulationCompleted = false;
+let circulationCompletedSteps = new Set();
+const CIRCULATION_REST_SECONDS = 5;
+const CIRCULATION_TOTAL_SECONDS = circulationSteps.reduce((sum,s)=>sum+s.seconds,0) + (circulationSteps.length-1)*CIRCULATION_REST_SECONDS;
+
+let appMode = localStorage.getItem(APP_MODE_STORAGE) || APP_MODE_TRI;
+if(appMode !== APP_MODE_TRI) appMode = APP_MODE_TRI;
+localStorage.setItem(APP_MODE_STORAGE, appMode);
+
+
 
 let healthHistory = [];
 let baseline = {
@@ -707,6 +795,20 @@ function weekStart(d=new Date()){const x=new Date(d);const day=(x.getDay()+6)%7;
 function saveLocal(){localStorage.setItem(STORAGE,JSON.stringify(history))}
 function loadLocal(){
   try{history=JSON.parse(localStorage.getItem(STORAGE)||"[]");if(!Array.isArray(history))history=[]}catch(e){history=[]}
+
+  // v1.6 profile migration: preserve the existing Back-to-Tri history,
+  // but copy it into a profile-specific key ready for future app modes.
+  if(!history.length){
+    try{
+      const legacy=JSON.parse(localStorage.getItem(LEGACY_STORAGE)||"[]");
+      if(Array.isArray(legacy)&&legacy.length){
+        history=legacy;
+        saveLocal();
+      }
+    }catch(e){}
+  }
+
+  // Original RehabTrainingLog migration remains as a final fallback.
   if(!history.length){
     try{
       const old=JSON.parse(localStorage.getItem(OLD_STORAGE)||"[]");
@@ -722,7 +824,7 @@ function loadLocal(){
 function categoryOf(name){
   if(endurance.has(name))return "Endurance";
   if(name==="CFT Upper-Back Reset")return "CFT";
-  if(name==="Daily Prehab"||name==="Daily Quick Routine"||name==="Pre-Walk Warm-Up")return "Mobility";
+  if(name==="Daily Prehab"||name==="Daily Quick Routine"||name==="Pre-Walk Warm-Up"||name==="Circulation Reset")return "Mobility";
   return "Rehab";
 }
 function showView(id){
@@ -746,10 +848,38 @@ function loadHealth(){
     const h=JSON.parse(localStorage.getItem(HEALTH_STORAGE)||"[]");
     healthHistory=Array.isArray(h)?h:[];
   }catch(e){healthHistory=[]}
+
+  if(!healthHistory.length){
+    try{
+      const legacy=JSON.parse(localStorage.getItem(LEGACY_HEALTH_STORAGE)||"[]");
+      if(Array.isArray(legacy)&&legacy.length){
+        healthHistory=legacy;
+        saveHealthLocal();
+      }
+    }catch(e){}
+  }
+
+  let baselineLoaded=false;
   try{
-    const b=JSON.parse(localStorage.getItem(BASELINE_STORAGE)||"{}");
-    baseline={...baseline,...b};
+    const raw=localStorage.getItem(BASELINE_STORAGE);
+    if(raw){
+      const b=JSON.parse(raw);
+      baseline={...baseline,...b};
+      baselineLoaded=true;
+    }
   }catch(e){}
+
+  if(!baselineLoaded){
+    try{
+      const raw=localStorage.getItem(LEGACY_BASELINE_STORAGE);
+      if(raw){
+        const b=JSON.parse(raw);
+        baseline={...baseline,...b};
+        saveBaselineLocal();
+      }
+    }catch(e){}
+  }
+
   fillBaselineForm();
 }
 function saveHealthLocal(){localStorage.setItem(HEALTH_STORAGE,JSON.stringify(healthHistory))}
@@ -1008,6 +1138,8 @@ function renderSession(){
   if(name==="Daily Quick Routine") renderQuickRoutine();
   $("preWalkTimer").classList.toggle("hidden",name!=="Pre-Walk Warm-Up");
   if(name==="Pre-Walk Warm-Up") renderPreWalk();
+  $("circulationTimer").classList.toggle("hidden",name!=="Circulation Reset");
+  if(name==="Circulation Reset") renderCirculation();
   $("enduranceFields").classList.toggle("hidden",!endurance.has(name));
   $("sessionNotice").classList.toggle("hidden",endurance.has(name));
   if(name==="CFT Upper-Back Reset"){
@@ -1016,6 +1148,8 @@ function renderSession(){
     $("sessionNotice").innerHTML="<b>Guided routine:</b> every work interval is 30 seconds, followed by an 8-second changeover before the next position. The timer advances automatically through 8 clock-stretch positions, 2 single-leg hip-thrust holds and 2 wall-supported hip lifts. Work time: 6:00 • changeovers: 1:28 • total: 7:28.";
   } else if(name==="Pre-Walk Warm-Up"){
     $("sessionNotice").innerHTML="<b>Pre-walk activation:</b> a short routine to loosen the hip-flexor/groin area and switch the posterior chain on before a brisk walk, particularly after a period of sitting. Clock positions are 15 seconds each, then 30 seconds per side for the wall-supported hip lift, with 8-second changeovers. Total: 4:12. Keep it comfortable rather than turning it into a workout; stop if symptoms increase.";
+  } else if(name==="Circulation Reset"){
+    $("sessionNotice").innerHTML="<b>Circulation Reset:</b> gentle breathing and rhythmic muscle movement intended to support normal circulation and lymphatic flow after waking or sitting. The rebounder is optional — marching works too. This is a movement/wellbeing routine, not a detox or treatment for a medical condition. Keep it easy and stop if you feel unwell, dizzy or develop unusual symptoms.";
   } else if(name==="Daily Prehab"){
     $("sessionNotice").innerHTML="<b>Prehab:</b> move smoothly and use the prescribed holds. Keep this as supportive work rather than turning it into a hard conditioning session.";
   } else if(!endurance.has(name)){
@@ -1092,6 +1226,22 @@ function collectRows(){
     });
     return rows;
   }
+  if(name==="Circulation Reset"){
+    const movement=$("circulationMovement").value;
+    [...circulationCompletedSteps].sort((a,b)=>a-b).forEach(i=>{
+      const step=circulationStep(i);
+      rows.push({
+        exercise:step.exercise,
+        set:i+1,
+        target:`${step.seconds} sec`,
+        load:"",
+        done:step.detail+` • completed ${step.seconds} sec`,
+        rpe:"",
+        pain:""
+      });
+    });
+    return rows;
+  }
   data.forEach((e,i)=>{
     for(let j=0;j<e.sets;j++){
       const r={exercise:e.name,set:j+1,target:e.target,load:draft[key(name,i,j,"load")]||"",done:draft[key(name,i,j,"done")]||"",rpe:draft[key(name,i,j,"rpe")]||"",pain:draft[key(name,i,j,"pain")]||""};
@@ -1114,17 +1264,23 @@ $("save").addEventListener("click",()=>{
   const h={
     id:Date.now(),date:$("date").value,session:name,category:categoryOf(name),
     sessionRpe:$("sessionRpe").value,sessionPain:$("sessionPain").value,notes:$("notes").value.trim(),
-    duration:$("duration").value.trim(),distance:$("distance").value.trim(),detail:$("enduranceDetail").value.trim(),
+    duration:$("duration").value.trim(),distance:$("distance").value.trim(),
+    detail:name==="Circulation Reset"
+      ? `${$("circulationContext").value} • rhythmic stage: ${$("circulationMovement").value}`
+      : $("enduranceDetail").value.trim(),
     rows:collectRows()
   };
   history.push(h);saveLocal();renderHome();clearCurrent();
   const quickCount=name==="Daily Quick Routine" ? h.rows.length : null;
   const preWalkCount=name==="Pre-Walk Warm-Up" ? h.rows.length : null;
+  const circulationCount=name==="Circulation Reset" ? h.rows.length : null;
   $("status").textContent=name==="Daily Quick Routine"
     ? `Saved Daily Quick Routine for ${h.date} • ${quickCount}/12 work intervals completed.`
     : name==="Pre-Walk Warm-Up"
       ? `Saved Pre-Walk Warm-Up for ${h.date} • ${preWalkCount}/10 work intervals completed.`
-      : `Saved ${name} for ${h.date}.`;
+      : name==="Circulation Reset"
+        ? `Saved Circulation Reset for ${h.date} • ${circulationCount}/6 movements completed.`
+        : `Saved ${name} for ${h.date}.`;
   $("status").className="status good";
 });
 
@@ -1575,6 +1731,185 @@ $("preWalkReset").addEventListener("click",()=>{
   renderPreWalk();
 });
 
+
+function circulationStep(i){
+  const base={...circulationSteps[i]};
+  if(i===4){
+    base.detail=$("circulationMovement")?.value || "March in place";
+  }
+  return base;
+}
+function saveCirculationPreference(){
+  const pref={
+    context:$("circulationContext").value,
+    movement:$("circulationMovement").value
+  };
+  localStorage.setItem(CIRCULATION_PREF_STORAGE,JSON.stringify(pref));
+}
+function loadCirculationPreference(){
+  try{
+    const pref=JSON.parse(localStorage.getItem(CIRCULATION_PREF_STORAGE)||"{}");
+    if(pref.context && [...$("circulationContext").options].some(o=>o.value===pref.context)) $("circulationContext").value=pref.context;
+    if(pref.movement && [...$("circulationMovement").options].some(o=>o.value===pref.movement)) $("circulationMovement").value=pref.movement;
+  }catch(e){}
+}
+function circulationCue(){ quickCue(); }
+function circulationOverallRemaining(){
+  if(circulationCompleted) return 0;
+  if(circulationPhase==="work"){
+    const futureWork=circulationSteps.slice(circulationIndex+1).reduce((sum,s)=>sum+s.seconds,0);
+    const futureRests=circulationSteps.length-circulationIndex-1;
+    return circulationSeconds + futureWork + futureRests*CIRCULATION_REST_SECONDS;
+  }
+  const nextIndex=circulationIndex+1;
+  const futureWork=circulationSteps.slice(nextIndex).reduce((sum,s)=>sum+s.seconds,0);
+  const futureRests=Math.max(0,circulationSteps.length-nextIndex-1);
+  return circulationSeconds + futureWork + futureRests*CIRCULATION_REST_SECONDS;
+}
+function circulationElapsed(){
+  if(circulationCompleted) return CIRCULATION_TOTAL_SECONDS;
+  let elapsed=0;
+  for(let i=0;i<circulationIndex;i++){
+    elapsed+=circulationSteps[i].seconds+CIRCULATION_REST_SECONDS;
+  }
+  if(circulationPhase==="work"){
+    elapsed+=circulationSteps[circulationIndex].seconds-circulationSeconds;
+  }else{
+    elapsed+=circulationSteps[circulationIndex].seconds+(CIRCULATION_REST_SECONDS-circulationSeconds);
+  }
+  return elapsed;
+}
+function renderCirculation(){
+  const timerBox=$("circulationTimer");
+  timerBox.classList.toggle("resting",!circulationCompleted&&circulationPhase==="rest");
+  if($("rebounderDemo")) $("rebounderDemo").classList.toggle("hidden",$("circulationMovement").value!=="Gentle rebounder");
+  const step=circulationStep(Math.min(circulationIndex,circulationSteps.length-1));
+  const nextStep=circulationStep(Math.min(circulationIndex+1,circulationSteps.length-1));
+
+  if(circulationCompleted){
+    $("circulationExercise").textContent="Reset complete ✓";
+    $("circulationPosition").textContent="Finish feeling loose, not fatigued";
+    $("circulationClock").textContent="0:00";
+    $("circulationOverall").textContent="All 6 movements complete • total 6:25";
+    $("circulationNext").textContent="Tap Save session below to add the routine to History.";
+  } else if(circulationPhase==="rest"){
+    $("circulationExercise").textContent="Change movement";
+    $("circulationPosition").textContent=`Next: ${nextStep.exercise}`;
+    $("circulationClock").textContent=`0:${String(circulationSeconds).padStart(2,"0")}`;
+    $("circulationOverall").textContent=`Overall ${fmtShort(circulationOverallRemaining())} remaining • 5-sec changeover`;
+    $("circulationNext").textContent=`Get ready: ${nextStep.detail}`;
+  } else {
+    $("circulationExercise").textContent=step.exercise;
+    $("circulationPosition").textContent=step.detail;
+    $("circulationClock").textContent=fmtShort(circulationSeconds);
+    $("circulationOverall").textContent=`Overall ${fmtShort(circulationOverallRemaining())} remaining • movement ${circulationIndex+1} of ${circulationSteps.length}`;
+    $("circulationNext").textContent=circulationIndex<circulationSteps.length-1
+      ? `Next: 5-sec changeover → ${circulationStep(circulationIndex+1).exercise}`
+      : "Next: finish";
+  }
+
+  $("circulationProgress").style.width=`${Math.min(100,(circulationElapsed()/CIRCULATION_TOTAL_SECONDS)*100)}%`;
+  $("circulationList").innerHTML=circulationSteps.map((x,i)=>{
+    const stepView=circulationStep(i);
+    const done=circulationCompletedSteps.has(i);
+    const current=!circulationCompleted && ((circulationPhase==="work"&&i===circulationIndex)||(circulationPhase==="rest"&&i===circulationIndex+1));
+    return `<div class="routine-step ${done?"done":current?"current":""}"><b>${i+1}</b><span>${esc(stepView.exercise)}<br><small>${esc(stepView.detail)}</small></span><span class="t">${fmtShort(stepView.seconds)}</span></div>`;
+  }).join("");
+}
+function circulationStop(){clearInterval(circulationTimerId);circulationTimerId=null;}
+function circulationAdvance(){
+  if(circulationPhase==="work"){
+    circulationCompletedSteps.add(circulationIndex);
+    circulationCue();
+    if(circulationIndex>=circulationSteps.length-1){
+      circulationStop();
+      circulationCompleted=true;
+      circulationSeconds=0;
+      renderCirculation();
+      $("status").textContent="Circulation Reset complete — 6/6 movements finished. Tap Save session to add it to History.";
+      $("status").className="status good";
+      return;
+    }
+    circulationPhase="rest";
+    circulationSeconds=CIRCULATION_REST_SECONDS;
+    renderCirculation();
+    return;
+  }
+  circulationCue();
+  circulationIndex++;
+  circulationPhase="work";
+  circulationSeconds=circulationSteps[circulationIndex].seconds;
+  renderCirculation();
+}
+function circulationPrevious(){
+  circulationStop();
+  circulationCompleted=false;
+  if(circulationPhase==="rest"){
+    circulationPhase="work";
+    circulationSeconds=circulationSteps[circulationIndex].seconds;
+    circulationCompletedSteps.delete(circulationIndex);
+  }else if(circulationIndex>0){
+    circulationCompletedSteps.delete(circulationIndex);
+    circulationIndex--;
+    circulationPhase="work";
+    circulationSeconds=circulationSteps[circulationIndex].seconds;
+    circulationCompletedSteps.delete(circulationIndex);
+  }else{
+    circulationSeconds=circulationSteps[0].seconds;
+    circulationCompletedSteps.delete(0);
+  }
+  renderCirculation();
+}
+$("circulationStart").addEventListener("click",()=>{
+  saveCirculationPreference();
+  if(circulationCompleted){
+    circulationIndex=0;
+    circulationSeconds=circulationSteps[0].seconds;
+    circulationPhase="work";
+    circulationCompleted=false;
+    circulationCompletedSteps.clear();
+    renderCirculation();
+  }
+  if(circulationTimerId)return;
+  circulationCue();
+  circulationTimerId=setInterval(()=>{
+    circulationSeconds--;
+    if(circulationSeconds<=0) circulationAdvance(); else renderCirculation();
+  },1000);
+});
+$("circulationPause").addEventListener("click",circulationStop);
+$("circulationSkip").addEventListener("click",()=>{
+  circulationStop();
+  if(circulationCompleted) return;
+  if(circulationPhase==="work"){
+    if(circulationIndex>=circulationSteps.length-1){
+      circulationCompleted=true;
+      circulationSeconds=0;
+    }else{
+      circulationPhase="rest";
+      circulationSeconds=CIRCULATION_REST_SECONDS;
+    }
+  }else{
+    circulationIndex++;
+    circulationPhase="work";
+    circulationSeconds=circulationSteps[circulationIndex].seconds;
+  }
+  renderCirculation();
+});
+$("circulationBack").addEventListener("click",circulationPrevious);
+$("circulationReset").addEventListener("click",()=>{
+  circulationStop();
+  circulationIndex=0;
+  circulationSeconds=circulationSteps[0].seconds;
+  circulationPhase="work";
+  circulationCompleted=false;
+  circulationCompletedSteps.clear();
+  renderCirculation();
+});
+$("circulationMovement").addEventListener("change",()=>{saveCirculationPreference();renderCirculation()});
+$("circulationContext").addEventListener("change",saveCirculationPreference);
+
+
 function renderClock(){
   const m=String(Math.floor(cftRemaining/60)).padStart(2,"0"),s=String(cftRemaining%60).padStart(2,"0");
   $("clock").textContent=`${m}:${s}`;
@@ -1586,7 +1921,7 @@ $("timerStart").addEventListener("click",()=>{
 $("timerPause").addEventListener("click",()=>{clearInterval(timerId);timerId=null});
 $("timerReset").addEventListener("click",()=>{clearInterval(timerId);timerId=null;cftRemaining=15*60;renderClock()});
 
-loadLocal();loadHealth();renderWeek();renderHome();renderSession();renderClock();renderHealthHistory();$("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();
+loadLocal();loadHealth();loadCirculationPreference();renderWeek();renderHome();renderSession();renderClock();renderHealthHistory();$("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();renderPreWalk();renderCirculation();
 
 // PWA install + service worker
 let deferredInstallPrompt = null;
