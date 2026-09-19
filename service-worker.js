@@ -1,4 +1,4 @@
-const CACHE_NAME = "getting-back-to-tri-v1-6-3";
+const CACHE_NAME = "getting-back-to-tri-v1-7";
 const APP_SHELL = [
   "./",
   "./index.html",

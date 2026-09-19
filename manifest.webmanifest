@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Getting Back to Tri",
   "short_name": "Back to Tri",
-  "description": "Private local exercise library, guided movement, recovery and triathlon session logger.",
+  "description": "Multi-mode personal movement app with Back-to-Tri training and separate Morning Movement logging.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

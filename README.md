@@ -1,36 +1,40 @@
 # Getting Back to Tri
 
-Personal Progressive Web App for exercise logging, guided mobility/circulation routines, recovery tracking and swim/bike/run sessions.
+Multi-mode Progressive Web App.
 
-Current release: **v1.6.3 PWA**.
+Current release: **v1.7 PWA**.
+
+## Modes
+
+### Getting Back to Tri
+The existing private local exercise library, guided mobility/circulation routines, Recovery dashboard and swim/bike/run session logging.
+
+### Morning Movement
+A completely separate simple mode intended for a short guided morning movement routine:
+- 7 guided movements
+- 6:15 total including 5-second changeovers
+- optional walk/march or gentle rebounder stage
+- optional energy-before and energy-after ratings (1–5)
+- optional notes
+- separate History and Settings
+- separate CSV export
+- separate local-storage namespace from Back-to-Tri data
+
+Morning Movement is a general wellbeing/movement tool, not a treatment for hypothyroidism and not a replacement for prescribed medication.
+
+## Mode selection
+On the first v1.7 launch, the app asks which mode to enter. The explicit selection is persisted locally in `gbtt_selected_mode_v1`. Either mode has a **Switch mode** button, and switching does not delete or mix data.
 
 ## Privacy / exercise-library architecture
-The public GitHub application contains the generic exercise-session engine only. Personal exercise names, ordering, sets, targets, technique cues, demo links and weekly plan are stored in browser/PWA local storage.
-
-Use the app's **Export library JSON** function to back up that private local library. Do not commit a private exercise-library JSON file to a public repository.
+The public GitHub application contains a generic local exercise-session engine. Personal Back-to-Tri exercise prescriptions remain in local browser/PWA storage and can be imported/exported separately as private JSON.
 
 ## GitHub Pages
 Publish from the `main` branch and `/(root)` folder.
 
-## Files
-Keep these files at the repository root:
-- `index.html`
-- `manifest.webmanifest`
-- `service-worker.js`
-- `icon.svg`
-- `README.md`
-
-## v1.6.3
-- Removes the hard-coded personal strength/mobility exercise library from the public source.
-- Adds a local **Private exercise library** manager.
-- Create, rename and delete sessions locally.
-- Add/edit/delete exercises and move them up/down to control session order.
-- Store sets, targets, tags, demo URLs/search terms and technique cues locally.
-- Optional per-session timer.
-- Pin local sessions to the Home screen.
-- Export/import the private exercise library as JSON.
-- Weekly plan moved from public code into private local data.
-- Existing training and recovery history remains separate and compatible.
-
-## Built-in guided routines
-The app continues to include the user-created Daily Quick Routine, Pre-Walk Warm-Up and Circulation Reset, plus swim/bike/run quick logging and the Recovery dashboard.
+## v1.7
+- Adds persisted first-use mode selection.
+- Adds separate Morning Movement mode.
+- Adds simple guided 6:15 morning routine.
+- Adds energy-before/after logging and Morning-only history.
+- Adds Morning settings, CSV export and optional vibration cues.
+- Keeps Back-to-Tri and Morning data in separate local-storage namespaces.

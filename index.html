@@ -154,6 +154,33 @@ main{padding:14px 0 90px}
 .library-exercise small{color:var(--muted)}
 .check{display:flex!important;align-items:center;gap:8px;color:var(--text)}
 .check input{width:auto}
+
+.mode-chooser{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.mode-card{width:min(680px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+.mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.mode-option{appearance:none;text-align:left;background:#12212a;border:1px solid #2b4350;border-radius:17px;padding:18px;color:var(--text);cursor:pointer}
+.mode-option:hover,.mode-option:focus{border-color:#5a7e91;outline:none}
+.mode-option .mode-icon{font-size:2rem;display:block;margin-bottom:8px}
+.mode-option b{display:block;font-size:1.05rem;margin-bottom:4px}
+.mode-option small{color:var(--muted);line-height:1.35}
+.header-actions{display:flex;align-items:center;gap:8px}
+.mode-switch{background:#152630;border:1px solid #35505f;color:#cfe0e8;border-radius:999px;padding:7px 10px;font-size:.72rem;cursor:pointer}
+.morning-header{background:linear-gradient(180deg,#16251d,#101a16);border-bottom:1px solid #2f4939}
+.morning-hero{background:linear-gradient(135deg,#19291f,#13231a)}
+.morning-nav{grid-template-columns:repeat(3,1fr)}
+.energy-row{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.energy-choice{position:relative}
+.energy-choice input{position:absolute;opacity:0;pointer-events:none}
+.energy-choice label{display:flex;align-items:center;justify-content:center;min-height:46px;border:1px solid #365044;border-radius:11px;background:#122019;cursor:pointer;font-weight:800}
+.energy-choice input:checked+label{background:#21432e;border-color:#5e9670}
+.morning-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.morning-history-card{background:#132119;border:1px solid #2d4737;border-radius:13px;padding:12px;margin-bottom:8px}
+.morning-history-card .energy-change{font-weight:900;font-size:1.05rem}
+.morning-demo{border-top:1px solid #2d4737;padding-top:9px;margin-top:10px}
+@media(max-width:620px){
+  .mode-grid{grid-template-columns:1fr}
+  .morning-summary{grid-template-columns:1fr 1fr}
+}
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -166,19 +193,39 @@ main{padding:14px 0 90px}
 
 </head>
 <body>
-<header>
+
+<section id="modeChooser" class="mode-chooser hidden">
+  <div class="mode-card">
+    <div class="kicker">Choose how you want to use the app</div>
+    <h2 style="margin:7px 0 5px">Two separate modes. Separate local data.</h2>
+    <p class="small">Your choice is remembered on this device. You can switch modes at any time without mixing histories.</p>
+    <div class="mode-grid">
+      <button class="mode-option" data-mode-choice="tri">
+        <span class="mode-icon">🏊‍♂️</span>
+        <b>Getting Back to Tri</b>
+        <small>Exercise library, guided routines, recovery, swim, bike and run.</small>
+      </button>
+      <button class="mode-option" data-mode-choice="morning">
+        <span class="mode-icon">☀️</span>
+        <b>Morning Movement</b>
+        <small>A simple guided morning routine with energy-before/after logging.</small>
+      </button>
+    </div>
+  </div>
+</section>
+<header id="triHeader">
   <div class="wrap">
     <div class="brand">
       <div>
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <span class="version">v1.6.3 PWA</span>
+      <div class="header-actions"><span class="version">v1.7 PWA</span><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
     </div>
   </div>
 </header>
 
-<main class="wrap">
+<main id="triApp" class="wrap">
   <nav class="nav">
     <button data-view="home" class="active">Home</button>
     <button data-view="train">Train</button>
@@ -654,14 +701,158 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.6.3 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.7 PWA • installable offline training app</div>
+</main>
+
+
+<header id="morningHeader" class="morning-header hidden">
+  <div class="wrap">
+    <div class="brand">
+      <div>
+        <h1>Morning Movement</h1>
+        <div class="subtitle">Gentle movement • simple logging • your own pace</div>
+      </div>
+      <div class="header-actions">
+        <span class="version">v1.7</span>
+        <button class="mode-switch" data-switch-mode="1">Switch mode</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="morningApp" class="wrap hidden">
+  <nav class="nav morning-nav">
+    <button data-morning-view="morningToday" class="active">Today</button>
+    <button data-morning-view="morningHistory">History</button>
+    <button data-morning-view="morningSettings">Settings</button>
+  </nav>
+
+  <section id="morningToday" class="morning-view">
+    <section class="hero morning-hero">
+      <div class="kicker">Morning routine</div>
+      <h2>Wake the body up gently.</h2>
+      <p>This routine supports normal movement, circulation and morning alertness. It is not a treatment for thyroid disease or a substitute for prescribed medication.</p>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Before you start</div>
+      <h3 style="margin:6px 0 9px">How is your energy this morning?</h3>
+      <div id="morningEnergyBefore" class="energy-row" aria-label="Energy before, 1 to 5">
+        <div class="energy-choice"><input type="radio" id="energyBefore1" name="energyBefore" value="1"><label for="energyBefore1">1</label></div>
+        <div class="energy-choice"><input type="radio" id="energyBefore2" name="energyBefore" value="2"><label for="energyBefore2">2</label></div>
+        <div class="energy-choice"><input type="radio" id="energyBefore3" name="energyBefore" value="3"><label for="energyBefore3">3</label></div>
+        <div class="energy-choice"><input type="radio" id="energyBefore4" name="energyBefore" value="4"><label for="energyBefore4">4</label></div>
+        <div class="energy-choice"><input type="radio" id="energyBefore5" name="energyBefore" value="5"><label for="energyBefore5">5</label></div>
+      </div>
+      <div class="small" style="margin-top:5px">1 = very low • 5 = very good. Optional.</div>
+
+      <label style="display:block;margin-top:12px">Two-minute rhythmic stage
+        <select id="morningMovementChoice">
+          <option value="Walk / march">Walk / march</option>
+          <option value="Gentle rebounder">Gentle rebounder</option>
+        </select>
+      </label>
+    </section>
+
+    <section id="morningTimer" class="quicktimer">
+      <div class="small">STANDARD MORNING ROUTINE • 7 MOVEMENTS • 5 SEC CHANGEOVERS</div>
+      <div id="morningExercise" class="stepname">Relaxed Breathing</div>
+      <div id="morningPosition" class="stepdetail">5 slow, comfortable breaths</div>
+      <div id="morningClock" class="bigclock">0:30</div>
+      <div id="morningOverall" class="small">Overall 6:15 remaining • movement 1 of 7</div>
+      <div class="progress" aria-hidden="true"><span id="morningProgress"></span></div>
+      <div id="morningNext" class="next">Next: 5-sec changeover → Ankle Pumps</div>
+      <div class="actions" style="margin-top:10px">
+        <button id="morningStart" class="primary">Start / Resume</button>
+        <button id="morningPause">Pause</button>
+        <button id="morningBack">← Previous</button>
+        <button id="morningSkip">Next →</button>
+        <button id="morningReset">Reset</button>
+      </div>
+      <div id="morningRoutineList" class="routine-list"></div>
+
+      <div class="panel morning-demo" style="margin-top:10px;padding:11px">
+        <div class="kicker">Technique demos</div>
+        <div class="small" style="margin:5px 0 9px">Only for movements where a visual may help. External videos need internet access.</div>
+        <div class="demo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=zKgRit_yN4c&t=12s">▶ Relaxed / diaphragmatic breathing</a>
+          <div class="text">Gentle breathing movement; avoid forcing a large breath.</div>
+        </div>
+        <div class="demo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://player.vimeo.com/video/419862653">▶ Ankle pumps</a>
+          <div class="text">Simple ankle movement demonstration.</div>
+        </div>
+        <div class="demo" id="morningRebounderDemo">
+          <a class="btn soft" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=JRXUZwaXYHo">▶ Gentle rebounder / basic bounce</a>
+          <div class="text">Use a low, comfortable bounce. Marching is an equally valid option.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="morningFinish" class="panel hidden">
+      <div class="kicker">After the routine</div>
+      <h3 style="margin:6px 0 9px">How is your energy now?</h3>
+      <div id="morningEnergyAfter" class="energy-row" aria-label="Energy after, 1 to 5">
+        <div class="energy-choice"><input type="radio" id="energyAfter1" name="energyAfter" value="1"><label for="energyAfter1">1</label></div>
+        <div class="energy-choice"><input type="radio" id="energyAfter2" name="energyAfter" value="2"><label for="energyAfter2">2</label></div>
+        <div class="energy-choice"><input type="radio" id="energyAfter3" name="energyAfter" value="3"><label for="energyAfter3">3</label></div>
+        <div class="energy-choice"><input type="radio" id="energyAfter4" name="energyAfter" value="4"><label for="energyAfter4">4</label></div>
+        <div class="energy-choice"><input type="radio" id="energyAfter5" name="energyAfter" value="5"><label for="energyAfter5">5</label></div>
+      </div>
+      <label style="display:block;margin-top:12px">Optional note
+        <textarea id="morningNotes" placeholder="How you felt, stiffness, anything unusual…"></textarea>
+      </label>
+      <div class="actions" style="margin-top:10px">
+        <button id="saveMorningSession" class="primary">Save morning session</button>
+      </div>
+      <div id="morningSaveStatus" class="status"></div>
+    </section>
+  </section>
+
+  <section id="morningHistory" class="morning-view hidden">
+    <section class="hero morning-hero">
+      <div class="kicker">History</div>
+      <h2>Simple morning pattern tracking.</h2>
+      <p>Energy ratings are subjective. The aim is to notice your own pattern over time, not to diagnose anything.</p>
+    </section>
+    <div id="morningHistoryList"></div>
+  </section>
+
+  <section id="morningSettings" class="morning-view hidden">
+    <section class="panel">
+      <div class="kicker">Settings</div>
+      <h3 style="margin:6px 0 8px">Morning Movement</h3>
+      <label>Default rhythmic stage
+        <select id="morningDefaultMovement">
+          <option value="Walk / march">Walk / march</option>
+          <option value="Gentle rebounder">Gentle rebounder</option>
+        </select>
+      </label>
+      <label class="check" style="margin-top:10px"><input id="morningVibration" type="checkbox" checked> Vibration cues when supported</label>
+      <div class="actions" style="margin-top:12px">
+        <button id="saveMorningSettings" class="primary">Save settings</button>
+        <button id="exportMorningCsv">Export history CSV</button>
+        <button id="deleteMorningHistory" class="danger">Delete Morning history</button>
+      </div>
+      <div id="morningSettingsStatus" class="status"></div>
+    </section>
+    <section class="panel notice">
+      <b style="color:#fff">Separate data:</b> Morning Movement history and settings use their own local-storage keys and are not mixed with Back-to-Tri sessions, recovery records or exercise-library data.
+    </section>
+  </section>
+
+  <div class="footerNote">Morning Movement • Getting Back to Tri v1.7 PWA</div>
 </main>
 
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-const APP_MODE_STORAGE = "gbtt_app_mode";
-const APP_MODE_TRI = "tri";
+const LEGACY_APP_MODE_STORAGE = "gbtt_app_mode";
+const MODE_SELECTION_STORAGE = "gbtt_selected_mode_v1";
+const MODE_TRI = "tri";
+const MODE_MORNING = "morning";
+const MORNING_HISTORY_STORAGE = "gbtt_morning_history_v1";
+const MORNING_SETTINGS_STORAGE = "gbtt_morning_settings_v1";
 const LEGACY_STORAGE = "gettingBackToTri_v1_history";
 const LEGACY_HEALTH_STORAGE = "gettingBackToTri_v1_health";
 const LEGACY_BASELINE_STORAGE = "gettingBackToTri_v1_baseline";
@@ -711,6 +902,19 @@ const circulationSteps = [
   {exercise:"Breathing + Shake-Out", detail:"Relaxed breathing • loosen hands, shoulders and legs", seconds:45}
 ];
 
+
+const morningBaseSteps = [
+  {exercise:"Relaxed Breathing", detail:"5 slow, comfortable breaths", seconds:30},
+  {exercise:"Ankle Pumps", detail:"Move ankles rhythmically through a comfortable range", seconds:30},
+  {exercise:"Calf Raises", detail:"About 15–20 slow raises • hold support if needed", seconds:45},
+  {exercise:"Easy Marching", detail:"Relaxed arms • comfortable pace", seconds:45},
+  {exercise:"Sit-to-Stands / Shallow Squats", detail:"About 8–10 comfortable repetitions", seconds:45},
+  {exercise:"Rhythmic Movement", detail:"Walk / march", seconds:120},
+  {exercise:"Finishing Breaths", detail:"5 relaxed breaths • finish feeling loose, not tired", seconds:30}
+];
+const MORNING_REST_SECONDS = 5;
+const MORNING_TOTAL_SECONDS = morningBaseSteps.reduce((sum,s)=>sum+s.seconds,0) + (morningBaseSteps.length-1)*MORNING_REST_SECONDS;
+
 const endurance = new Set(["Swim","Bike","Run"]);
 const systemSessions = ["Daily Quick Routine","Pre-Walk Warm-Up","Circulation Reset","Swim","Bike","Run"];
 const summaries = {
@@ -757,11 +961,17 @@ let circulationCompletedSteps = new Set();
 const CIRCULATION_REST_SECONDS = 5;
 const CIRCULATION_TOTAL_SECONDS = circulationSteps.reduce((sum,s)=>sum+s.seconds,0) + (circulationSteps.length-1)*CIRCULATION_REST_SECONDS;
 
-let appMode = localStorage.getItem(APP_MODE_STORAGE) || APP_MODE_TRI;
-if(appMode !== APP_MODE_TRI) appMode = APP_MODE_TRI;
-localStorage.setItem(APP_MODE_STORAGE, appMode);
 
 
+let morningHistory = [];
+let morningSettings = {defaultMovement:"Walk / march", vibration:true};
+let morningIndex = 0;
+let morningSeconds = morningBaseSteps[0].seconds;
+let morningPhase = "work";
+let morningTimerId = null;
+let morningCompleted = false;
+let morningCompletedSteps = new Set();
+let morningSessionStartedAt = null;
 
 let healthHistory = [];
 let baseline = {
@@ -987,6 +1197,285 @@ function showView(id){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+
+
+
+function selectedEnergy(name){
+  return numOrNull(document.querySelector(`input[name="${name}"]:checked`)?.value);
+}
+function clearEnergy(name){
+  document.querySelectorAll(`input[name="${name}"]`).forEach(x=>x.checked=false);
+}
+function showModeChooser(){
+  $("modeChooser").classList.remove("hidden");
+  $("triHeader").classList.add("hidden");
+  $("triApp").classList.add("hidden");
+  $("morningHeader").classList.add("hidden");
+  $("morningApp").classList.add("hidden");
+  morningStop();
+}
+function activateMode(mode, persist=true){
+  if(![MODE_TRI,MODE_MORNING].includes(mode)){showModeChooser();return}
+  if(persist) localStorage.setItem(MODE_SELECTION_STORAGE,mode);
+  $("modeChooser").classList.add("hidden");
+  const tri=mode===MODE_TRI;
+  $("triHeader").classList.toggle("hidden",!tri);
+  $("triApp").classList.toggle("hidden",!tri);
+  $("morningHeader").classList.toggle("hidden",tri);
+  $("morningApp").classList.toggle("hidden",tri);
+  if(tri){
+    morningStop();
+    renderHome();
+  }else{
+    showMorningView("morningToday");
+    renderMorning();
+    renderMorningHistory();
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-mode-choice]").forEach(b=>b.addEventListener("click",()=>activateMode(b.dataset.modeChoice,true)));
+document.querySelectorAll("[data-switch-mode]").forEach(b=>b.addEventListener("click",showModeChooser));
+
+function showMorningView(id){
+  document.querySelectorAll(".morning-view").forEach(v=>v.classList.toggle("hidden",v.id!==id));
+  document.querySelectorAll("[data-morning-view]").forEach(b=>b.classList.toggle("active",b.dataset.morningView===id));
+  if(id==="morningHistory")renderMorningHistory();
+  if(id==="morningSettings")fillMorningSettings();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-morning-view]").forEach(b=>b.addEventListener("click",()=>showMorningView(b.dataset.morningView)));
+
+function loadMorning(){
+  try{
+    const h=JSON.parse(localStorage.getItem(MORNING_HISTORY_STORAGE)||"[]");
+    morningHistory=Array.isArray(h)?h:[];
+  }catch(e){morningHistory=[]}
+  try{
+    const s=JSON.parse(localStorage.getItem(MORNING_SETTINGS_STORAGE)||"{}");
+    morningSettings={...morningSettings,...s};
+  }catch(e){}
+  if(!["Walk / march","Gentle rebounder"].includes(morningSettings.defaultMovement)) morningSettings.defaultMovement="Walk / march";
+  morningSettings.vibration=morningSettings.vibration!==false;
+  $("morningMovementChoice").value=morningSettings.defaultMovement;
+  fillMorningSettings();
+}
+function saveMorningHistoryLocal(){localStorage.setItem(MORNING_HISTORY_STORAGE,JSON.stringify(morningHistory))}
+function saveMorningSettingsLocal(){localStorage.setItem(MORNING_SETTINGS_STORAGE,JSON.stringify(morningSettings))}
+function fillMorningSettings(){
+  $("morningDefaultMovement").value=morningSettings.defaultMovement;
+  $("morningVibration").checked=morningSettings.vibration;
+}
+function morningStep(i){
+  const s={...morningBaseSteps[i]};
+  if(i===5) s.detail=$("morningMovementChoice").value;
+  return s;
+}
+function morningCue(){
+  if(morningSettings.vibration && navigator.vibrate) navigator.vibrate(100);
+}
+function morningRemaining(){
+  if(morningCompleted)return 0;
+  if(morningPhase==="work"){
+    const futureWork=morningBaseSteps.slice(morningIndex+1).reduce((sum,s)=>sum+s.seconds,0);
+    return morningSeconds + futureWork + (morningBaseSteps.length-morningIndex-1)*MORNING_REST_SECONDS;
+  }
+  const next=morningIndex+1;
+  const futureWork=morningBaseSteps.slice(next).reduce((sum,s)=>sum+s.seconds,0);
+  return morningSeconds + futureWork + Math.max(0,morningBaseSteps.length-next-1)*MORNING_REST_SECONDS;
+}
+function morningElapsed(){
+  if(morningCompleted)return MORNING_TOTAL_SECONDS;
+  let elapsed=0;
+  for(let i=0;i<morningIndex;i++) elapsed+=morningBaseSteps[i].seconds+MORNING_REST_SECONDS;
+  if(morningPhase==="work") elapsed+=morningBaseSteps[morningIndex].seconds-morningSeconds;
+  else elapsed+=morningBaseSteps[morningIndex].seconds+(MORNING_REST_SECONDS-morningSeconds);
+  return elapsed;
+}
+function renderMorning(){
+  $("morningRebounderDemo").classList.toggle("hidden",$("morningMovementChoice").value!=="Gentle rebounder");
+  const step=morningStep(Math.min(morningIndex,morningBaseSteps.length-1));
+  const next=morningStep(Math.min(morningIndex+1,morningBaseSteps.length-1));
+  $("morningTimer").classList.toggle("resting",!morningCompleted&&morningPhase==="rest");
+
+  if(morningCompleted){
+    $("morningExercise").textContent="Morning routine complete ✓";
+    $("morningPosition").textContent="Finish feeling gently awake, not fatigued";
+    $("morningClock").textContent="0:00";
+    $("morningOverall").textContent="All 7 movements complete • total 6:15";
+    $("morningNext").textContent="Add an after-energy rating below, then save the session.";
+    $("morningFinish").classList.remove("hidden");
+  }else if(morningPhase==="rest"){
+    $("morningExercise").textContent="Change movement";
+    $("morningPosition").textContent=`Next: ${next.exercise}`;
+    $("morningClock").textContent=`0:${String(morningSeconds).padStart(2,"0")}`;
+    $("morningOverall").textContent=`Overall ${fmtShort(morningRemaining())} remaining • 5-sec changeover`;
+    $("morningNext").textContent=`Get ready: ${next.detail}`;
+  }else{
+    $("morningExercise").textContent=step.exercise;
+    $("morningPosition").textContent=step.detail;
+    $("morningClock").textContent=fmtShort(morningSeconds);
+    $("morningOverall").textContent=`Overall ${fmtShort(morningRemaining())} remaining • movement ${morningIndex+1} of ${morningBaseSteps.length}`;
+    $("morningNext").textContent=morningIndex<morningBaseSteps.length-1
+      ? `Next: 5-sec changeover → ${morningStep(morningIndex+1).exercise}`
+      : "Next: finish";
+  }
+  $("morningProgress").style.width=`${Math.min(100,(morningElapsed()/MORNING_TOTAL_SECONDS)*100)}%`;
+  $("morningRoutineList").innerHTML=morningBaseSteps.map((x,i)=>{
+    const s=morningStep(i);
+    const done=morningCompletedSteps.has(i);
+    const current=!morningCompleted&&((morningPhase==="work"&&i===morningIndex)||(morningPhase==="rest"&&i===morningIndex+1));
+    return `<div class="routine-step ${done?"done":current?"current":""}"><b>${i+1}</b><span>${esc(s.exercise)}<br><small>${esc(s.detail)}</small></span><span class="t">${fmtShort(s.seconds)}</span></div>`;
+  }).join("");
+}
+function morningStop(){clearInterval(morningTimerId);morningTimerId=null}
+function morningAdvance(){
+  if(morningPhase==="work"){
+    morningCompletedSteps.add(morningIndex);
+    morningCue();
+    if(morningIndex>=morningBaseSteps.length-1){
+      morningStop();
+      morningCompleted=true;
+      morningSeconds=0;
+      renderMorning();
+      return;
+    }
+    morningPhase="rest";
+    morningSeconds=MORNING_REST_SECONDS;
+  }else{
+    morningCue();
+    morningIndex++;
+    morningPhase="work";
+    morningSeconds=morningBaseSteps[morningIndex].seconds;
+  }
+  renderMorning();
+}
+function morningPrevious(){
+  morningStop();morningCompleted=false;$("morningFinish").classList.add("hidden");
+  if(morningPhase==="rest"){
+    morningPhase="work";morningSeconds=morningBaseSteps[morningIndex].seconds;morningCompletedSteps.delete(morningIndex);
+  }else if(morningIndex>0){
+    morningCompletedSteps.delete(morningIndex);
+    morningIndex--;morningPhase="work";morningSeconds=morningBaseSteps[morningIndex].seconds;morningCompletedSteps.delete(morningIndex);
+  }else{
+    morningSeconds=morningBaseSteps[0].seconds;morningCompletedSteps.delete(0);
+  }
+  renderMorning();
+}
+function resetMorningRoutine(clearRatings=false){
+  morningStop();
+  morningIndex=0;morningSeconds=morningBaseSteps[0].seconds;morningPhase="work";morningCompleted=false;
+  morningCompletedSteps.clear();morningSessionStartedAt=null;
+  $("morningFinish").classList.add("hidden");
+  $("morningNotes").value="";
+  $("morningSaveStatus").textContent="";
+  if(clearRatings){clearEnergy("energyBefore");clearEnergy("energyAfter")}
+  renderMorning();
+}
+$("morningStart").addEventListener("click",()=>{
+  if(morningCompleted) resetMorningRoutine(false);
+  if(morningTimerId)return;
+  if(!morningSessionStartedAt) morningSessionStartedAt=Date.now();
+  morningCue();
+  morningTimerId=setInterval(()=>{
+    morningSeconds--;
+    if(morningSeconds<=0)morningAdvance();else renderMorning();
+  },1000);
+});
+$("morningPause").addEventListener("click",morningStop);
+$("morningBack").addEventListener("click",morningPrevious);
+$("morningSkip").addEventListener("click",()=>{
+  morningStop();
+  if(morningCompleted)return;
+  if(morningPhase==="work"){
+    morningCompletedSteps.add(morningIndex);
+    if(morningIndex>=morningBaseSteps.length-1){
+      morningCompleted=true;morningSeconds=0;$("morningFinish").classList.remove("hidden");
+    }else{
+      morningPhase="rest";morningSeconds=MORNING_REST_SECONDS;
+    }
+  }else{
+    morningIndex++;morningPhase="work";morningSeconds=morningBaseSteps[morningIndex].seconds;
+  }
+  renderMorning();
+});
+$("morningReset").addEventListener("click",()=>resetMorningRoutine(true));
+$("morningMovementChoice").addEventListener("change",renderMorning);
+
+function saveMorningSession(){
+  const before=selectedEnergy("energyBefore");
+  const after=selectedEnergy("energyAfter");
+  const entry={
+    id:Date.now(),
+    date:localDate(),
+    completed:morningCompletedSteps.size,
+    total:morningBaseSteps.length,
+    movement:$("morningMovementChoice").value,
+    energyBefore:before,
+    energyAfter:after,
+    notes:$("morningNotes").value.trim(),
+    nominalDurationSec:MORNING_TOTAL_SECONDS
+  };
+  morningHistory.push(entry);saveMorningHistoryLocal();
+  $("morningSaveStatus").textContent=`Saved ${entry.date} • ${entry.completed}/${entry.total} movements.`;
+  $("morningSaveStatus").className="status good";
+  renderMorningHistory();
+  setTimeout(()=>resetMorningRoutine(true),500);
+}
+$("saveMorningSession").addEventListener("click",saveMorningSession);
+
+function renderMorningHistory(){
+  const box=$("morningHistoryList");if(!box)return;
+  const items=[...morningHistory].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.id||0)-(a.id||0));
+  if(!items.length){
+    box.innerHTML='<section class="panel notice">No Morning Movement sessions saved yet.</section>';return;
+  }
+  box.innerHTML=items.map(x=>{
+    const before=x.energyBefore??"—",after=x.energyAfter??"—";
+    const delta=(x.energyBefore!=null&&x.energyAfter!=null)?x.energyAfter-x.energyBefore:null;
+    const change=delta==null?"":delta>0?` (+${delta})`:delta<0?` (${delta})`:" (no change)";
+    return `<article class="morning-history-card">
+      <div class="readiness-top"><div><b>${esc(x.date)}</b><small>${esc(x.movement||"")}</small></div><span class="pill">${esc(x.completed)}/${esc(x.total)}</span></div>
+      <div class="morning-summary">
+        <div><span class="small">Energy</span><div class="energy-change">${esc(before)} → ${esc(after)}${esc(change)}</div></div>
+        <div><span class="small">Routine</span><b>${x.completed===x.total?"Complete":"Partial"}</b></div>
+      </div>
+      ${x.notes?`<div class="small" style="margin-top:8px">${esc(x.notes)}</div>`:""}
+    </article>`;
+  }).join("");
+}
+function morningCsv(){
+  const rows=[["Date","Completed movements","Total movements","Movement option","Energy before","Energy after","Energy change","Notes"]];
+  [...morningHistory].sort((a,b)=>(a.date||"").localeCompare(b.date||"")).forEach(x=>{
+    const delta=(x.energyBefore!=null&&x.energyAfter!=null)?x.energyAfter-x.energyBefore:"";
+    rows.push([x.date,x.completed,x.total,x.movement,x.energyBefore??"",x.energyAfter??"",delta,x.notes||""]);
+  });
+  return rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
+}
+function downloadMorningCsv(){
+  const blob=new Blob([morningCsv()],{type:"text/csv;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="Morning_Movement_History.csv";a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+$("exportMorningCsv").addEventListener("click",downloadMorningCsv);
+$("saveMorningSettings").addEventListener("click",()=>{
+  morningSettings.defaultMovement=$("morningDefaultMovement").value;
+  morningSettings.vibration=$("morningVibration").checked;
+  saveMorningSettingsLocal();
+  $("morningMovementChoice").value=morningSettings.defaultMovement;
+  renderMorning();
+  $("morningSettingsStatus").textContent="Morning Movement settings saved.";
+  $("morningSettingsStatus").className="status good";
+});
+$("deleteMorningHistory").addEventListener("click",e=>{
+  if(e.currentTarget.dataset.confirm!=="1"){
+    e.currentTarget.dataset.confirm="1";e.currentTarget.textContent="Tap again to confirm";return;
+  }
+  morningHistory=[];saveMorningHistoryLocal();renderMorningHistory();
+  e.currentTarget.dataset.confirm="0";e.currentTarget.textContent="Delete Morning history";
+  $("morningSettingsStatus").textContent="Morning Movement history deleted.";
+  $("morningSettingsStatus").className="status good";
+});
 
 
 function numOrNull(v){
@@ -2211,6 +2700,10 @@ loadExerciseLibrary();loadLocal();loadHealth();loadCirculationPreference();
 refreshSessionSelect();renderLibraryManager();renderWeeklyPlanInputs();renderWeek();renderHome();
 resetSessionTimerForSelection();renderSession();renderClock();renderHealthHistory();
 $("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();renderPreWalk();renderCirculation();
+loadMorning();renderMorning();renderMorningHistory();
+const initialMode=localStorage.getItem(MODE_SELECTION_STORAGE);
+if([MODE_TRI,MODE_MORNING].includes(initialMode)) activateMode(initialMode,false);
+else showModeChooser();
 
 // PWA install + service worker
 let deferredInstallPrompt = null;
