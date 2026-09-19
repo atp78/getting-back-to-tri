@@ -229,7 +229,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <div class="header-actions"><span class="version">v1.8c PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
+      <div class="header-actions"><span class="version">v1.8c.1 PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
     </div>
   </div>
 </header>
@@ -710,7 +710,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.8c PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.8c.1.1 PWA • installable offline training app</div>
 </main>
 
 
@@ -850,7 +850,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8c PWA</div>
+  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8c.1.1 PWA</div>
 </main>
 
 
@@ -858,9 +858,9 @@ main{padding:14px 0 90px}
   <div class="sync-card">
     <div class="sync-top">
       <div>
-        <div class="kicker">v1.8c • Split cloud sync</div>
-        <h2 style="margin:6px 0 4px">Workout Library + Personal Data</h2>
-        <div class="small">Local storage remains the working copy. Google Drive now keeps the reusable workout library separate from your private recorded data.</div>
+        <div class="kicker">v1.8c.1 • Structured cloud sync</div>
+        <h2 style="margin:6px 0 4px">Clear, purpose-specific Drive files</h2>
+        <div class="small">Local storage remains the working copy. Google Drive now separates reusable workouts, completed-session history, recovery data, settings and the weekly plan.</div>
       </div>
       <button id="closeSync" class="mode-switch">Close</button>
     </div>
@@ -868,7 +868,7 @@ main{padding:14px 0 90px}
     <section class="panel" style="margin-top:12px">
       <div class="kicker">Safety first</div>
       <h3 style="margin:6px 0 7px">Complete local backup</h3>
-      <p class="notice">The complete backup still contains everything together so it can restore the whole app. It is separate from the two-file cloud-sync structure.</p>
+      <p class="notice">The complete backup still contains the whole app state in one file for disaster recovery. It is separate from the normal structured cloud-sync files.</p>
       <div class="actions">
         <button id="downloadCompleteBackup" class="primary">Download complete backup</button>
         <label class="btn" for="restoreCompleteBackup">Restore backup</label>
@@ -880,7 +880,8 @@ main{padding:14px 0 90px}
     <section class="panel">
       <div class="kicker">Google Drive setup</div>
       <h3 style="margin:6px 0 7px">My Drive › Getting Back to Tri</h3>
-      <p class="small">The folder now contains two active sync files: <b>Workout Library</b> for reusable session definitions, and <b>Personal Data</b> for completed sessions, recovery data, settings and your weekly plan. OAuth access tokens remain in memory only.</p>
+      <p class="small">The app uses the narrow <span class="sync-code">drive.file</span> permission. Google access tokens stay in memory only and are not saved in local storage.</p>
+
       <details style="margin-top:9px">
         <summary><b>Google Cloud setup</b></summary>
         <ol class="sync-steps">
@@ -890,12 +891,14 @@ main{padding:14px 0 90px}
           <li>While the OAuth app is in Testing, add the Google accounts you use as test users.</li>
         </ol>
       </details>
+
       <label style="display:block;margin-top:10px">Google OAuth Web Client ID
         <input id="driveClientId" placeholder="1234567890-abc…apps.googleusercontent.com">
       </label>
       <label style="display:block;margin-top:8px">Device label
         <input id="driveDeviceLabel" placeholder="e.g. Andy Pixel 8">
       </label>
+
       <div class="actions" style="margin-top:10px">
         <button id="saveDriveSetup">Save setup</button>
         <button id="connectDrive" class="primary">Connect Google Drive</button>
@@ -909,37 +912,54 @@ main{padding:14px 0 90px}
       <div class="kicker">Cloud structure</div>
       <div class="sync-meta">
         <div class="metric"><b id="syncFolderState">Not set</b><span>Drive folder</span></div>
-        <div class="metric"><b id="syncLibraryState">Not set</b><span>Workout Library</span></div>
-        <div class="metric"><b id="syncPersonalState">Not set</b><span>Personal Data</span></div>
+        <div class="metric"><b id="syncLibraryState">Not created</b><span>Workout Library</span></div>
+        <div class="metric"><b id="syncHistoryState">Not created</b><span>Workout Session History</span></div>
+        <div class="metric"><b id="syncRecoveryState">Not created</b><span>Recovery Data</span></div>
+        <div class="metric"><b id="syncSettingsState">Not created</b><span>Settings</span></div>
+        <div class="metric"><b id="syncWeeklyPlanState">Not created</b><span>Weekly Plan</span></div>
         <div class="metric"><b id="syncLastAction">—</b><span>Last sync action</span></div>
       </div>
+
       <div id="legacyMigrationBox" class="notice hidden" style="margin-top:10px">
-        <b>Existing combined sync file found.</b><br>
-        v1.8c can split it into the two new files without deleting the old combined JSON. The old file remains in Drive as a safety copy.
+        <b id="legacyMigrationTitle">Older cloud structure found.</b><br>
+        <span id="legacyMigrationText">v1.8c.1 can migrate it into the new purpose-specific files without deleting the older source file.</span>
         <div class="actions" style="margin-top:9px">
-          <button id="migrateLegacySync" class="primary">Split existing sync file</button>
+          <button id="migrateLegacySync" class="primary">Migrate cloud structure</button>
         </div>
       </div>
+
       <div class="actions" style="margin-top:10px">
         <button id="pullDrive" class="primary">⬇ Pull all</button>
         <button id="pushDrive">⬆ Push all</button>
       </div>
+
       <details style="margin-top:10px">
         <summary><b>Individual file controls</b></summary>
         <div class="actions" style="margin-top:9px">
-          <button id="pullLibrary">⬇ Pull Workout Library</button>
-          <button id="pushLibrary">⬆ Push Workout Library</button>
-          <button id="pullPersonal">⬇ Pull Personal Data</button>
-          <button id="pushPersonal">⬆ Push Personal Data</button>
+          <button data-pull-kind="library">⬇ Workout Library</button>
+          <button data-push-kind="library">⬆ Workout Library</button>
+          <button data-pull-kind="history">⬇ Session History</button>
+          <button data-push-kind="history">⬆ Session History</button>
+          <button data-pull-kind="recovery">⬇ Recovery Data</button>
+          <button data-push-kind="recovery">⬆ Recovery Data</button>
+          <button data-pull-kind="settings">⬇ Settings</button>
+          <button data-push-kind="settings">⬆ Settings</button>
+          <button data-pull-kind="weeklyPlan">⬇ Weekly Plan</button>
+          <button data-push-kind="weeklyPlan">⬆ Weekly Plan</button>
         </div>
       </details>
+
       <div id="syncStatus" class="status"></div>
-      <p class="notice" style="margin-top:10px"><b>Safe workflow:</b> on a device you have not used recently, Pull all before editing or pushing. Conflict checks are maintained independently for the Workout Library and Personal Data files.</p>
-      <p class="small">The Workout Library file contains session definitions only — no completed-session history, recovery data or weekly plan. The selected app mode also remains device-local.</p>
-      <div style="margin-top:8px">
+      <p class="notice" style="margin-top:10px"><b>Safe workflow:</b> on a device you have not used recently, Pull all before editing or pushing. Conflict checks are maintained independently for each cloud file.</p>
+      <p class="small">The Workout Library is the shareable file. It contains workout/session definitions only. Completed Morning Movement sessions are stored in Workout Session History alongside sessions completed in Back-to-Tri mode. Selected app mode and Google credentials remain device-local.</p>
+
+      <div style="margin-top:8px" class="actions">
         <a id="openDriveFolder" class="btn soft hidden" target="_blank" rel="noopener">Open folder</a>
-        <a id="openLibraryFile" class="btn soft hidden" target="_blank" rel="noopener">Open Workout Library</a>
-        <a id="openPersonalFile" class="btn soft hidden" target="_blank" rel="noopener">Open Personal Data</a>
+        <a id="openLibraryFile" class="btn soft hidden" target="_blank" rel="noopener">Workout Library</a>
+        <a id="openHistoryFile" class="btn soft hidden" target="_blank" rel="noopener">Session History</a>
+        <a id="openRecoveryFile" class="btn soft hidden" target="_blank" rel="noopener">Recovery Data</a>
+        <a id="openSettingsFile" class="btn soft hidden" target="_blank" rel="noopener">Settings</a>
+        <a id="openWeeklyPlanFile" class="btn soft hidden" target="_blank" rel="noopener">Weekly Plan</a>
       </div>
     </section>
   </div>
@@ -961,11 +981,23 @@ const DEVICE_ID_STORAGE = "gbtt_device_id_v1";
 const SYNC_SCHEMA = "gbtt-cloud-sync";
 const SYNC_VERSION = 1;
 const WORKOUT_LIBRARY_SYNC_SCHEMA = "gbtt-workout-library-sync";
-const PERSONAL_DATA_SYNC_SCHEMA = "gbtt-personal-data-sync";
+const SESSION_HISTORY_SYNC_SCHEMA = "gbtt-workout-session-history-sync";
+const RECOVERY_DATA_SYNC_SCHEMA = "gbtt-recovery-data-sync";
+const SETTINGS_SYNC_SCHEMA = "gbtt-settings-sync";
+const WEEKLY_PLAN_SYNC_SCHEMA = "gbtt-weekly-plan-sync";
+const LEGACY_PERSONAL_DATA_SYNC_SCHEMA = "gbtt-personal-data-sync";
+
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+
 const WORKOUT_LIBRARY_FILE_NAME = "Getting_Back_to_Tri_Workout_Library.json";
-const PERSONAL_DATA_FILE_NAME = "Getting_Back_to_Tri_Personal_Data.json";
+const SESSION_HISTORY_FILE_NAME = "Getting_Back_to_Tri_Workout_Session_History.json";
+const RECOVERY_DATA_FILE_NAME = "Getting_Back_to_Tri_Recovery_Data.json";
+const SETTINGS_FILE_NAME = "Getting_Back_to_Tri_Settings.json";
+const WEEKLY_PLAN_FILE_NAME = "Getting_Back_to_Tri_Weekly_Plan.json";
+
+const LEGACY_PERSONAL_DATA_FILE_NAME = "Getting_Back_to_Tri_Personal_Data.json";
 const LEGACY_SYNC_FILE_NAME = "Getting_Back_to_Tri_Sync.json";
+
 const SYNC_DATA_KEYS = [
   "gbtt_tri_history_v1",
   "gbtt_tri_health_v1",
@@ -975,14 +1007,7 @@ const SYNC_DATA_KEYS = [
   "gbtt_morning_history_v1",
   "gbtt_morning_settings_v1"
 ];
-const PERSONAL_DATA_KEYS = [
-  "gbtt_tri_history_v1",
-  "gbtt_tri_health_v1",
-  "gbtt_tri_baseline_v1",
-  "gbtt_tri_circulation_pref_v1",
-  "gbtt_morning_history_v1",
-  "gbtt_morning_settings_v1"
-];
+
 const LEGACY_STORAGE = "gettingBackToTri_v1_history";
 const LEGACY_HEALTH_STORAGE = "gettingBackToTri_v1_health";
 const LEGACY_BASELINE_STORAGE = "gettingBackToTri_v1_baseline";
@@ -1097,21 +1122,37 @@ const CIRCULATION_TOTAL_SECONDS = circulationSteps.reduce((sum,s)=>sum+s.seconds
 let driveAccessToken = "";
 let driveTokenExpiresAt = 0;
 let driveTokenClient = null;
+
 let driveConfig = {
   clientId:"",
   folderId:"",
   folderName:"Getting Back to Tri",
   deviceLabel:"",
-  legacyFileId:"",
+
   libraryFileId:"",
-  personalFileId:"",
+  historyFileId:"",
+  recoveryFileId:"",
+  settingsFileId:"",
+  weeklyPlanFileId:"",
+
   libraryModifiedTime:"",
-  personalModifiedTime:"",
+  historyModifiedTime:"",
+  recoveryModifiedTime:"",
+  settingsModifiedTime:"",
+  weeklyPlanModifiedTime:"",
+
   libraryHasPulled:false,
-  personalHasPulled:false,
+  historyHasPulled:false,
+  recoveryHasPulled:false,
+  settingsHasPulled:false,
+  weeklyPlanHasPulled:false,
+
+  legacyPersonalFileId:"",
+  legacyCombinedFileId:"",
   lastAction:""
 };
-let pendingLegacySyncFileId = "";
+
+let pendingMigrationSource = null;
 
 let morningHistory = [];
 let morningSettings = {defaultMovement:"Walk / march", vibration:true};
@@ -1357,6 +1398,10 @@ function jsonValueFromStorage(key){
   if(raw===null)return null;
   try{return JSON.parse(raw)}catch(e){return raw}
 }
+function putJsonStorage(key,value){
+  if(value===null||value===undefined)localStorage.removeItem(key);
+  else localStorage.setItem(key,JSON.stringify(value));
+}
 function deviceId(){
   let id=localStorage.getItem(DEVICE_ID_STORAGE);
   if(!id){
@@ -1365,118 +1410,849 @@ function deviceId(){
   }
   return id;
 }
-function defaultDeviceLabel(){return navigator.userAgentData?.platform || navigator.platform || "This device"}
+function defaultDeviceLabel(){
+  return navigator.userAgentData?.platform || navigator.platform || "This device";
+}
+function sourceDevice(){
+  return {id:deviceId(),label:driveConfig.deviceLabel||defaultDeviceLabel()};
+}
 function currentLibraryObject(){
   const raw=jsonValueFromStorage(EXERCISE_LIBRARY_STORAGE);
-  return raw && typeof raw==="object" ? raw : {schema:"gbtt-exercise-library",version:1,sessions:[],weeklyPlan:{}};
+  return raw&&typeof raw==="object"?raw:{schema:"gbtt-exercise-library",version:1,sessions:[],weeklyPlan:{}};
 }
 function currentWeeklyPlan(){
-  const lib=currentLibraryObject(), plan={};
+  const lib=currentLibraryObject();
+  const plan={};
   dayNames.forEach(d=>plan[d]=String(lib.weeklyPlan?.[d]||""));
   return plan;
 }
+function applyWeeklyPlan(plan){
+  const lib=currentLibraryObject();
+  lib.schema="gbtt-exercise-library";
+  lib.version=1;
+  lib.sessions=Array.isArray(lib.sessions)?lib.sessions:[];
+  lib.weeklyPlan={};
+  dayNames.forEach(d=>lib.weeklyPlan[d]=String(plan?.[d]||""));
+  localStorage.setItem(EXERCISE_LIBRARY_STORAGE,JSON.stringify(lib));
+}
+
 function loadDriveConfig(){
   try{
     const x=JSON.parse(localStorage.getItem(DRIVE_CONFIG_STORAGE)||"{}");
-    driveConfig={...driveConfig,...x};
-    if(!driveConfig.legacyFileId && x.fileId)driveConfig.legacyFileId=x.fileId;
+
+    // Keep values that still exist in the new schema.
+    Object.keys(driveConfig).forEach(k=>{
+      if(Object.prototype.hasOwnProperty.call(x,k))driveConfig[k]=x[k];
+    });
+
+    // v1.8c migration: its Personal Data file is now a legacy source.
+    if(!driveConfig.legacyPersonalFileId && x.personalFileId)driveConfig.legacyPersonalFileId=x.personalFileId;
+
+    // v1.8a/b migration: one combined file was the legacy source.
+    if(!driveConfig.legacyCombinedFileId){
+      if(x.legacyFileId)driveConfig.legacyCombinedFileId=x.legacyFileId;
+      else if(x.fileId)driveConfig.legacyCombinedFileId=x.fileId;
+    }
+
+    // v1.8c's Workout Library file remains valid and reusable.
+    if(!driveConfig.libraryFileId && x.libraryFileId)driveConfig.libraryFileId=x.libraryFileId;
+    if(!driveConfig.libraryModifiedTime && x.libraryModifiedTime)driveConfig.libraryModifiedTime=x.libraryModifiedTime;
+    if(!driveConfig.libraryHasPulled && x.libraryHasPulled)driveConfig.libraryHasPulled=!!x.libraryHasPulled;
   }catch(e){}
+
   if(!driveConfig.deviceLabel)driveConfig.deviceLabel=defaultDeviceLabel();
   fillDriveSetup();
 }
-function saveDriveConfig(){localStorage.setItem(DRIVE_CONFIG_STORAGE,JSON.stringify(driveConfig));fillDriveSetup()}
+function saveDriveConfig(){
+  localStorage.setItem(DRIVE_CONFIG_STORAGE,JSON.stringify(driveConfig));
+  fillDriveSetup();
+}
 function fillDriveSetup(){
   if(!$("driveClientId"))return;
   $("driveClientId").value=driveConfig.clientId||"";
   $("driveDeviceLabel").value=driveConfig.deviceLabel||defaultDeviceLabel();
   renderSyncMeta();
 }
+
+/* Complete local backup: intentionally preserves the older all-in-one format
+   because it is a disaster-recovery package rather than a cloud-sync file. */
 function buildSyncPayload(){
-  const data={};SYNC_DATA_KEYS.forEach(k=>data[k]=jsonValueFromStorage(k));
-  return {schema:SYNC_SCHEMA,version:SYNC_VERSION,updatedAt:new Date().toISOString(),sourceDevice:{id:deviceId(),label:driveConfig.deviceLabel||defaultDeviceLabel()},data};
+  const data={};
+  SYNC_DATA_KEYS.forEach(k=>data[k]=jsonValueFromStorage(k));
+  return {
+    schema:SYNC_SCHEMA,
+    version:SYNC_VERSION,
+    updatedAt:new Date().toISOString(),
+    sourceDevice:sourceDevice(),
+    data
+  };
 }
-function validateSyncPayload(payload){return !!(payload&&payload.schema===SYNC_SCHEMA&&Number(payload.version)===SYNC_VERSION&&payload.data&&typeof payload.data==="object")}
+function validateSyncPayload(payload){
+  return !!(payload&&payload.schema===SYNC_SCHEMA&&Number(payload.version)===SYNC_VERSION&&payload.data&&typeof payload.data==="object");
+}
 function applySyncPayload(payload){
   if(!validateSyncPayload(payload))throw new Error("This is not a compatible Getting Back to Tri complete backup.");
-  SYNC_DATA_KEYS.forEach(k=>{if(Object.prototype.hasOwnProperty.call(payload.data,k)){const v=payload.data[k];if(v===null||v===undefined)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));}});
+  SYNC_DATA_KEYS.forEach(k=>{
+    if(Object.prototype.hasOwnProperty.call(payload.data,k))putJsonStorage(k,payload.data[k]);
+  });
 }
+
+/* Workout Library: shareable session definitions only. */
 function buildWorkoutLibraryPayload(sourceLibrary=null){
   const lib=sourceLibrary&&typeof sourceLibrary==="object"?sourceLibrary:currentLibraryObject();
-  return {schema:WORKOUT_LIBRARY_SYNC_SCHEMA,version:1,updatedAt:new Date().toISOString(),sourceDevice:{id:deviceId(),label:driveConfig.deviceLabel||defaultDeviceLabel()},library:{schema:"gbtt-exercise-library",version:1,sessions:Array.isArray(lib.sessions)?lib.sessions:[]}};
+  return {
+    schema:WORKOUT_LIBRARY_SYNC_SCHEMA,
+    version:1,
+    updatedAt:new Date().toISOString(),
+    sourceDevice:sourceDevice(),
+    library:{
+      schema:"gbtt-exercise-library",
+      version:1,
+      sessions:Array.isArray(lib.sessions)?lib.sessions:[]
+    }
+  };
 }
-function validateWorkoutLibraryPayload(payload){return !!(payload&&payload.schema===WORKOUT_LIBRARY_SYNC_SCHEMA&&Number(payload.version)===1&&payload.library&&Array.isArray(payload.library.sessions))}
+function validateWorkoutLibraryPayload(payload){
+  return !!(payload&&payload.schema===WORKOUT_LIBRARY_SYNC_SCHEMA&&Number(payload.version)===1&&payload.library&&Array.isArray(payload.library.sessions));
+}
 function applyWorkoutLibraryPayload(payload){
   if(!validateWorkoutLibraryPayload(payload))throw new Error("The Workout Library cloud file is not compatible.");
   const local=currentLibraryObject();
-  localStorage.setItem(EXERCISE_LIBRARY_STORAGE,JSON.stringify({schema:"gbtt-exercise-library",version:1,sessions:payload.library.sessions,weeklyPlan:local.weeklyPlan||{}}));
+  localStorage.setItem(EXERCISE_LIBRARY_STORAGE,JSON.stringify({
+    schema:"gbtt-exercise-library",
+    version:1,
+    sessions:payload.library.sessions,
+    weeklyPlan:local.weeklyPlan||{}
+  }));
 }
-function buildPersonalDataPayload(sourceData=null,sourceWeeklyPlan=null){
-  const data={};
-  PERSONAL_DATA_KEYS.forEach(k=>data[k]=sourceData&&Object.prototype.hasOwnProperty.call(sourceData,k)?sourceData[k]:jsonValueFromStorage(k));
-  return {schema:PERSONAL_DATA_SYNC_SCHEMA,version:1,updatedAt:new Date().toISOString(),sourceDevice:{id:deviceId(),label:driveConfig.deviceLabel||defaultDeviceLabel()},weeklyPlan:sourceWeeklyPlan||currentWeeklyPlan(),data};
+
+/* Workout Session History: all completed sessions irrespective of app mode.
+   Original record objects are wrapped rather than transformed, preserving data. */
+function buildSessionHistoryPayload(sourceTriHistory=null,sourceMorningHistory=null){
+  const tri=Array.isArray(sourceTriHistory)?sourceTriHistory:(jsonValueFromStorage(STORAGE)||[]);
+  const morning=Array.isArray(sourceMorningHistory)?sourceMorningHistory:(jsonValueFromStorage(MORNING_HISTORY_STORAGE)||[]);
+  const sessions=[];
+  (Array.isArray(tri)?tri:[]).forEach(record=>sessions.push({mode:"tri",record}));
+  (Array.isArray(morning)?morning:[]).forEach(record=>sessions.push({mode:"morning",record}));
+  return {
+    schema:SESSION_HISTORY_SYNC_SCHEMA,
+    version:1,
+    updatedAt:new Date().toISOString(),
+    sourceDevice:sourceDevice(),
+    sessions
+  };
 }
-function validatePersonalDataPayload(payload){return !!(payload&&payload.schema===PERSONAL_DATA_SYNC_SCHEMA&&Number(payload.version)===1&&payload.data&&typeof payload.data==="object"&&payload.weeklyPlan&&typeof payload.weeklyPlan==="object")}
-function applyPersonalDataPayload(payload){
-  if(!validatePersonalDataPayload(payload))throw new Error("The Personal Data cloud file is not compatible.");
-  PERSONAL_DATA_KEYS.forEach(k=>{if(Object.prototype.hasOwnProperty.call(payload.data,k)){const v=payload.data[k];if(v===null||v===undefined)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));}});
-  const lib=currentLibraryObject();lib.schema="gbtt-exercise-library";lib.version=1;lib.sessions=Array.isArray(lib.sessions)?lib.sessions:[];lib.weeklyPlan={};dayNames.forEach(d=>lib.weeklyPlan[d]=String(payload.weeklyPlan?.[d]||""));localStorage.setItem(EXERCISE_LIBRARY_STORAGE,JSON.stringify(lib));
+function validateSessionHistoryPayload(payload){
+  return !!(payload&&payload.schema===SESSION_HISTORY_SYNC_SCHEMA&&Number(payload.version)===1&&Array.isArray(payload.sessions));
 }
-function downloadJsonFile(name,obj){const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json;charset=utf-8"});const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
-function setSyncStatus(message,type=""){$("syncStatus").textContent=message;$("syncStatus").className="status"+(type?` ${type}`:"")}
-function stateText(id,modified,hasPulled){if(!id)return "Not created";if(!hasPulled)return "Found • Pull first";return modified?`Synced • ${new Date(modified).toLocaleString()}`:"Ready"}
+function applySessionHistoryPayload(payload){
+  if(!validateSessionHistoryPayload(payload))throw new Error("The Workout Session History cloud file is not compatible.");
+  const tri=[],morning=[];
+  payload.sessions.forEach(item=>{
+    if(!item||typeof item!=="object"||!("record" in item))return;
+    if(item.mode==="morning")morning.push(item.record);
+    else if(item.mode==="tri")tri.push(item.record);
+  });
+  putJsonStorage(STORAGE,tri);
+  putJsonStorage(MORNING_HISTORY_STORAGE,morning);
+}
+
+/* Recovery Data: recovery snapshots/history plus the personal baseline. */
+function buildRecoveryDataPayload(sourceHealth=undefined,sourceBaseline=undefined){
+  return {
+    schema:RECOVERY_DATA_SYNC_SCHEMA,
+    version:1,
+    updatedAt:new Date().toISOString(),
+    sourceDevice:sourceDevice(),
+    history:sourceHealth!==undefined?sourceHealth:jsonValueFromStorage(HEALTH_STORAGE),
+    baseline:sourceBaseline!==undefined?sourceBaseline:jsonValueFromStorage(BASELINE_STORAGE)
+  };
+}
+function validateRecoveryDataPayload(payload){
+  return !!(payload&&payload.schema===RECOVERY_DATA_SYNC_SCHEMA&&Number(payload.version)===1&&Object.prototype.hasOwnProperty.call(payload,"history")&&Object.prototype.hasOwnProperty.call(payload,"baseline"));
+}
+function applyRecoveryDataPayload(payload){
+  if(!validateRecoveryDataPayload(payload))throw new Error("The Recovery Data cloud file is not compatible.");
+  putJsonStorage(HEALTH_STORAGE,payload.history);
+  putJsonStorage(BASELINE_STORAGE,payload.baseline);
+}
+
+/* Settings: syncable preferences only. Device mode and Google setup stay local. */
+function buildSettingsPayload(sourceCirculation=undefined,sourceMorningSettings=undefined){
+  return {
+    schema:SETTINGS_SYNC_SCHEMA,
+    version:1,
+    updatedAt:new Date().toISOString(),
+    sourceDevice:sourceDevice(),
+    circulation:sourceCirculation!==undefined?sourceCirculation:jsonValueFromStorage(CIRCULATION_PREF_STORAGE),
+    morningMovement:sourceMorningSettings!==undefined?sourceMorningSettings:jsonValueFromStorage(MORNING_SETTINGS_STORAGE)
+  };
+}
+function validateSettingsPayload(payload){
+  return !!(payload&&payload.schema===SETTINGS_SYNC_SCHEMA&&Number(payload.version)===1&&Object.prototype.hasOwnProperty.call(payload,"circulation")&&Object.prototype.hasOwnProperty.call(payload,"morningMovement"));
+}
+function applySettingsPayload(payload){
+  if(!validateSettingsPayload(payload))throw new Error("The Settings cloud file is not compatible.");
+  putJsonStorage(CIRCULATION_PREF_STORAGE,payload.circulation);
+  putJsonStorage(MORNING_SETTINGS_STORAGE,payload.morningMovement);
+}
+
+/* Weekly Plan: deliberately separate so v1.9 can evolve the planner schema. */
+function buildWeeklyPlanPayload(sourcePlan=null){
+  return {
+    schema:WEEKLY_PLAN_SYNC_SCHEMA,
+    version:1,
+    updatedAt:new Date().toISOString(),
+    sourceDevice:sourceDevice(),
+    plan:sourcePlan||currentWeeklyPlan()
+  };
+}
+function validateWeeklyPlanPayload(payload){
+  return !!(payload&&payload.schema===WEEKLY_PLAN_SYNC_SCHEMA&&Number(payload.version)===1&&payload.plan&&typeof payload.plan==="object");
+}
+function applyWeeklyPlanPayload(payload){
+  if(!validateWeeklyPlanPayload(payload))throw new Error("The Weekly Plan cloud file is not compatible.");
+  applyWeeklyPlan(payload.plan);
+}
+
+/* v1.8c source validator, used only for migration. */
+function validateLegacyPersonalDataPayload(payload){
+  return !!(payload&&payload.schema===LEGACY_PERSONAL_DATA_SYNC_SCHEMA&&Number(payload.version)===1&&payload.data&&typeof payload.data==="object");
+}
+
+function downloadJsonFile(name,obj){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+function setSyncStatus(message,type=""){
+  $("syncStatus").textContent=message;
+  $("syncStatus").className="status"+(type?` ${type}`:"");
+}
+function stateText(id,modified,hasPulled){
+  if(!id)return "Not created";
+  if(!hasPulled)return "Found • Pull first";
+  return modified?`Synced • ${new Date(modified).toLocaleString()}`:"Ready";
+}
+function syncDef(kind){
+  const defs={
+    library:{
+      label:"Workout Library",
+      fileName:WORKOUT_LIBRARY_FILE_NAME,
+      property:"gbttWorkoutLibrary",
+      idKey:"libraryFileId",modifiedKey:"libraryModifiedTime",pulledKey:"libraryHasPulled",
+      stateId:"syncLibraryState",linkId:"openLibraryFile",
+      build:()=>buildWorkoutLibraryPayload(),validate:validateWorkoutLibraryPayload,apply:applyWorkoutLibraryPayload
+    },
+    history:{
+      label:"Workout Session History",
+      fileName:SESSION_HISTORY_FILE_NAME,
+      property:"gbttSessionHistory",
+      idKey:"historyFileId",modifiedKey:"historyModifiedTime",pulledKey:"historyHasPulled",
+      stateId:"syncHistoryState",linkId:"openHistoryFile",
+      build:()=>buildSessionHistoryPayload(),validate:validateSessionHistoryPayload,apply:applySessionHistoryPayload
+    },
+    recovery:{
+      label:"Recovery Data",
+      fileName:RECOVERY_DATA_FILE_NAME,
+      property:"gbttRecoveryData",
+      idKey:"recoveryFileId",modifiedKey:"recoveryModifiedTime",pulledKey:"recoveryHasPulled",
+      stateId:"syncRecoveryState",linkId:"openRecoveryFile",
+      build:()=>buildRecoveryDataPayload(),validate:validateRecoveryDataPayload,apply:applyRecoveryDataPayload
+    },
+    settings:{
+      label:"Settings",
+      fileName:SETTINGS_FILE_NAME,
+      property:"gbttSettings",
+      idKey:"settingsFileId",modifiedKey:"settingsModifiedTime",pulledKey:"settingsHasPulled",
+      stateId:"syncSettingsState",linkId:"openSettingsFile",
+      build:()=>buildSettingsPayload(),validate:validateSettingsPayload,apply:applySettingsPayload
+    },
+    weeklyPlan:{
+      label:"Weekly Plan",
+      fileName:WEEKLY_PLAN_FILE_NAME,
+      property:"gbttWeeklyPlan",
+      idKey:"weeklyPlanFileId",modifiedKey:"weeklyPlanModifiedTime",pulledKey:"weeklyPlanHasPulled",
+      stateId:"syncWeeklyPlanState",linkId:"openWeeklyPlanFile",
+      build:()=>buildWeeklyPlanPayload(),validate:validateWeeklyPlanPayload,apply:applyWeeklyPlanPayload
+    }
+  };
+  return defs[kind];
+}
+function allSyncKinds(){
+  return ["library","history","recovery","settings","weeklyPlan"];
+}
 function renderSyncMeta(){
   if(!$("syncFolderState"))return;
-  $("syncFolderState").textContent=driveConfig.folderId?`My Drive › ${driveConfig.folderName||"Getting Back to Tri"}`:"Not set";
-  $("syncLibraryState").textContent=stateText(driveConfig.libraryFileId,driveConfig.libraryModifiedTime,driveConfig.libraryHasPulled);
-  $("syncPersonalState").textContent=stateText(driveConfig.personalFileId,driveConfig.personalModifiedTime,driveConfig.personalHasPulled);
+
+  $("syncFolderState").textContent=driveConfig.folderId
+    ?`My Drive › ${driveConfig.folderName||"Getting Back to Tri"}`
+    :"Not set";
   $("syncLastAction").textContent=driveConfig.lastAction||"—";
-  const fl=$("openDriveFolder");if(driveConfig.folderId){fl.href=`https://drive.google.com/drive/folders/${encodeURIComponent(driveConfig.folderId)}`;fl.classList.remove("hidden")}else fl.classList.add("hidden");
-  const ll=$("openLibraryFile");if(driveConfig.libraryFileId){ll.href=`https://drive.google.com/open?id=${encodeURIComponent(driveConfig.libraryFileId)}`;ll.classList.remove("hidden")}else ll.classList.add("hidden");
-  const pl=$("openPersonalFile");if(driveConfig.personalFileId){pl.href=`https://drive.google.com/open?id=${encodeURIComponent(driveConfig.personalFileId)}`;pl.classList.remove("hidden")}else pl.classList.add("hidden");
-  $("legacyMigrationBox").classList.toggle("hidden",!pendingLegacySyncFileId);
+
+  allSyncKinds().forEach(kind=>{
+    const d=syncDef(kind);
+    $(d.stateId).textContent=stateText(driveConfig[d.idKey],driveConfig[d.modifiedKey],driveConfig[d.pulledKey]);
+    const link=$(d.linkId);
+    if(driveConfig[d.idKey]){
+      link.href=`https://drive.google.com/open?id=${encodeURIComponent(driveConfig[d.idKey])}`;
+      link.classList.remove("hidden");
+    }else link.classList.add("hidden");
+  });
+
+  const folderLink=$("openDriveFolder");
+  if(driveConfig.folderId){
+    folderLink.href=`https://drive.google.com/drive/folders/${encodeURIComponent(driveConfig.folderId)}`;
+    folderLink.classList.remove("hidden");
+  }else folderLink.classList.add("hidden");
+
+  $("legacyMigrationBox").classList.toggle("hidden",!pendingMigrationSource);
+  if(pendingMigrationSource){
+    if(pendingMigrationSource.type==="personal"){
+      $("legacyMigrationTitle").textContent="v1.8c Personal Data file found.";
+      $("legacyMigrationText").textContent="It can be split into Workout Session History, Recovery Data, Settings and Weekly Plan. The old Personal Data file will be kept unchanged as a safety copy.";
+    }else{
+      $("legacyMigrationTitle").textContent="Older combined sync file found.";
+      $("legacyMigrationText").textContent="It can be split into the new purpose-specific files. The original combined JSON will be kept unchanged as a safety copy.";
+    }
+  }
 }
-function openSyncPanel(){$("syncOverlay").classList.remove("hidden");fillDriveSetup()}
+function openSyncPanel(){
+  $("syncOverlay").classList.remove("hidden");
+  fillDriveSetup();
+}
 function closeSyncPanel(){$("syncOverlay").classList.add("hidden")}
 document.querySelectorAll("[data-open-sync]").forEach(b=>b.addEventListener("click",openSyncPanel));
 $("closeSync").addEventListener("click",closeSyncPanel);
 $("syncOverlay").addEventListener("click",e=>{if(e.target===$("syncOverlay"))closeSyncPanel()});
-$("downloadCompleteBackup").addEventListener("click",()=>{const payload=buildSyncPayload();payload.backupType="manual-complete-backup";downloadJsonFile(`Getting_Back_to_Tri_Complete_Backup_${localDate()}.json`,payload);$("backupStatus").textContent="Complete backup downloaded.";$("backupStatus").className="status good"});
-$("restoreCompleteBackup").addEventListener("change",async e=>{const file=e.target.files?.[0];if(!file)return;try{const payload=JSON.parse(await file.text());if(!validateSyncPayload(payload))throw new Error("Invalid backup");if(!confirm("Restore this complete backup? Current synced app data on this device will be replaced. Google sync setup and selected mode will be kept."))return;applySyncPayload(payload);$("backupStatus").textContent="Backup restored. Reloading app…";$("backupStatus").className="status good";setTimeout(()=>location.reload(),300)}catch(err){$("backupStatus").textContent="Could not restore that backup file.";$("backupStatus").className="status warn"}finally{e.target.value=""}});
-$("saveDriveSetup").addEventListener("click",()=>{driveConfig.clientId=$("driveClientId").value.trim();driveConfig.deviceLabel=$("driveDeviceLabel").value.trim()||defaultDeviceLabel();saveDriveConfig();$("driveConnectionStatus").textContent="Sync setup saved on this device.";$("driveConnectionStatus").className="status good"});
-let googleGisLoadPromise=null;
+
+$("downloadCompleteBackup").addEventListener("click",()=>{
+  const payload=buildSyncPayload();
+  payload.backupType="manual-complete-backup";
+  downloadJsonFile(`Getting_Back_to_Tri_Complete_Backup_${localDate()}.json`,payload);
+  $("backupStatus").textContent="Complete backup downloaded.";
+  $("backupStatus").className="status good";
+});
+$("restoreCompleteBackup").addEventListener("change",async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{
+    const payload=JSON.parse(await file.text());
+    if(!validateSyncPayload(payload))throw new Error("Invalid backup");
+    if(!confirm("Restore this complete backup? Current app data on this device will be replaced. Google sync setup and selected mode will be kept."))return;
+    applySyncPayload(payload);
+    $("backupStatus").textContent="Backup restored. Reloading app…";
+    $("backupStatus").className="status good";
+    setTimeout(()=>location.reload(),300);
+  }catch(err){
+    $("backupStatus").textContent="Could not restore that backup file.";
+    $("backupStatus").className="status warn";
+  }finally{e.target.value=""}
+});
+
+$("saveDriveSetup").addEventListener("click",()=>{
+  driveConfig.clientId=$("driveClientId").value.trim();
+  driveConfig.deviceLabel=$("driveDeviceLabel").value.trim()||defaultDeviceLabel();
+  saveDriveConfig();
+  $("driveConnectionStatus").textContent="Sync setup saved on this device.";
+  $("driveConnectionStatus").className="status good";
+});
+
+let googleGisLoadPromise = null;
 function ensureGoogleLibrary(){
-  if(window.google?.accounts?.oauth2)return Promise.resolve();if(googleGisLoadPromise)return googleGisLoadPromise;
-  googleGisLoadPromise=new Promise((resolve,reject)=>{let settled=false,checkTimer=null;const finishOk=()=>{if(settled)return;settled=true;clearTimeout(timeoutTimer);if(checkTimer)clearInterval(checkTimer);resolve()};const finishBad=message=>{if(settled)return;settled=true;clearTimeout(timeoutTimer);if(checkTimer)clearInterval(checkTimer);googleGisLoadPromise=null;reject(new Error(message))};const oldScript=document.getElementById("googleGisScript");if(oldScript)oldScript.remove();const script=document.createElement("script");script.id="googleGisScript";script.src="https://accounts.google.com/gsi/client?gbtt="+Date.now();script.async=true;script.defer=true;script.onload=()=>{let attempts=0;checkTimer=setInterval(()=>{attempts++;if(window.google?.accounts?.oauth2)finishOk();else if(attempts>=20)finishBad("Google Identity Services downloaded but did not initialise. Check browser privacy settings or content blocking for accounts.google.com.")},100)};script.onerror=()=>finishBad("Could not download Google Identity Services from accounts.google.com. Check the internet connection, DNS/content blocking, or try the app once in Chrome.");document.head.appendChild(script);const timeoutTimer=setTimeout(()=>finishBad("Timed out loading Google Identity Services. Try opening the app in Chrome and check that accounts.google.com is reachable."),12000)});return googleGisLoadPromise;
+  if(window.google?.accounts?.oauth2)return Promise.resolve();
+  if(googleGisLoadPromise)return googleGisLoadPromise;
+
+  googleGisLoadPromise=new Promise((resolve,reject)=>{
+    let settled=false,checkTimer=null;
+    const finishOk=()=>{
+      if(settled)return;
+      settled=true;clearTimeout(timeoutTimer);if(checkTimer)clearInterval(checkTimer);resolve();
+    };
+    const finishBad=message=>{
+      if(settled)return;
+      settled=true;clearTimeout(timeoutTimer);if(checkTimer)clearInterval(checkTimer);
+      googleGisLoadPromise=null;reject(new Error(message));
+    };
+    const oldScript=document.getElementById("googleGisScript");
+    if(oldScript)oldScript.remove();
+
+    const script=document.createElement("script");
+    script.id="googleGisScript";
+    script.src="https://accounts.google.com/gsi/client?gbtt="+Date.now();
+    script.async=true;script.defer=true;
+    script.onload=()=>{
+      let attempts=0;
+      checkTimer=setInterval(()=>{
+        attempts++;
+        if(window.google?.accounts?.oauth2)finishOk();
+        else if(attempts>=20)finishBad("Google Identity Services downloaded but did not initialise. Check browser privacy settings or content blocking for accounts.google.com.");
+      },100);
+    };
+    script.onerror=()=>finishBad("Could not download Google Identity Services from accounts.google.com. Check the internet connection, DNS/content blocking, or try the app once in Chrome.");
+    document.head.appendChild(script);
+
+    const timeoutTimer=setTimeout(()=>finishBad("Timed out loading Google Identity Services. Try opening the app in Chrome and check that accounts.google.com is reachable."),12000);
+  });
+  return googleGisLoadPromise;
 }
 async function connectGoogleDrive(){
-  try{$("driveConnectionStatus").textContent="Loading Google Identity Services…";$("driveConnectionStatus").className="status";await ensureGoogleLibrary();driveConfig.clientId=$("driveClientId").value.trim();driveConfig.deviceLabel=$("driveDeviceLabel").value.trim()||defaultDeviceLabel();if(!driveConfig.clientId)throw new Error("Paste your Google OAuth Web Client ID first.");saveDriveConfig();driveTokenClient=google.accounts.oauth2.initTokenClient({client_id:driveConfig.clientId,scope:DRIVE_SCOPE,callback:response=>{if(response?.error){$("driveConnectionStatus").textContent=`Google connection failed: ${response.error}`;$("driveConnectionStatus").className="status warn";return}if(!response?.access_token){$("driveConnectionStatus").textContent="Google did not return an access token.";$("driveConnectionStatus").className="status warn";return}driveAccessToken=response.access_token;driveTokenExpiresAt=Date.now()+Math.max(60,Number(response.expires_in||3600))*1000;const granted=google.accounts.oauth2.hasGrantedAllScopes?google.accounts.oauth2.hasGrantedAllScopes(response,DRIVE_SCOPE):true;$("driveConnectionStatus").textContent=granted?"Connected to Google Drive for this browser session.":"Connected, but Drive file permission was not granted.";$("driveConnectionStatus").className=granted?"status good":"status warn"}});driveTokenClient.requestAccessToken({prompt:""})}catch(err){$("driveConnectionStatus").textContent=err.message;$("driveConnectionStatus").className="status warn"}}
+  try{
+    $("driveConnectionStatus").textContent="Loading Google Identity Services…";
+    $("driveConnectionStatus").className="status";
+    await ensureGoogleLibrary();
+    driveConfig.clientId=$("driveClientId").value.trim();
+    driveConfig.deviceLabel=$("driveDeviceLabel").value.trim()||defaultDeviceLabel();
+    if(!driveConfig.clientId)throw new Error("Paste your Google OAuth Web Client ID first.");
+    saveDriveConfig();
+
+    driveTokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:driveConfig.clientId,
+      scope:DRIVE_SCOPE,
+      callback:response=>{
+        if(response?.error){
+          $("driveConnectionStatus").textContent=`Google connection failed: ${response.error}`;
+          $("driveConnectionStatus").className="status warn";
+          return;
+        }
+        if(!response?.access_token){
+          $("driveConnectionStatus").textContent="Google did not return an access token.";
+          $("driveConnectionStatus").className="status warn";
+          return;
+        }
+        driveAccessToken=response.access_token;
+        driveTokenExpiresAt=Date.now()+Math.max(60,Number(response.expires_in||3600))*1000;
+        const granted=google.accounts.oauth2.hasGrantedAllScopes
+          ?google.accounts.oauth2.hasGrantedAllScopes(response,DRIVE_SCOPE):true;
+        $("driveConnectionStatus").textContent=granted
+          ?"Connected to Google Drive for this browser session."
+          :"Connected, but Drive file permission was not granted.";
+        $("driveConnectionStatus").className=granted?"status good":"status warn";
+      }
+    });
+    driveTokenClient.requestAccessToken({prompt:""});
+  }catch(err){
+    $("driveConnectionStatus").textContent=err.message;
+    $("driveConnectionStatus").className="status warn";
+  }
+}
 $("connectDrive").addEventListener("click",connectGoogleDrive);
-function driveTokenReady(){return !!driveAccessToken&&Date.now()<driveTokenExpiresAt-30000}
-async function driveFetch(url,options={}){if(!driveTokenReady())throw new Error("Connect Google Drive first (access tokens are intentionally kept only in memory).");const headers={...(options.headers||{}),Authorization:`Bearer ${driveAccessToken}`};const res=await fetch(url,{...options,headers});if(!res.ok){let detail="";try{detail=(await res.json())?.error?.message||""}catch(e){try{detail=await res.text()}catch(_){}}if(res.status===401)driveAccessToken="";throw new Error(detail||`Google Drive request failed (${res.status}).`)}return res}
-async function getDriveMetadata(fileId){const fields="id,name,modifiedTime,size,parents,appProperties";const res=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?fields=${encodeURIComponent(fields)}`);return await res.json()}
-async function searchByAppProperty(key,value){const q=`appProperties has { key='${key}' and value='${value}' } and trashed = false`;const fields="files(id,name,modifiedTime,size,parents,appProperties)";const url=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&pageSize=20&orderBy=modifiedTime%20desc&fields=${encodeURIComponent(fields)}`;const res=await driveFetch(url);return (await res.json()).files||[]}
-async function searchAppFolders(){return searchByAppProperty("gbttFolder","v1")}
-async function createAppFolder(){const metadata={name:"Getting Back to Tri",mimeType:"application/vnd.google-apps.folder",appProperties:{gbttFolder:"v1"}};const res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,parents",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(metadata)});return await res.json()}
-async function ensureAppFolder(){if(driveConfig.folderId){try{const existing=await getDriveMetadata(driveConfig.folderId);if(existing?.id)return existing}catch(e){driveConfig.folderId=""}}const folders=await searchAppFolders();const folder=folders[0]||await createAppFolder();driveConfig.folderId=folder.id;driveConfig.folderName=folder.name||"Getting Back to Tri";saveDriveConfig();return folder}
-function fileInFolder(file,folderId){return Array.isArray(file?.parents)&&file.parents.includes(folderId)}
-async function createJsonDriveFile(name,appPropertyKey,payload){const folder=await ensureAppFolder();const metadata={name,mimeType:"application/json",parents:[folder.id],appProperties:{[appPropertyKey]:"v1"}};let res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,size,parents",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(metadata)});let file=await res.json();res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(file.id)}?uploadType=media&fields=id,name,modifiedTime,size,parents`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});return await res.json()}
-async function updateJsonDriveFile(fileId,payload){const res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(fileId)}?uploadType=media&fields=id,name,modifiedTime,size,parents`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});return await res.json()}
-async function readJsonDriveFile(fileId){const meta=await getDriveMetadata(fileId);const res=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`);return {meta,payload:await res.json()}}
-function adoptFoundFile(kind,file){if(kind==="library"){const changed=driveConfig.libraryFileId&&driveConfig.libraryFileId!==file.id;driveConfig.libraryFileId=file.id;if(changed){driveConfig.libraryModifiedTime="";driveConfig.libraryHasPulled=false}}else{const changed=driveConfig.personalFileId&&driveConfig.personalFileId!==file.id;driveConfig.personalFileId=file.id;if(changed){driveConfig.personalModifiedTime="";driveConfig.personalHasPulled=false}}}
-async function findCloudFiles(){const folder=await ensureAppFolder();const [libraries,personals,legacyFiles]=await Promise.all([searchByAppProperty("gbttWorkoutLibrary","v1"),searchByAppProperty("gbttPersonalData","v1"),searchByAppProperty("gbttSync","v1")]);const library=libraries.find(f=>fileInFolder(f,folder.id))||libraries[0]||null;const personal=personals.find(f=>fileInFolder(f,folder.id))||personals[0]||null;const legacy=legacyFiles.find(f=>fileInFolder(f,folder.id))||legacyFiles[0]||null;if(library)adoptFoundFile("library",library);if(personal)adoptFoundFile("personal",personal);pendingLegacySyncFileId=(!library||!personal)&&legacy?legacy.id:"";driveConfig.legacyFileId=legacy?.id||driveConfig.legacyFileId||"";saveDriveConfig();return {folder,library,personal,legacy}}
-async function createMissingSplitFiles(){await findCloudFiles();if(!driveConfig.libraryFileId){const file=await createJsonDriveFile(WORKOUT_LIBRARY_FILE_NAME,"gbttWorkoutLibrary",buildWorkoutLibraryPayload());driveConfig.libraryFileId=file.id;driveConfig.libraryModifiedTime=file.modifiedTime||"";driveConfig.libraryHasPulled=true}if(!driveConfig.personalFileId){const file=await createJsonDriveFile(PERSONAL_DATA_FILE_NAME,"gbttPersonalData",buildPersonalDataPayload());driveConfig.personalFileId=file.id;driveConfig.personalModifiedTime=file.modifiedTime||"";driveConfig.personalHasPulled=true}saveDriveConfig()}
-$("findDriveFile").addEventListener("click",async()=>{try{setSyncStatus("Looking for the Workout Library, Personal Data and any legacy combined sync file…");await findCloudFiles();if(pendingLegacySyncFileId){setSyncStatus("Existing combined sync file found. Split it before using the new two-file sync structure.","warn");return}if(!driveConfig.libraryFileId||!driveConfig.personalFileId){await createMissingSplitFiles();driveConfig.lastAction=`Created split cloud files • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Workout Library and Personal Data files are ready in the Getting Back to Tri folder.","good");return}setSyncStatus("Both split cloud files found. Pull all before the first Push from this device.","good")}catch(err){setSyncStatus(err.message,"warn")}});
-$("migrateLegacySync").addEventListener("click",async()=>{try{if(!pendingLegacySyncFileId)throw new Error("No legacy combined sync file is waiting to be split.");setSyncStatus("Reading the existing combined sync file…");const {payload:legacy}=await readJsonDriveFile(pendingLegacySyncFileId);if(!validateSyncPayload(legacy))throw new Error("The existing combined sync file is not compatible.");const legacyLibrary=legacy.data?.[EXERCISE_LIBRARY_STORAGE]||{sessions:[],weeklyPlan:{}};const sessionCount=Array.isArray(legacyLibrary.sessions)?legacyLibrary.sessions.length:0;const historyCount=Array.isArray(legacy.data?.[STORAGE])?legacy.data[STORAGE].length:0;if(!confirm(`Split the existing cloud file into Workout Library and Personal Data?\n\nWorkout sessions found: ${sessionCount}\nRecorded training sessions found: ${historyCount}\n\nThe original combined JSON will be kept unchanged as a safety copy.`))return;const sourceData={};PERSONAL_DATA_KEYS.forEach(k=>sourceData[k]=legacy.data?.[k]??null);const sourcePlan={};dayNames.forEach(d=>sourcePlan[d]=String(legacyLibrary.weeklyPlan?.[d]||""));if(!driveConfig.libraryFileId){const f=await createJsonDriveFile(WORKOUT_LIBRARY_FILE_NAME,"gbttWorkoutLibrary",buildWorkoutLibraryPayload(legacyLibrary));driveConfig.libraryFileId=f.id;driveConfig.libraryModifiedTime=f.modifiedTime||"";driveConfig.libraryHasPulled=false}if(!driveConfig.personalFileId){const f=await createJsonDriveFile(PERSONAL_DATA_FILE_NAME,"gbttPersonalData",buildPersonalDataPayload(sourceData,sourcePlan));driveConfig.personalFileId=f.id;driveConfig.personalModifiedTime=f.modifiedTime||"";driveConfig.personalHasPulled=false}pendingLegacySyncFileId="";driveConfig.lastAction=`Split legacy cloud file • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Split complete. The old combined JSON was retained unchanged. Pull all once before your next Push.","good")}catch(err){setSyncStatus(err.message,"warn")}});
-async function pullWorkoutLibrary(ask=true){if(!driveConfig.libraryFileId)throw new Error("Find or create the Workout Library cloud file first.");const {meta,payload}=await readJsonDriveFile(driveConfig.libraryFileId);if(!validateWorkoutLibraryPayload(payload))throw new Error("The cloud Workout Library file is not compatible.");if(ask){const count=payload.library.sessions.length;if(!confirm(`Pull the cloud Workout Library and replace this device's local workout-session definitions?\n\n${count} session${count===1?"":"s"} found.\nYour personal weekly plan will be kept.`))return false}applyWorkoutLibraryPayload(payload);driveConfig.libraryModifiedTime=meta.modifiedTime||"";driveConfig.libraryHasPulled=true;return true}
-async function pullPersonalData(ask=true){if(!driveConfig.personalFileId)throw new Error("Find or create the Personal Data cloud file first.");const {meta,payload}=await readJsonDriveFile(driveConfig.personalFileId);if(!validatePersonalDataPayload(payload))throw new Error("The cloud Personal Data file is not compatible.");if(ask){const count=Array.isArray(payload.data?.[STORAGE])?payload.data[STORAGE].length:0;if(!confirm(`Pull Personal Data and replace this device's recorded/history data and weekly plan?\n\n${count} recorded training session${count===1?"":"s"} found.\nWorkout-library session definitions will be kept.`))return false}applyPersonalDataPayload(payload);driveConfig.personalModifiedTime=meta.modifiedTime||"";driveConfig.personalHasPulled=true;return true}
-async function pushWorkoutLibrary(){if(!driveConfig.libraryFileId)throw new Error("Find or create the Workout Library cloud file first.");if(!driveConfig.libraryHasPulled)throw new Error("Pull the Workout Library first on this device before pushing.");const meta=await getDriveMetadata(driveConfig.libraryFileId);if(driveConfig.libraryModifiedTime&&meta.modifiedTime&&meta.modifiedTime!==driveConfig.libraryModifiedTime){driveConfig.libraryHasPulled=false;saveDriveConfig();throw new Error("The cloud Workout Library changed since this device last saw it. Pull the Workout Library first.")}const updated=await updateJsonDriveFile(driveConfig.libraryFileId,buildWorkoutLibraryPayload());driveConfig.libraryModifiedTime=updated.modifiedTime||"";driveConfig.libraryHasPulled=true;return true}
-async function pushPersonalData(){if(!driveConfig.personalFileId)throw new Error("Find or create the Personal Data cloud file first.");if(!driveConfig.personalHasPulled)throw new Error("Pull Personal Data first on this device before pushing.");const meta=await getDriveMetadata(driveConfig.personalFileId);if(driveConfig.personalModifiedTime&&meta.modifiedTime&&meta.modifiedTime!==driveConfig.personalModifiedTime){driveConfig.personalHasPulled=false;saveDriveConfig();throw new Error("The cloud Personal Data changed since this device last saw it. Pull Personal Data first.")}const updated=await updateJsonDriveFile(driveConfig.personalFileId,buildPersonalDataPayload());driveConfig.personalModifiedTime=updated.modifiedTime||"";driveConfig.personalHasPulled=true;return true}
-$("pullLibrary").addEventListener("click",async()=>{try{setSyncStatus("Pulling Workout Library…");if(await pullWorkoutLibrary(true)){driveConfig.lastAction=`Pulled Workout Library • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Workout Library pulled successfully. Reloading app…","good");setTimeout(()=>location.reload(),350)}}catch(err){setSyncStatus(err.message,"warn")}});
-$("pullPersonal").addEventListener("click",async()=>{try{setSyncStatus("Pulling Personal Data…");if(await pullPersonalData(true)){driveConfig.lastAction=`Pulled Personal Data • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Personal Data pulled successfully. Reloading app…","good");setTimeout(()=>location.reload(),350)}}catch(err){setSyncStatus(err.message,"warn")}});
-$("pushLibrary").addEventListener("click",async()=>{try{setSyncStatus("Checking and pushing Workout Library…");await pushWorkoutLibrary();driveConfig.lastAction=`Pushed Workout Library • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Workout Library pushed successfully.","good")}catch(err){setSyncStatus(err.message,"warn")}});
-$("pushPersonal").addEventListener("click",async()=>{try{setSyncStatus("Checking and pushing Personal Data…");await pushPersonalData();driveConfig.lastAction=`Pushed Personal Data • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Personal Data pushed successfully.","good")}catch(err){setSyncStatus(err.message,"warn")}});
-$("pullDrive").addEventListener("click",async()=>{try{if(!driveConfig.libraryFileId||!driveConfig.personalFileId)throw new Error("Find or create both cloud files first.");const libRead=await readJsonDriveFile(driveConfig.libraryFileId);const personalRead=await readJsonDriveFile(driveConfig.personalFileId);if(!validateWorkoutLibraryPayload(libRead.payload)||!validatePersonalDataPayload(personalRead.payload))throw new Error("One of the split cloud files is not compatible.");const workoutCount=libRead.payload.library.sessions.length;const historyCount=Array.isArray(personalRead.payload.data?.[STORAGE])?personalRead.payload.data[STORAGE].length:0;if(!confirm(`Pull both cloud files and replace this device's synced data?\n\nWorkout Library: ${workoutCount} sessions\nPersonal Data: ${historyCount} recorded training sessions\n\nYour selected app mode and Google setup remain device-local.`))return;applyWorkoutLibraryPayload(libRead.payload);applyPersonalDataPayload(personalRead.payload);driveConfig.libraryModifiedTime=libRead.meta.modifiedTime||"";driveConfig.personalModifiedTime=personalRead.meta.modifiedTime||"";driveConfig.libraryHasPulled=true;driveConfig.personalHasPulled=true;driveConfig.lastAction=`Pulled all • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Workout Library and Personal Data pulled successfully. Reloading app…","good");setTimeout(()=>location.reload(),350)}catch(err){setSyncStatus(err.message,"warn")}});
-$("pushDrive").addEventListener("click",async()=>{try{if(!driveConfig.libraryFileId||!driveConfig.personalFileId)throw new Error("Find or create both cloud files first.");if(!driveConfig.libraryHasPulled||!driveConfig.personalHasPulled)throw new Error("Pull all first on this device before using Push all.");setSyncStatus("Checking both cloud files for changes…");await pushWorkoutLibrary();await pushPersonalData();driveConfig.lastAction=`Pushed all • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;saveDriveConfig();setSyncStatus("Workout Library and Personal Data pushed successfully.","good")}catch(err){setSyncStatus(err.message,"warn")}});
+
+function driveTokenReady(){
+  return !!driveAccessToken&&Date.now()<driveTokenExpiresAt-30000;
+}
+async function driveFetch(url,options={}){
+  if(!driveTokenReady())throw new Error("Connect Google Drive first (access tokens are intentionally kept only in memory).");
+  const headers={...(options.headers||{}),Authorization:`Bearer ${driveAccessToken}`};
+  const res=await fetch(url,{...options,headers});
+  if(!res.ok){
+    let detail="";
+    try{detail=(await res.json())?.error?.message||""}catch(e){try{detail=await res.text()}catch(_){}}
+    if(res.status===401)driveAccessToken="";
+    throw new Error(detail||`Google Drive request failed (${res.status}).`);
+  }
+  return res;
+}
+async function getDriveMetadata(fileId){
+  const fields="id,name,modifiedTime,size,parents,appProperties";
+  const res=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?fields=${encodeURIComponent(fields)}`);
+  return await res.json();
+}
+async function searchByAppProperty(key,value){
+  const q=`appProperties has { key='${key}' and value='${value}' } and trashed = false`;
+  const fields="files(id,name,modifiedTime,size,parents,appProperties)";
+  const url=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&pageSize=30&orderBy=modifiedTime%20desc&fields=${encodeURIComponent(fields)}`;
+  const res=await driveFetch(url);
+  return (await res.json()).files||[];
+}
+async function searchAppFolders(){
+  return searchByAppProperty("gbttFolder","v1");
+}
+async function createAppFolder(){
+  const metadata={
+    name:"Getting Back to Tri",
+    mimeType:"application/vnd.google-apps.folder",
+    appProperties:{gbttFolder:"v1"}
+  };
+  const res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,parents",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(metadata)
+  });
+  return await res.json();
+}
+async function ensureAppFolder(){
+  if(driveConfig.folderId){
+    try{
+      const existing=await getDriveMetadata(driveConfig.folderId);
+      if(existing?.id)return existing;
+    }catch(e){driveConfig.folderId=""}
+  }
+  const folders=await searchAppFolders();
+  const folder=folders[0]||await createAppFolder();
+  driveConfig.folderId=folder.id;
+  driveConfig.folderName=folder.name||"Getting Back to Tri";
+  saveDriveConfig();
+  return folder;
+}
+function fileInFolder(file,folderId){
+  return Array.isArray(file?.parents)&&file.parents.includes(folderId);
+}
+async function createJsonDriveFile(name,appPropertyKey,payload){
+  const folder=await ensureAppFolder();
+  const metadata={
+    name,
+    mimeType:"application/json",
+    parents:[folder.id],
+    appProperties:{[appPropertyKey]:"v1"}
+  };
+  let res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,size,parents",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(metadata)
+  });
+  let file=await res.json();
+  res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(file.id)}?uploadType=media&fields=id,name,modifiedTime,size,parents`,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  });
+  return await res.json();
+}
+async function updateJsonDriveFile(fileId,payload){
+  const res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(fileId)}?uploadType=media&fields=id,name,modifiedTime,size,parents`,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  });
+  return await res.json();
+}
+async function readJsonDriveFile(fileId){
+  const meta=await getDriveMetadata(fileId);
+  const res=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`);
+  return {meta,payload:await res.json()};
+}
+function adoptFoundFile(kind,file){
+  if(!file)return;
+  const d=syncDef(kind);
+  const oldId=driveConfig[d.idKey];
+  driveConfig[d.idKey]=file.id;
+  if(oldId&&oldId!==file.id){
+    driveConfig[d.modifiedKey]="";
+    driveConfig[d.pulledKey]=false;
+  }
+}
+async function findCloudFiles(){
+  const folder=await ensureAppFolder();
+  const searches=await Promise.all([
+    searchByAppProperty("gbttWorkoutLibrary","v1"),
+    searchByAppProperty("gbttSessionHistory","v1"),
+    searchByAppProperty("gbttRecoveryData","v1"),
+    searchByAppProperty("gbttSettings","v1"),
+    searchByAppProperty("gbttWeeklyPlan","v1"),
+    searchByAppProperty("gbttPersonalData","v1"),
+    searchByAppProperty("gbttSync","v1")
+  ]);
+
+  const [libraries,histories,recoveries,settingsFiles,weeklyPlans,legacyPersonals,legacyCombined]=searches;
+  const pick=files=>files.find(f=>fileInFolder(f,folder.id))||files[0]||null;
+
+  const found={
+    library:pick(libraries),
+    history:pick(histories),
+    recovery:pick(recoveries),
+    settings:pick(settingsFiles),
+    weeklyPlan:pick(weeklyPlans),
+    legacyPersonal:pick(legacyPersonals),
+    legacyCombined:pick(legacyCombined)
+  };
+
+  ["library","history","recovery","settings","weeklyPlan"].forEach(k=>adoptFoundFile(k,found[k]));
+
+  if(found.legacyPersonal)driveConfig.legacyPersonalFileId=found.legacyPersonal.id;
+  if(found.legacyCombined)driveConfig.legacyCombinedFileId=found.legacyCombined.id;
+
+  const missing=allSyncKinds().filter(k=>!driveConfig[syncDef(k).idKey]);
+  pendingMigrationSource=null;
+  if(missing.length){
+    if(found.legacyPersonal)pendingMigrationSource={type:"personal",id:found.legacyPersonal.id};
+    else if(found.legacyCombined)pendingMigrationSource={type:"combined",id:found.legacyCombined.id};
+  }
+
+  saveDriveConfig();
+  return {...found,missing};
+}
+async function createMissingFilesFromLocal(){
+  await findCloudFiles();
+  if(pendingMigrationSource)return false;
+
+  for(const kind of allSyncKinds()){
+    const d=syncDef(kind);
+    if(!driveConfig[d.idKey]){
+      const file=await createJsonDriveFile(d.fileName,d.property,d.build());
+      driveConfig[d.idKey]=file.id;
+      driveConfig[d.modifiedKey]=file.modifiedTime||"";
+      driveConfig[d.pulledKey]=true;
+    }
+  }
+  saveDriveConfig();
+  return true;
+}
+
+$("findDriveFile").addEventListener("click",async()=>{
+  try{
+    setSyncStatus("Looking for the structured cloud files and any older sync format…");
+    const found=await findCloudFiles();
+
+    if(pendingMigrationSource){
+      setSyncStatus("An older cloud structure was found. Use “Migrate cloud structure” before normal Pull / Push.","warn");
+      return;
+    }
+
+    if(found.missing.length){
+      await createMissingFilesFromLocal();
+      driveConfig.lastAction=`Created structured cloud files • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
+      saveDriveConfig();
+      setSyncStatus("All five cloud files are ready in My Drive › Getting Back to Tri.","good");
+      return;
+    }
+
+    setSyncStatus("All five cloud files found. Pull all before the first Push from this device.","good");
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
+
+async function migrateFromLegacyPersonal(sourcePayload,legacyCombinedPayload=null){
+  if(!validateLegacyPersonalDataPayload(sourcePayload))throw new Error("The v1.8c Personal Data file is not compatible.");
+
+  const sourceData=sourcePayload.data||{};
+  const sourcePlan=sourcePayload.weeklyPlan||{};
+  let sourceLibrary=null;
+
+  // Normally v1.8c already has its separate Workout Library file.
+  // If not, use the retained combined v1.8a/b backup if available.
+  if(!driveConfig.libraryFileId&&legacyCombinedPayload&&validateSyncPayload(legacyCombinedPayload)){
+    sourceLibrary=legacyCombinedPayload.data?.[EXERCISE_LIBRARY_STORAGE]||null;
+  }
+  if(!sourceLibrary)sourceLibrary=currentLibraryObject();
+
+  return {
+    library:buildWorkoutLibraryPayload(sourceLibrary),
+    history:buildSessionHistoryPayload(
+      Array.isArray(sourceData[STORAGE])?sourceData[STORAGE]:[],
+      Array.isArray(sourceData[MORNING_HISTORY_STORAGE])?sourceData[MORNING_HISTORY_STORAGE]:[]
+    ),
+    recovery:buildRecoveryDataPayload(sourceData[HEALTH_STORAGE]??null,sourceData[BASELINE_STORAGE]??null),
+    settings:buildSettingsPayload(sourceData[CIRCULATION_PREF_STORAGE]??null,sourceData[MORNING_SETTINGS_STORAGE]??null),
+    weeklyPlan:buildWeeklyPlanPayload(sourcePlan)
+  };
+}
+function migrateFromCombinedPayload(sourcePayload){
+  if(!validateSyncPayload(sourcePayload))throw new Error("The older combined sync file is not compatible.");
+  const data=sourcePayload.data||{};
+  const lib=data[EXERCISE_LIBRARY_STORAGE]||{sessions:[],weeklyPlan:{}};
+  return {
+    library:buildWorkoutLibraryPayload(lib),
+    history:buildSessionHistoryPayload(
+      Array.isArray(data[STORAGE])?data[STORAGE]:[],
+      Array.isArray(data[MORNING_HISTORY_STORAGE])?data[MORNING_HISTORY_STORAGE]:[]
+    ),
+    recovery:buildRecoveryDataPayload(data[HEALTH_STORAGE]??null,data[BASELINE_STORAGE]??null),
+    settings:buildSettingsPayload(data[CIRCULATION_PREF_STORAGE]??null,data[MORNING_SETTINGS_STORAGE]??null),
+    weeklyPlan:buildWeeklyPlanPayload(lib.weeklyPlan||{})
+  };
+}
+async function writeMissingMigrationFiles(payloads){
+  for(const kind of allSyncKinds()){
+    const d=syncDef(kind);
+    if(!driveConfig[d.idKey]){
+      const file=await createJsonDriveFile(d.fileName,d.property,payloads[kind]);
+      driveConfig[d.idKey]=file.id;
+      driveConfig[d.modifiedKey]=file.modifiedTime||"";
+    }
+    // Force a Pull after migration so every device establishes the same base.
+    driveConfig[d.pulledKey]=false;
+  }
+  saveDriveConfig();
+}
+
+$("migrateLegacySync").addEventListener("click",async()=>{
+  try{
+    if(!pendingMigrationSource)throw new Error("No older cloud structure is waiting to be migrated.");
+    setSyncStatus("Reading the older cloud data…");
+
+    let payloads,description;
+    if(pendingMigrationSource.type==="personal"){
+      const {payload:personal}=await readJsonDriveFile(pendingMigrationSource.id);
+      let combined=null;
+      if(!driveConfig.libraryFileId&&driveConfig.legacyCombinedFileId){
+        try{combined=(await readJsonDriveFile(driveConfig.legacyCombinedFileId)).payload}catch(e){}
+      }
+      payloads=await migrateFromLegacyPersonal(personal,combined);
+      description="the existing v1.8c Personal Data file";
+    }else{
+      const {payload:combined}=await readJsonDriveFile(pendingMigrationSource.id);
+      payloads=migrateFromCombinedPayload(combined);
+      description="the existing combined sync file";
+    }
+
+    const historyCount=payloads.history.sessions.length;
+    const workoutCount=payloads.library.library.sessions.length;
+
+    if(!confirm(
+      `Migrate ${description} into the new structured cloud files?\n\n`+
+      `Workout Library: ${workoutCount} session${workoutCount===1?"":"s"}\n`+
+      `Workout Session History: ${historyCount} completed record${historyCount===1?"":"s"}\n`+
+      `Recovery Data, Settings and Weekly Plan will also be separated.\n\n`+
+      `The older source file will be kept unchanged as a safety copy.`
+    ))return;
+
+    await writeMissingMigrationFiles(payloads);
+    pendingMigrationSource=null;
+    driveConfig.lastAction=`Migrated cloud structure • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
+    saveDriveConfig();
+    setSyncStatus("Migration complete. The older source file was retained unchanged. Pull all once before your next Push.","good");
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
+
+function itemCount(kind,payload){
+  if(kind==="library")return payload.library?.sessions?.length||0;
+  if(kind==="history")return payload.sessions?.length||0;
+  if(kind==="recovery")return Array.isArray(payload.history)?payload.history.length:(payload.history?1:0);
+  if(kind==="settings")return [payload.circulation,payload.morningMovement].filter(v=>v!==null&&v!==undefined).length;
+  if(kind==="weeklyPlan")return dayNames.filter(d=>String(payload.plan?.[d]||"").trim()).length;
+  return 0;
+}
+function pullConfirmText(kind,payload){
+  const count=itemCount(kind,payload);
+  if(kind==="library")return `Pull the cloud Workout Library and replace this device's workout definitions?\n\n${count} workout session${count===1?"":"s"} found.\nYour weekly plan and recorded history will be kept.`;
+  if(kind==="history")return `Pull Workout Session History and replace this device's completed-session history?\n\n${count} completed session record${count===1?"":"s"} found across both app modes.`;
+  if(kind==="recovery")return `Pull Recovery Data and replace this device's recovery history/baseline?\n\n${count} recovery history entr${count===1?"y":"ies"} found.`;
+  if(kind==="settings")return `Pull synced Settings and replace this device's Morning Movement and Circulation preferences?\n\nSelected app mode and Google setup will not change.`;
+  if(kind==="weeklyPlan")return `Pull the Weekly Plan and replace this device's current weekly plan?\n\n${count} day${count===1?"":"s"} currently contain planned activity.`;
+  return `Pull ${syncDef(kind).label}?`;
+}
+async function pullOne(kind,ask=true,applyNow=true){
+  const d=syncDef(kind);
+  const fileId=driveConfig[d.idKey];
+  if(!fileId)throw new Error(`Find or create the ${d.label} cloud file first.`);
+
+  const {meta,payload}=await readJsonDriveFile(fileId);
+  if(!d.validate(payload))throw new Error(`The cloud ${d.label} file is not compatible.`);
+  if(ask&&!confirm(pullConfirmText(kind,payload)))return null;
+
+  if(applyNow)d.apply(payload);
+  driveConfig[d.modifiedKey]=meta.modifiedTime||"";
+  driveConfig[d.pulledKey]=true;
+  return {meta,payload};
+}
+async function pushOne(kind){
+  const d=syncDef(kind);
+  const fileId=driveConfig[d.idKey];
+  if(!fileId)throw new Error(`Find or create the ${d.label} cloud file first.`);
+  if(!driveConfig[d.pulledKey])throw new Error(`Pull ${d.label} first on this device before pushing.`);
+
+  const meta=await getDriveMetadata(fileId);
+  if(driveConfig[d.modifiedKey]&&meta.modifiedTime&&meta.modifiedTime!==driveConfig[d.modifiedKey]){
+    driveConfig[d.pulledKey]=false;
+    saveDriveConfig();
+    throw new Error(`The cloud ${d.label} changed since this device last saw it. Pull ${d.label} first.`);
+  }
+
+  const updated=await updateJsonDriveFile(fileId,d.build());
+  driveConfig[d.modifiedKey]=updated.modifiedTime||"";
+  driveConfig[d.pulledKey]=true;
+  return updated;
+}
+
+document.querySelectorAll("[data-pull-kind]").forEach(btn=>btn.addEventListener("click",async()=>{
+  const kind=btn.dataset.pullKind,d=syncDef(kind);
+  try{
+    setSyncStatus(`Pulling ${d.label}…`);
+    const result=await pullOne(kind,true,true);
+    if(result){
+      driveConfig.lastAction=`Pulled ${d.label} • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
+      saveDriveConfig();
+      setSyncStatus(`${d.label} pulled successfully. Reloading app…`,"good");
+      setTimeout(()=>location.reload(),350);
+    }
+  }catch(err){setSyncStatus(err.message,"warn")}
+}));
+document.querySelectorAll("[data-push-kind]").forEach(btn=>btn.addEventListener("click",async()=>{
+  const kind=btn.dataset.pushKind,d=syncDef(kind);
+  try{
+    setSyncStatus(`Checking and pushing ${d.label}…`);
+    await pushOne(kind);
+    driveConfig.lastAction=`Pushed ${d.label} • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
+    saveDriveConfig();
+    setSyncStatus(`${d.label} pushed successfully.`,"good");
+  }catch(err){setSyncStatus(err.message,"warn")}
+}));
+
+$("pullDrive").addEventListener("click",async()=>{
+  try{
+    const missing=allSyncKinds().filter(k=>!driveConfig[syncDef(k).idKey]);
+    if(missing.length)throw new Error("Find / create all cloud files first.");
+
+    setSyncStatus("Reading all five cloud files…");
+    const reads={};
+    for(const kind of allSyncKinds()){
+      reads[kind]=await pullOne(kind,false,false);
+    }
+
+    const workoutCount=itemCount("library",reads.library.payload);
+    const historyCount=itemCount("history",reads.history.payload);
+
+    if(!confirm(
+      `Pull all structured cloud data and replace this device's synced data?\n\n`+
+      `Workout Library: ${workoutCount} workout session${workoutCount===1?"":"s"}\n`+
+      `Workout Session History: ${historyCount} completed record${historyCount===1?"":"s"}\n`+
+      `Recovery Data, Settings and Weekly Plan will also be pulled.\n\n`+
+      `Selected app mode and Google setup remain device-local.`
+    ))return;
+
+    // Apply only after every remote file has been read and validated.
+    allSyncKinds().forEach(kind=>syncDef(kind).apply(reads[kind].payload));
+
+    driveConfig.lastAction=`Pulled all • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
+    saveDriveConfig();
+    setSyncStatus("All structured cloud data pulled successfully. Reloading app…","good");
+    setTimeout(()=>location.reload(),350);
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
+
+$("pushDrive").addEventListener("click",async()=>{
+  try{
+    const missing=allSyncKinds().filter(k=>!driveConfig[syncDef(k).idKey]);
+    if(missing.length)throw new Error("Find / create all cloud files first.");
+    const notPulled=allSyncKinds().filter(k=>!driveConfig[syncDef(k).pulledKey]);
+    if(notPulled.length)throw new Error("Pull all first on this device before using Push all.");
+
+    // Check every remote modifiedTime before updating any file, reducing the
+    // chance of a partial multi-file push when one remote file has changed.
+    setSyncStatus("Checking all five cloud files for changes…");
+    for(const kind of allSyncKinds()){
+      const d=syncDef(kind);
+      const meta=await getDriveMetadata(driveConfig[d.idKey]);
+      if(driveConfig[d.modifiedKey]&&meta.modifiedTime&&meta.modifiedTime!==driveConfig[d.modifiedKey]){
+        driveConfig[d.pulledKey]=false;
+        saveDriveConfig();
+        throw new Error(`${d.label} changed in Drive. Pull all before pushing.`);
+      }
+    }
+
+    setSyncStatus("Pushing all five cloud files…");
+    for(const kind of allSyncKinds()){
+      const d=syncDef(kind);
+      const updated=await updateJsonDriveFile(driveConfig[d.idKey],d.build());
+      driveConfig[d.modifiedKey]=updated.modifiedTime||"";
+      driveConfig[d.pulledKey]=true;
+    }
+
+    driveConfig.lastAction=`Pushed all • ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`;
+    saveDriveConfig();
+    setSyncStatus("All structured cloud data pushed successfully.","good");
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
 
 function selectedEnergy(name){
   return numOrNull(document.querySelector(`input[name="${name}"]:checked`)?.value);

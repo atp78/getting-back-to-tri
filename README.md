@@ -2,7 +2,39 @@
 
 Multi-mode, local-first Progressive Web App.
 
-Current release: **v1.8c PWA**.
+Current release: **v1.8c.1 PWA**.
+
+## v1.8c.1 — purpose-specific cloud files
+
+Google Drive now uses five clearly named active files under `My Drive / Getting Back to Tri`:
+
+- `Getting_Back_to_Tri_Workout_Library.json`
+  - reusable workout/session definitions only
+  - designed to be shareable
+  - excludes completed history, recovery data and weekly plan
+- `Getting_Back_to_Tri_Workout_Session_History.json`
+  - completed sessions from both Back-to-Tri and Morning Movement modes
+  - preserves each original history record inside a mode wrapper
+- `Getting_Back_to_Tri_Recovery_Data.json`
+  - recovery history/snapshots and recovery baseline
+- `Getting_Back_to_Tri_Settings.json`
+  - Morning Movement and Circulation preferences
+  - excludes selected app mode and Google credentials, which remain device-local
+- `Getting_Back_to_Tri_Weekly_Plan.json`
+  - current seven-day weekly plan
+  - separate now so v1.9 can evolve the printable planner without mixing it into settings
+
+### Migration
+- A v1.8c `Getting_Back_to_Tri_Personal_Data.json` is detected and can be split into Session History, Recovery Data, Settings and Weekly Plan.
+- An older combined `Getting_Back_to_Tri_Sync.json` is also supported as a migration source.
+- Older source files are retained unchanged as safety copies.
+- The existing v1.8c Workout Library file is reused rather than duplicated when available.
+
+### Sync behaviour
+- `Pull all` / `Push all` handles all five active files.
+- Each file also has individual Pull / Push controls.
+- Conflict protection is maintained per file.
+- `Push all` checks all five remote modified times before it starts writing any file.
 
 ## v1.8c — split Workout Library and Personal Data
 - Replaces the single active cloud sync JSON with two files inside `My Drive / Getting Back to Tri`:
