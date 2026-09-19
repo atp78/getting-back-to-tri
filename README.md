@@ -2,7 +2,15 @@
 
 Multi-mode, local-first Progressive Web App.
 
-Current release: **v1.8a.1 PWA**.
+Current release: **v1.8b PWA**.
+
+## v1.8b — dedicated Google Drive folder
+- Creates/uses `My Drive / Getting Back to Tri`.
+- New sync files are created inside that folder.
+- Detects the existing root-level v1.8a/v1.8a.1 sync file.
+- Offers to move the existing sync file into the folder rather than creating a competing copy.
+- Preserves the existing Google Drive file ID during migration, so already-linked devices keep referring to the same cloud file.
+- Shows the Drive folder location in the Sync panel and adds an Open folder shortcut.
 
 ## v1.8a.1 — Google Identity Services loading fix
 - Google Identity Services now retries on demand when Connect Google Drive is tapped.

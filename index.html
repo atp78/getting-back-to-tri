@@ -229,7 +229,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <div class="header-actions"><span class="version">v1.8a.1 PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
+      <div class="header-actions"><span class="version">v1.8b PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
     </div>
   </div>
 </header>
@@ -710,7 +710,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.8a.1.1 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.8b PWA • installable offline training app</div>
 </main>
 
 
@@ -850,7 +850,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8a.1.1 PWA</div>
+  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8b PWA</div>
 </main>
 
 
@@ -858,7 +858,7 @@ main{padding:14px 0 90px}
   <div class="sync-card">
     <div class="sync-top">
       <div>
-        <div class="kicker">v1.8a.1 • Cross-device sync</div>
+        <div class="kicker">v1.8b • Cross-device sync</div>
         <h2 style="margin:6px 0 4px">Complete backup + Google Drive</h2>
         <div class="small">Manual Pull / Push first. Local storage remains the working copy, so the app still works offline.</div>
       </div>
@@ -879,8 +879,8 @@ main{padding:14px 0 90px}
 
     <section class="panel">
       <div class="kicker">Google Drive setup</div>
-      <h3 style="margin:6px 0 7px">One private JSON file</h3>
-      <p class="small">The app uses Google Identity Services and the narrow <span class="sync-code">drive.file</span> permission. OAuth access tokens stay in memory and are not saved in local storage.</p>
+      <h3 style="margin:6px 0 7px">One private JSON file in its own Drive folder</h3>
+      <p class="small">The app uses Google Identity Services and the narrow <span class="sync-code">drive.file</span> permission. OAuth access tokens stay in memory and are not saved in local storage. v1.8b stores the sync file under <b>My Drive › Getting Back to Tri</b>.</p>
 
       <details style="margin-top:9px">
         <summary><b>One-time Google Cloud setup</b></summary>
@@ -916,6 +916,7 @@ main{padding:14px 0 90px}
     <section class="panel">
       <div class="kicker">Manual sync</div>
       <div class="sync-meta">
+        <div class="metric"><b id="syncFolderState">Not set</b><span>Drive folder</span></div>
         <div class="metric"><b id="syncFileState">No file selected</b><span>Drive sync file</span></div>
         <div class="metric"><b id="syncCloudUpdated">—</b><span>Last cloud modification</span></div>
         <div class="metric"><b id="syncDeviceState">Local only</b><span>This device</span></div>
@@ -924,11 +925,12 @@ main{padding:14px 0 90px}
       <div class="actions" style="margin-top:10px">
         <button id="pullDrive" class="primary">⬇ Pull from Drive</button>
         <button id="pushDrive">⬆ Push to Drive</button>
+        <button id="moveLegacySync" class="hidden">Move existing sync file into folder</button>
       </div>
       <div id="syncStatus" class="status"></div>
       <p class="notice" style="margin-top:10px"><b>Safe workflow:</b> on a device you have not used recently, Pull first. v1.8a blocks a Push if the Drive file has changed since this device last saw it.</p>
       <p class="small">Your selected mode remains device-local, so a phone can default to Back to Tri while a tablet defaults to Morning Movement.</p>
-      <div style="margin-top:8px"><a id="openDriveFile" class="btn soft hidden" target="_blank" rel="noopener">Open sync file in Google Drive</a></div>
+      <div style="margin-top:8px"><a id="openDriveFolder" class="btn soft hidden" target="_blank" rel="noopener">Open Getting Back to Tri folder</a> <a id="openDriveFile" class="btn soft hidden" target="_blank" rel="noopener">Open sync file</a></div>
     </section>
   </div>
 </section>
@@ -1076,11 +1078,14 @@ let driveConfig = {
   clientId:"",
   fileId:"",
   fileName:"Getting_Back_to_Tri_Sync.json",
+  folderId:"",
+  folderName:"Getting Back to Tri",
   deviceLabel:"",
   lastCloudModifiedTime:"",
   hasPulled:false,
   lastAction:""
 };
+let pendingLegacySyncFileId = "";
 
 let morningHistory = [];
 let morningSettings = {defaultMovement:"Walk / march", vibration:true};
@@ -1392,15 +1397,27 @@ function setSyncStatus(message,type=""){
 }
 function renderSyncMeta(){
   if(!$("syncFileState"))return;
+  $("syncFolderState").textContent=driveConfig.folderId
+    ? `My Drive › ${driveConfig.folderName||"Getting Back to Tri"}`
+    : "Not set";
   $("syncFileState").textContent=driveConfig.fileId?(driveConfig.fileName||"Sync file"):"No file selected";
   $("syncCloudUpdated").textContent=driveConfig.lastCloudModifiedTime?new Date(driveConfig.lastCloudModifiedTime).toLocaleString():"—";
   $("syncDeviceState").textContent=driveConfig.hasPulled?"Ready to push":"Pull first";
   $("syncLastAction").textContent=driveConfig.lastAction||"—";
-  const link=$("openDriveFile");
+
+  const folderLink=$("openDriveFolder");
+  if(driveConfig.folderId){
+    folderLink.href=`https://drive.google.com/drive/folders/${encodeURIComponent(driveConfig.folderId)}`;
+    folderLink.classList.remove("hidden");
+  }else folderLink.classList.add("hidden");
+
+  const fileLink=$("openDriveFile");
   if(driveConfig.fileId){
-    link.href=`https://drive.google.com/open?id=${encodeURIComponent(driveConfig.fileId)}`;
-    link.classList.remove("hidden");
-  }else link.classList.add("hidden");
+    fileLink.href=`https://drive.google.com/open?id=${encodeURIComponent(driveConfig.fileId)}`;
+    fileLink.classList.remove("hidden");
+  }else fileLink.classList.add("hidden");
+
+  $("moveLegacySync").classList.toggle("hidden",!pendingLegacySyncFileId);
 }
 function openSyncPanel(){
   $("syncOverlay").classList.remove("hidden");
@@ -1559,31 +1576,72 @@ async function driveFetch(url,options={}){
   return res;
 }
 async function getDriveMetadata(fileId){
-  const fields="id,name,modifiedTime,size";
+  const fields="id,name,modifiedTime,size,parents";
   const res=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?fields=${encodeURIComponent(fields)}`);
   return await res.json();
 }
-async function searchSyncFiles(){
-  const q="appProperties has { key='gbttSync' and value='v1' } and trashed = false";
-  const fields="files(id,name,modifiedTime,size)";
+async function searchAppFolders(){
+  const q="mimeType='application/vnd.google-apps.folder' and appProperties has { key='gbttFolder' and value='v1' } and trashed = false";
+  const fields="files(id,name,modifiedTime,parents)";
   const url=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&pageSize=10&orderBy=modifiedTime%20desc&fields=${encodeURIComponent(fields)}`;
   const res=await driveFetch(url);
   return (await res.json()).files||[];
 }
+async function createAppFolder(){
+  const metadata={
+    name:"Getting Back to Tri",
+    mimeType:"application/vnd.google-apps.folder",
+    appProperties:{gbttFolder:"v1"}
+  };
+  const res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,parents",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(metadata)
+  });
+  return await res.json();
+}
+async function ensureAppFolder(){
+  if(driveConfig.folderId){
+    try{
+      const existing=await getDriveMetadata(driveConfig.folderId);
+      if(existing?.id)return existing;
+    }catch(e){
+      driveConfig.folderId="";
+    }
+  }
+  const folders=await searchAppFolders();
+  const folder=folders[0]||await createAppFolder();
+  driveConfig.folderId=folder.id;
+  driveConfig.folderName=folder.name||"Getting Back to Tri";
+  saveDriveConfig();
+  return folder;
+}
+async function searchSyncFiles(){
+  const q="appProperties has { key='gbttSync' and value='v1' } and trashed = false";
+  const fields="files(id,name,modifiedTime,size,parents)";
+  const url=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&pageSize=20&orderBy=modifiedTime%20desc&fields=${encodeURIComponent(fields)}`;
+  const res=await driveFetch(url);
+  return (await res.json()).files||[];
+}
+function fileInFolder(file,folderId){
+  return Array.isArray(file?.parents) && file.parents.includes(folderId);
+}
 async function createDriveSyncFile(){
+  const folder=await ensureAppFolder();
   const metadata={
     name:driveConfig.fileName||"Getting_Back_to_Tri_Sync.json",
     mimeType:"application/json",
+    parents:[folder.id],
     appProperties:{gbttSync:"v1"}
   };
-  let res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,size",{
+  let res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,size,parents",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(metadata)
   });
   let file=await res.json();
   const payload=buildSyncPayload();
-  res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(file.id)}?uploadType=media&fields=id,name,modifiedTime,size`,{
+  res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(file.id)}?uploadType=media&fields=id,name,modifiedTime,size,parents`,{
     method:"PATCH",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(payload)
@@ -1593,31 +1651,84 @@ async function createDriveSyncFile(){
   driveConfig.fileName=file.name||driveConfig.fileName;
   driveConfig.lastCloudModifiedTime=file.modifiedTime||"";
   driveConfig.hasPulled=true;
-  driveConfig.lastAction=`Created + pushed • ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+  driveConfig.lastAction=`Created in folder + pushed • ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+  pendingLegacySyncFileId="";
   saveDriveConfig();
   return file;
 }
+async function moveFileIntoAppFolder(fileId){
+  const folder=await ensureAppFolder();
+  const meta=await getDriveMetadata(fileId);
+  if(fileInFolder(meta,folder.id))return meta;
+
+  const removeParents=(meta.parents||[]).filter(p=>p!==folder.id).join(",");
+  let url=`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?addParents=${encodeURIComponent(folder.id)}&fields=${encodeURIComponent("id,name,modifiedTime,size,parents")}`;
+  if(removeParents)url+=`&removeParents=${encodeURIComponent(removeParents)}`;
+
+  const res=await driveFetch(url,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:"{}"
+  });
+  return await res.json();
+}
 $("findDriveFile").addEventListener("click",async()=>{
   try{
-    setSyncStatus("Looking for the app sync file…");
+    setSyncStatus("Looking for the Getting Back to Tri folder and sync file…");
+    const folder=await ensureAppFolder();
     const files=await searchSyncFiles();
-    if(files.length){
-      const f=files[0];
-      const same=f.id===driveConfig.fileId;
-      driveConfig.fileId=f.id;
-      driveConfig.fileName=f.name||driveConfig.fileName;
+
+    const inFolder=files.find(f=>fileInFolder(f,folder.id));
+    if(inFolder){
+      const same=inFolder.id===driveConfig.fileId;
+      driveConfig.fileId=inFolder.id;
+      driveConfig.fileName=inFolder.name||driveConfig.fileName;
+      pendingLegacySyncFileId="";
       if(!same){
         driveConfig.lastCloudModifiedTime="";
         driveConfig.hasPulled=false;
       }
       saveDriveConfig();
-      setSyncStatus("Existing sync file found. Pull it before the first Push from this device.","good");
-    }else{
-      const f=await createDriveSyncFile();
-      setSyncStatus(`Created ${f.name||driveConfig.fileName} and uploaded this device's current data.`,"good");
+      setSyncStatus("Sync file found inside My Drive › Getting Back to Tri. Pull it before the first Push from this device.","good");
+      return;
     }
+
+    let legacy=null;
+    if(driveConfig.fileId){
+      try{
+        const current=await getDriveMetadata(driveConfig.fileId);
+        if(current?.id && !fileInFolder(current,folder.id))legacy=current;
+      }catch(e){}
+    }
+    if(!legacy)legacy=files.find(f=>!fileInFolder(f,folder.id));
+
+    if(legacy){
+      driveConfig.fileId=legacy.id;
+      driveConfig.fileName=legacy.name||driveConfig.fileName;
+      pendingLegacySyncFileId=legacy.id;
+      saveDriveConfig();
+      setSyncStatus("Existing sync file found in My Drive. Use “Move existing sync file into folder” to keep the same cloud file ID.","warn");
+      return;
+    }
+
+    const created=await createDriveSyncFile();
+    setSyncStatus(`Created My Drive › Getting Back to Tri › ${created.name||driveConfig.fileName} and uploaded this device's current data.`,"good");
   }catch(err){setSyncStatus(err.message,"warn")}
 });
+$("moveLegacySync").addEventListener("click",async()=>{
+  try{
+    if(!pendingLegacySyncFileId)throw new Error("No legacy sync file is waiting to be moved.");
+    setSyncStatus("Moving the existing sync file into My Drive › Getting Back to Tri…");
+    const moved=await moveFileIntoAppFolder(pendingLegacySyncFileId);
+    driveConfig.fileId=moved.id;
+    driveConfig.fileName=moved.name||driveConfig.fileName;
+    pendingLegacySyncFileId="";
+    driveConfig.lastAction=`Moved sync file into folder • ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+    saveDriveConfig();
+    setSyncStatus("Existing sync file moved into the Getting Back to Tri folder. Its Drive file ID was preserved.","good");
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
+
 async function readDrivePayload(){
   if(!driveConfig.fileId)throw new Error("Find or create the Drive sync file first.");
   const meta=await getDriveMetadata(driveConfig.fileId);
