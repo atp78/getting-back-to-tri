@@ -43,7 +43,7 @@ h1{font-size:clamp(1.35rem,4.5vw,1.85rem);margin:0;line-height:1.05}
 .subtitle{font-size:.86rem;color:var(--muted);margin-top:5px}
 main{padding:14px 0 90px}
 .nav{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 13px
+  display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:0 0 13px
 }
 .nav button{font-size:.78rem;padding:8px 5px;background:#111d25}
 .nav button.active{background:var(--accent2);border-color:#31657f;color:#c7eeff}
@@ -122,6 +122,25 @@ main{padding:14px 0 90px}
 .kicker{font-size:.7rem;font-weight:900;letter-spacing:.1em;color:#8ecfee;text-transform:uppercase}
 .hr{height:1px;background:var(--line);margin:12px 0}
 .footerNote{margin-top:18px;color:#8198a7;font-size:.73rem;text-align:center}
+
+.readiness-card{padding:14px;border-radius:14px;border:1px solid var(--line);background:#13212a;margin-bottom:11px}
+.readiness-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.readiness-badge{display:inline-flex;align-items:center;justify-content:center;min-width:86px;padding:7px 11px;border-radius:999px;font-weight:900;font-size:.78rem;letter-spacing:.04em;border:1px solid var(--line)}
+.readiness-badge.green{background:#173526;border-color:#2f7550;color:#bff2d1}
+.readiness-badge.amber{background:#3a3117;border-color:#76632a;color:#ffe284}
+.readiness-badge.red{background:#3a1d22;border-color:#7b3b46;color:#ffd0d5}
+.readiness-badge.neutral{background:#1b2a34;color:#b9cbd5}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.metric{background:#101b23;border:1px solid #263c49;border-radius:11px;padding:10px;min-width:0}
+.metric b{display:block;font-size:1.08rem}
+.metric span{display:block;font-size:.72rem;color:var(--muted);margin-top:2px}
+.health-entry{background:#14212a;border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px}
+.health-entry .metrics{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.health-entry .metrics span{font-size:.72rem;border:1px solid #2c4452;background:#101b23;border-radius:999px;padding:4px 7px;color:#bfd0da}
+.baseline-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pastebox{min-height:105px}
+.home-readiness{margin-top:11px}
+
 @media(max-width:520px){
   .grid2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}
   .set{grid-template-columns:25px 1fr 1fr}.quickcards{grid-template-columns:repeat(3,1fr)}
@@ -147,7 +166,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Rehab • strength • mobility • swim • bike • run</div>
       </div>
-      <span class="version">v1.3 PWA</span>
+      <span class="version">v1.5 PWA</span>
     </div>
   </div>
 </header>
@@ -156,6 +175,7 @@ main{padding:14px 0 90px}
   <nav class="nav">
     <button data-view="home" class="active">Home</button>
     <button data-view="train">Train</button>
+    <button data-view="recovery">Recovery</button>
     <button data-view="history">History</button>
     <button data-view="data">Data</button>
   </nav>
@@ -181,12 +201,25 @@ main{padding:14px 0 90px}
         <div class="quickcard" data-start="Daily Prehab"><div class="icon">🧘</div><b>Prehab</b><small>Daily mobility</small></div>
         <div class="quickcard" data-start="CFT Upper-Back Reset"><div class="icon">💪</div><b>CFT</b><small>15-min reset</small></div>
         <div class="quickcard" data-start="Daily Quick Routine"><div class="icon">⏱️</div><b>Daily quick</b><small>7:28 guided</small></div>
+        <div class="quickcard" data-start="Pre-Walk Warm-Up"><div class="icon">🚶</div><b>Pre-walk</b><small>4:12 guided</small></div>
       </div>
       <div class="quickcards" style="margin-top:8px">
         <div class="quickcard" data-start="Swim"><div class="icon">🏊</div><b>Swim</b><small>Quick log</small></div>
         <div class="quickcard" data-start="Bike"><div class="icon">🚴</div><b>Bike</b><small>Quick log</small></div>
         <div class="quickcard" data-start="Run"><div class="icon">🏃</div><b>Run</b><small>Quick log</small></div>
       </div>
+    </section>
+
+
+    <section id="homeReadiness" class="readiness-card home-readiness">
+      <div class="readiness-top">
+        <div>
+          <div class="kicker">Latest recovery</div>
+          <b id="homeReadinessTitle">No recovery snapshot yet</b>
+        </div>
+        <span id="homeReadinessBadge" class="readiness-badge neutral">SET UP</span>
+      </div>
+      <div id="homeReadinessText" class="small" style="margin-top:8px">Add your personal baseline and a daily Garmin snapshot in Recovery.</div>
     </section>
 
     <h3 class="section-title">Current weekly framework</h3>
@@ -233,6 +266,25 @@ main{padding:14px 0 90px}
       <div id="quickRoutineList" class="routine-list"></div>
     </section>
 
+
+    <section id="preWalkTimer" class="quicktimer hidden">
+      <div class="small">PRE-WALK WARM-UP • 10 WORK INTERVALS • 8 SEC CHANGEOVERS</div>
+      <div id="preWalkExercise" class="stepname">Clock Stretch</div>
+      <div id="preWalkPosition" class="stepdetail">Right foot • 12 o'clock</div>
+      <div id="preWalkClock" class="bigclock">0:15</div>
+      <div id="preWalkOverall" class="small">Overall 4:12 remaining • interval 1 of 10</div>
+      <div class="progress" aria-hidden="true"><span id="preWalkProgress"></span></div>
+      <div id="preWalkNext" class="next">Next: 8-sec changeover → Right foot • 1 o'clock</div>
+      <div class="actions" style="margin-top:10px">
+        <button id="preWalkStart" class="primary">Start / Resume</button>
+        <button id="preWalkPause">Pause</button>
+        <button id="preWalkBack">← Previous</button>
+        <button id="preWalkSkip">Next →</button>
+        <button id="preWalkReset">Reset</button>
+      </div>
+      <div id="preWalkList" class="routine-list"></div>
+    </section>
+
     <section id="sessionNotice" class="panel notice"></section>
     <div id="exercises"></div>
 
@@ -270,6 +322,142 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
+
+  <section id="recovery" class="view hidden">
+    <section class="hero">
+      <div class="kicker">Recovery dashboard</div>
+      <h2>Use your own baseline, not generic cut-offs.</h2>
+      <p>Store Garmin recovery markers locally and compare each day with your normal range. This is a training aid, not a medical assessment.</p>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Personal baseline</div>
+      <h3 style="margin:6px 0 8px">Set your normal values</h3>
+      <div class="notice" style="margin-bottom:9px">These values stay on this device. Nothing here is uploaded to GitHub.</div>
+      <div class="baseline-grid">
+        <label>Overnight HRV (ms)
+          <input id="baseHrv" type="number" min="1" step="1" placeholder="e.g. 55">
+        </label>
+        <label>Resting HR (bpm)
+          <input id="baseRhr" type="number" min="20" max="120" step="1" placeholder="e.g. 50">
+        </label>
+        <label>Sleep score
+          <input id="baseSleepScore" type="number" min="0" max="100" step="1" placeholder="e.g. 75">
+        </label>
+        <label>Sleep duration (min)
+          <input id="baseSleepMinutes" type="number" min="0" max="900" step="1" placeholder="e.g. 420">
+        </label>
+        <label>Body Battery morning/high
+          <input id="baseBodyBattery" type="number" min="0" max="100" step="1" placeholder="e.g. 75">
+        </label>
+        <label>Stress average
+          <input id="baseStress" type="number" min="0" max="100" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="saveBaseline" class="primary">Save baseline</button>
+      </div>
+      <div id="baselineStatus" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Fast entry</div>
+      <h3 style="margin:6px 0 8px">Paste a Garmin / ChatGPT summary</h3>
+      <textarea id="healthPaste" class="pastebox" placeholder="Example: Sleep 7h05, score 85, HRV 54 ms, resting HR 47, Body Battery 96, stress 13, steps 286"></textarea>
+      <div class="actions" style="margin-top:8px">
+        <button id="parseHealth">Fill fields from text</button>
+        <button id="clearHealthPaste">Clear</button>
+      </div>
+      <div id="parseStatus" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Daily snapshot</div>
+      <div class="grid2">
+        <label>Date
+          <input id="healthDate" type="date">
+        </label>
+        <label>Sleep score
+          <input id="healthSleepScore" type="number" min="0" max="100" step="1" placeholder="0–100">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Sleep hours
+          <input id="healthSleepHours" type="number" min="0" max="14" step="1" placeholder="e.g. 7">
+        </label>
+        <label>Sleep minutes
+          <input id="healthSleepMins" type="number" min="0" max="59" step="1" placeholder="e.g. 5">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Overnight HRV (ms)
+          <input id="healthHrv" type="number" min="1" step="1" placeholder="ms">
+        </label>
+        <label>Resting HR (bpm)
+          <input id="healthRhr" type="number" min="20" max="120" step="1" placeholder="bpm">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Body Battery
+          <input id="healthBodyBattery" type="number" min="0" max="100" step="1" placeholder="0–100">
+        </label>
+        <label>Stress average
+          <input id="healthStress" type="number" min="0" max="100" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Steps
+          <input id="healthSteps" type="number" min="0" step="1" placeholder="optional">
+        </label>
+        <label>Awake minutes
+          <input id="healthAwake" type="number" min="0" max="600" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Deep sleep (min)
+          <input id="healthDeep" type="number" min="0" max="600" step="1" placeholder="optional">
+        </label>
+        <label>REM sleep (min)
+          <input id="healthRem" type="number" min="0" max="600" step="1" placeholder="optional">
+        </label>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <label>Light sleep (min)
+          <input id="healthLight" type="number" min="0" max="800" step="1" placeholder="optional">
+        </label>
+        <label>Notes
+          <input id="healthNotes" placeholder="illness, medication, unusual stress…">
+        </label>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="previewReadiness">Preview readiness</button>
+        <button id="saveHealth" class="primary">Save snapshot</button>
+      </div>
+      <div id="healthStatus" class="status"></div>
+    </section>
+
+    <section id="readinessPreview" class="readiness-card">
+      <div class="readiness-top">
+        <div>
+          <div class="kicker">Readiness</div>
+          <b id="readinessTitle">Not enough data</b>
+        </div>
+        <span id="readinessBadge" class="readiness-badge neutral">SET UP</span>
+      </div>
+      <div id="readinessText" class="small" style="margin-top:8px">Save a baseline and enter today’s recovery markers.</div>
+      <div id="readinessMetrics" class="metric-grid" style="margin-top:10px"></div>
+    </section>
+
+    <section class="panel">
+      <div class="actions">
+        <button id="exportHealthCsv">Export recovery CSV</button>
+        <button id="deleteHealth" class="danger">Delete recovery history</button>
+      </div>
+    </section>
+
+    <div id="healthHistory"></div>
+  </section>
+
   <section id="history" class="view hidden">
     <section class="panel">
       <div class="actions">
@@ -296,22 +484,23 @@ main{padding:14px 0 90px}
       <div class="kicker">Backup & migration</div>
       <h3 style="margin:6px 0 8px">Keep your training history portable</h3>
       <div class="actions">
-        <button id="exportCsv" class="primary">Export CSV</button>
-        <label class="btn" for="importCsv">Import CSV</label>
+        <button id="exportCsv" class="primary">Export training CSV</button>
+        <button id="exportHealthCsvData">Export recovery CSV</button>
+        <label class="btn" for="importCsv">Import training CSV</label>
         <input id="importCsv" type="file" accept=".csv,text/csv" class="hidden">
       </div>
       <div id="csvStatus" class="status">Compatible with the older RehabTrainingLog CSV layout.</div>
     </section>
     <section class="panel notice">
-      <b style="color:#fff">Storage:</b> sessions are saved locally in this browser. If your browser clears local site data or you move to another device, restore from an exported CSV.
+      <b style="color:#fff">Storage:</b> training and recovery entries are saved locally in this browser/PWA. No personal recovery figures are stored in the public GitHub source. Export CSV backups periodically.
     </section>
     <section class="panel">
       <div class="kicker">Included in v1.0</div>
-      <p class="notice">Invicta Lower Body, Upper Body, Whole Body and Daily Prehab; guided Daily Quick Routine; BodyCraft CFT upper-back reset; swim/bike/run quick logging; unified history; CSV import/export.</p>
+      <p class="notice">Invicta Lower Body, Upper Body, Whole Body and Daily Prehab; guided Daily Quick Routine; guided Pre-Walk Warm-Up; BodyCraft CFT upper-back reset; swim/bike/run logging; recovery dashboard with personal baselines and readiness; training + recovery CSV export.</p>
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.3 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.5 PWA • installable offline training app</div>
 </main>
 
 <script>
@@ -319,6 +508,8 @@ main{padding:14px 0 90px}
 const $ = id => document.getElementById(id);
 const STORAGE = "gettingBackToTri_v1_history";
 const OLD_STORAGE = "rehabTrainingLog";
+const HEALTH_STORAGE = "gettingBackToTri_v1_health";
+const BASELINE_STORAGE = "gettingBackToTri_v1_baseline";
 
 const rehab = {
   "Lower Body":[
@@ -440,14 +631,29 @@ const quickRoutineSteps = [
   {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Right • midfoot pressure into wall"}
 ];
 
+
+const preWalkSteps = [
+  {exercise:"Clock Stretch", detail:"Right foot • 12 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Right foot • 1 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Right foot • 2 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Right foot • 3 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 12 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 1 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 2 o'clock", seconds:15},
+  {exercise:"Clock Stretch", detail:"Left foot • 3 o'clock", seconds:15},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Left • midfoot pressure into wall", seconds:30},
+  {exercise:"Wall-Supported Single-Leg Hip Lift", detail:"Right • midfoot pressure into wall", seconds:30}
+];
+
 const endurance = new Set(["Swim","Bike","Run"]);
-const programmeNames = [...Object.keys(rehab),"Daily Quick Routine","CFT Upper-Back Reset","Swim","Bike","Run"];
+const programmeNames = [...Object.keys(rehab),"Daily Quick Routine","Pre-Walk Warm-Up","CFT Upper-Back Reset","Swim","Bike","Run"];
 const summaries = {
   "Lower Body":"Invicta lower-body rehab strength session.",
   "Upper Body":"Invicta upper-body strength session.",
   "Whole Body":"Invicta whole-body strength session.",
   "Daily Prehab":"Daily mobility + isometric prehab.",
   "Daily Quick Routine":"Guided 7:28 daily routine • 12 × 30-second work intervals with 8-second changeovers.",
+  "Pre-Walk Warm-Up":"Guided 4:12 activation routine before walking • 8 clock positions + 2 wall-supported hip lifts • 8-second changeovers.",
   "CFT Upper-Back Reset":"15-minute BodyCraft CFT accessory circuit • 2 rounds • 15–20 sec between exercises • 60–90 sec between rounds.",
   "Swim":"Quick-log a swim session.",
   "Bike":"Quick-log a bike session.",
@@ -477,6 +683,23 @@ const QUICK_WORK_SECONDS = 30;
 const QUICK_REST_SECONDS = 8;
 const QUICK_TOTAL_SECONDS = quickRoutineSteps.length * QUICK_WORK_SECONDS + (quickRoutineSteps.length - 1) * QUICK_REST_SECONDS;
 
+let preWalkIndex = 0;
+let preWalkSeconds = preWalkSteps[0].seconds;
+let preWalkPhase = "work";
+let preWalkTimerId = null;
+let preWalkCompleted = false;
+let preWalkCompletedSteps = new Set();
+const PREWALK_REST_SECONDS = 8;
+const PREWALK_TOTAL_SECONDS = preWalkSteps.reduce((sum,s)=>sum+s.seconds,0) + (preWalkSteps.length-1)*PREWALK_REST_SECONDS;
+
+
+let healthHistory = [];
+let baseline = {
+  hrv:null, rhr:null, sleepScore:null, sleepMinutes:null,
+  bodyBattery:null, stress:null
+};
+
+
 function esc(v){return String(v??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
 function key(session,i,j,f){return `${session}|${i}|${j}|${f}`}
 function localDate(d=new Date()){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-")}
@@ -499,17 +722,248 @@ function loadLocal(){
 function categoryOf(name){
   if(endurance.has(name))return "Endurance";
   if(name==="CFT Upper-Back Reset")return "CFT";
-  if(name==="Daily Prehab"||name==="Daily Quick Routine")return "Mobility";
+  if(name==="Daily Prehab"||name==="Daily Quick Routine"||name==="Pre-Walk Warm-Up")return "Mobility";
   return "Rehab";
 }
 function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("hidden",v.id!==id));
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
   if(id==="history")renderHistory();
+  if(id==="recovery"){renderHealthHistory();renderReadiness(currentHealthEntry());}
   if(id==="home")renderHome();
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+
+
+function numOrNull(v){
+  if(v===null||v===undefined||v==="") return null;
+  const n=Number(v); return Number.isFinite(n)?n:null;
+}
+function clamp(n,min,max){return Math.min(max,Math.max(min,n))}
+function loadHealth(){
+  try{
+    const h=JSON.parse(localStorage.getItem(HEALTH_STORAGE)||"[]");
+    healthHistory=Array.isArray(h)?h:[];
+  }catch(e){healthHistory=[]}
+  try{
+    const b=JSON.parse(localStorage.getItem(BASELINE_STORAGE)||"{}");
+    baseline={...baseline,...b};
+  }catch(e){}
+  fillBaselineForm();
+}
+function saveHealthLocal(){localStorage.setItem(HEALTH_STORAGE,JSON.stringify(healthHistory))}
+function saveBaselineLocal(){localStorage.setItem(BASELINE_STORAGE,JSON.stringify(baseline))}
+function fillBaselineForm(){
+  const pairs=[
+    ["baseHrv","hrv"],["baseRhr","rhr"],["baseSleepScore","sleepScore"],
+    ["baseSleepMinutes","sleepMinutes"],["baseBodyBattery","bodyBattery"],["baseStress","stress"]
+  ];
+  pairs.forEach(([id,k])=>{if($(id)) $(id).value=baseline[k]??""});
+}
+function metricScore(current, base, mode){
+  if(current===null||base===null||!Number.isFinite(current)||!Number.isFinite(base)||base<=0) return null;
+  if(mode==="higher"){
+    const ratio=current/base;
+    if(ratio>=0.95) return 2;
+    if(ratio>=0.85) return 1;
+    return 0;
+  }
+  if(mode==="lower"){
+    const d=current-base;
+    if(d<=2) return 2;
+    if(d<=5) return 1;
+    return 0;
+  }
+  if(mode==="score"){
+    const d=current-base;
+    if(d>=-3) return 2;
+    if(d>=-10) return 1;
+    return 0;
+  }
+  if(mode==="minutes"){
+    const d=current-base;
+    if(d>=-15) return 2;
+    if(d>=-60) return 1;
+    return 0;
+  }
+  if(mode==="stress"){
+    const d=current-base;
+    if(d<=5) return 2;
+    if(d<=15) return 1;
+    return 0;
+  }
+  return null;
+}
+function readinessFrom(entry){
+  const tests=[
+    {key:"hrv",label:"HRV",value:entry.hrv,base:baseline.hrv,mode:"higher",unit:" ms"},
+    {key:"rhr",label:"Resting HR",value:entry.rhr,base:baseline.rhr,mode:"lower",unit:" bpm"},
+    {key:"sleepScore",label:"Sleep score",value:entry.sleepScore,base:baseline.sleepScore,mode:"score",unit:""},
+    {key:"sleepMinutes",label:"Sleep",value:entry.sleepMinutes,base:baseline.sleepMinutes,mode:"minutes",unit:" min"},
+    {key:"bodyBattery",label:"Body Battery",value:entry.bodyBattery,base:baseline.bodyBattery,mode:"higher",unit:""},
+    {key:"stress",label:"Stress",value:entry.stress,base:baseline.stress,mode:"stress",unit:""}
+  ];
+  const scored=tests.map(t=>({...t,score:metricScore(t.value,t.base,t.mode)})).filter(t=>t.score!==null);
+  if(scored.length<3){
+    return {status:"neutral",label:"SET UP",title:"Not enough data",text:"Enter at least three current markers with matching personal baseline values.",score:null,metrics:tests};
+  }
+  const avg=scored.reduce((s,x)=>s+x.score,0)/scored.length;
+  let status,label,title,text;
+  if(avg>=1.5){
+    status="green";label="GREEN";title="Recovery broadly on baseline";
+    text="Your available recovery markers are mostly close to your normal range. Keep the planned session appropriate to symptoms and RPE.";
+  }else if(avg>=0.8){
+    status="amber";label="AMBER";title="Some recovery markers are off baseline";
+    text="One or more markers are meaningfully away from your normal range. Keep intensity controlled and let symptoms/RPE guide the session.";
+  }else{
+    status="red";label="RED";title="Several recovery markers are well off baseline";
+    text="Recovery markers are collectively suppressed. Favour recovery, mobility or easy work rather than adding intensity.";
+  }
+  return {status,label,title,text,score:avg,metrics:tests};
+}
+function currentHealthEntry(){
+  const h=numOrNull($("healthSleepHours").value)||0;
+  const m=numOrNull($("healthSleepMins").value)||0;
+  const hasSleep=$("healthSleepHours").value!==""||$("healthSleepMins").value!=="";
+  return {
+    id:Date.now(),
+    date:$("healthDate").value||localDate(),
+    sleepScore:numOrNull($("healthSleepScore").value),
+    sleepMinutes:hasSleep ? h*60+m : null,
+    hrv:numOrNull($("healthHrv").value),
+    rhr:numOrNull($("healthRhr").value),
+    bodyBattery:numOrNull($("healthBodyBattery").value),
+    stress:numOrNull($("healthStress").value),
+    steps:numOrNull($("healthSteps").value),
+    awake:numOrNull($("healthAwake").value),
+    deep:numOrNull($("healthDeep").value),
+    rem:numOrNull($("healthRem").value),
+    light:numOrNull($("healthLight").value),
+    notes:$("healthNotes").value.trim()
+  };
+}
+function renderReadiness(entry){
+  const r=readinessFrom(entry);
+  $("readinessTitle").textContent=r.title;
+  $("readinessText").textContent=r.text;
+  $("readinessBadge").textContent=r.label;
+  $("readinessBadge").className=`readiness-badge ${r.status}`;
+  $("readinessMetrics").innerHTML=r.metrics.filter(x=>x.value!==null).map(x=>{
+    const score=metricScore(x.value,x.base,x.mode);
+    const state=score===null?"—":score===2?"✓":score===1?"~":"!";
+    const baseText=x.base===null?"baseline not set":`baseline ${x.base}${x.unit}`;
+    return `<div class="metric"><b>${esc(x.value)}${esc(x.unit)} <small>${state}</small></b><span>${esc(x.label)} • ${esc(baseText)}</span></div>`;
+  }).join("");
+  return r;
+}
+function renderHealthHistory(){
+  const box=$("healthHistory"); if(!box) return;
+  box.innerHTML="";
+  const items=[...healthHistory].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.id||0)-(a.id||0));
+  if(!items.length){box.innerHTML='<section class="panel notice">No recovery snapshots saved yet.</section>';renderHomeReadiness();return}
+  items.forEach(h=>{
+    const r=readinessFrom(h);
+    const metrics=[
+      h.sleepScore!==null&&h.sleepScore!==undefined?`Sleep ${h.sleepScore}`:"",
+      h.sleepMinutes!==null&&h.sleepMinutes!==undefined?`Sleep ${Math.floor(h.sleepMinutes/60)}h ${String(h.sleepMinutes%60).padStart(2,"0")}m`:"",
+      h.hrv!==null&&h.hrv!==undefined?`HRV ${h.hrv}ms`:"",
+      h.rhr!==null&&h.rhr!==undefined?`RHR ${h.rhr}`:"",
+      h.bodyBattery!==null&&h.bodyBattery!==undefined?`Battery ${h.bodyBattery}`:"",
+      h.stress!==null&&h.stress!==undefined?`Stress ${h.stress}`:"",
+      h.steps!==null&&h.steps!==undefined?`${h.steps.toLocaleString()} steps`:""
+    ].filter(Boolean);
+    const x=document.createElement("article");x.className="health-entry";
+    x.innerHTML=`<div class="readiness-top"><div><b>${esc(h.date)}</b><small>${esc(r.title)}</small></div><span class="readiness-badge ${r.status}">${esc(r.label)}</span></div>
+      <div class="metrics">${metrics.map(m=>`<span>${esc(m)}</span>`).join("")}</div>
+      ${h.notes?`<div class="small" style="margin-top:7px">${esc(h.notes)}</div>`:""}`;
+    box.appendChild(x);
+  });
+  renderHomeReadiness();
+}
+function renderHomeReadiness(){
+  if(!$("homeReadinessBadge")) return;
+  const latest=[...healthHistory].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.id||0)-(a.id||0))[0];
+  if(!latest){
+    $("homeReadinessBadge").textContent="SET UP";
+    $("homeReadinessBadge").className="readiness-badge neutral";
+    $("homeReadinessTitle").textContent="No recovery snapshot yet";
+    $("homeReadinessText").textContent="Add your personal baseline and a daily Garmin snapshot in Recovery.";
+    return;
+  }
+  const r=readinessFrom(latest);
+  $("homeReadinessBadge").textContent=r.label;
+  $("homeReadinessBadge").className=`readiness-badge ${r.status}`;
+  $("homeReadinessTitle").textContent=`${latest.date} • ${r.title}`;
+  $("homeReadinessText").textContent=r.text;
+}
+function clearHealthForm(){
+  ["healthSleepScore","healthSleepHours","healthSleepMins","healthHrv","healthRhr","healthBodyBattery","healthStress","healthSteps","healthAwake","healthDeep","healthRem","healthLight","healthNotes"].forEach(id=>$(id).value="");
+}
+function parseMinutesText(text, label){
+  const patterns=[
+    new RegExp(label+String.raw`[^0-9]{0,12}(\d+)\s*h(?:ours?)?\s*(\d{1,2})?\s*m?`,"i"),
+    new RegExp(label+String.raw`[^0-9]{0,12}(\d+)\s*h\s*(\d{1,2})`,"i")
+  ];
+  for(const p of patterns){
+    const m=text.match(p); if(m) return {h:Number(m[1]),m:Number(m[2]||0)};
+  }
+  return null;
+}
+function parseHealthText(){
+  const t=$("healthPaste").value;
+  if(!t.trim()){ $("parseStatus").textContent="Paste a Garmin or ChatGPT summary first.";return }
+  const grab=(patterns)=>{
+    for(const p of patterns){const m=t.match(p);if(m)return Number(String(m[1]).replace(/,/g,""))}
+    return null;
+  };
+  const score=grab([/sleep\s*score\D{0,12}(\d{1,3})/i,/score\D{0,8}(\d{1,3})/i]);
+  const hrv=grab([/(?:overnight\s*)?hrv(?:\s*(?:avg|average))?\D{0,10}(\d{2,3})\s*ms/i]);
+  const rhr=grab([/resting\s*(?:heart\s*rate|hr)\D{0,10}(\d{2,3})/i]);
+  const battery=grab([/body\s*battery(?:\s*(?:high|morning))?\D{0,10}(\d{1,3})/i]);
+  const stress=grab([/stress(?:\s*(?:avg|average|overall))?\D{0,10}(\d{1,3})/i]);
+  const steps=grab([/steps\D{0,10}([\d,]+)/i,/([\d,]+)\s*steps/i]);
+  let sleep=parseMinutesText(t,"sleep(?: duration)?");
+  if(!sleep){
+    const m=t.match(/(?:sleep|duration)\D{0,12}(\d+)\s*h\s*(\d{1,2})\s*(?:m|min)?/i);
+    if(m) sleep={h:Number(m[1]),m:Number(m[2]||0)};
+  }
+  const deep=grab([/deep(?: sleep)?\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+  const rem=grab([/\brem(?: sleep)?\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+  const light=grab([/light(?: sleep)?\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+  const awake=grab([/awake\D{0,10}(\d+)\s*(?:min|m)\b/i]);
+
+  if(score!==null)$("healthSleepScore").value=clamp(score,0,100);
+  if(hrv!==null)$("healthHrv").value=hrv;
+  if(rhr!==null)$("healthRhr").value=rhr;
+  if(battery!==null)$("healthBodyBattery").value=clamp(battery,0,100);
+  if(stress!==null)$("healthStress").value=clamp(stress,0,100);
+  if(steps!==null)$("healthSteps").value=Math.max(0,steps);
+  if(sleep){$("healthSleepHours").value=sleep.h;$("healthSleepMins").value=clamp(sleep.m,0,59)}
+  if(deep!==null)$("healthDeep").value=deep;
+  if(rem!==null)$("healthRem").value=rem;
+  if(light!==null)$("healthLight").value=light;
+  if(awake!==null)$("healthAwake").value=awake;
+
+  const found=[score,hrv,rhr,battery,stress,steps,sleep].filter(x=>x!==null).length;
+  $("parseStatus").textContent=found?`Filled ${found} recovery field${found===1?"":"s"} from the pasted text.`:"No recognised recovery values found. You can still enter them manually.";
+  $("parseStatus").className=found?"status good":"status warn";
+  renderReadiness(currentHealthEntry());
+}
+function healthCsv(){
+  const rows=[["Date","Readiness","Sleep score","Sleep minutes","HRV ms","Resting HR bpm","Body Battery","Stress","Steps","Deep min","REM min","Light min","Awake min","Notes"]];
+  [...healthHistory].sort((a,b)=>(a.date||"").localeCompare(b.date||"")).forEach(h=>{
+    const r=readinessFrom(h);
+    rows.push([h.date,r.label,h.sleepScore??"",h.sleepMinutes??"",h.hrv??"",h.rhr??"",h.bodyBattery??"",h.stress??"",h.steps??"",h.deep??"",h.rem??"",h.light??"",h.awake??"",h.notes||""]);
+  });
+  return rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
+}
+function downloadHealthCsv(){
+  const blob=new Blob([healthCsv()],{type:"text/csv;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="Getting_Back_to_Tri_Recovery_Log.csv";a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
 
 function renderWeek(){
   $("weekPlan").innerHTML=weekly.map(([d,p])=>`<div class="day"><b>${d}</b><span>${p}</span></div>`).join("");
@@ -520,6 +974,7 @@ function renderHome(){
   $("statWeek").textContent=weekHist.length;
   $("statStrength").textContent=weekHist.filter(h=>["Rehab","CFT","Mobility"].includes(h.category||categoryOf(h.session))).length;
   $("statEndurance").textContent=weekHist.filter(h=>(h.category||categoryOf(h.session))==="Endurance").length;
+  renderHomeReadiness();
   const today=weekly[(new Date().getDay()+6)%7];
   const parts=today[1].split(" + ");
   $("todayPills").innerHTML=`<span class="pill">Today: ${esc(today[0])}</span>`+parts.map(x=>{
@@ -551,12 +1006,16 @@ function renderSession(){
   $("cftTimer").classList.toggle("hidden",name!=="CFT Upper-Back Reset");
   $("quickRoutineTimer").classList.toggle("hidden",name!=="Daily Quick Routine");
   if(name==="Daily Quick Routine") renderQuickRoutine();
+  $("preWalkTimer").classList.toggle("hidden",name!=="Pre-Walk Warm-Up");
+  if(name==="Pre-Walk Warm-Up") renderPreWalk();
   $("enduranceFields").classList.toggle("hidden",!endurance.has(name));
   $("sessionNotice").classList.toggle("hidden",endurance.has(name));
   if(name==="CFT Upper-Back Reset"){
     $("sessionNotice").innerHTML="<b>How to run it:</b> 2-minute warm-up → exercises 1–5 → 15–20 sec between exercises → 60–90 sec after exercise 5 → repeat for round 2 → finish with a 1-minute doorway pec stretch or child's-pose reach. Stop for sharp pain, tingling, loss of strength or radiating arm pain.";
   } else if(name==="Daily Quick Routine"){
     $("sessionNotice").innerHTML="<b>Guided routine:</b> every work interval is 30 seconds, followed by an 8-second changeover before the next position. The timer advances automatically through 8 clock-stretch positions, 2 single-leg hip-thrust holds and 2 wall-supported hip lifts. Work time: 6:00 • changeovers: 1:28 • total: 7:28.";
+  } else if(name==="Pre-Walk Warm-Up"){
+    $("sessionNotice").innerHTML="<b>Pre-walk activation:</b> a short routine to loosen the hip-flexor/groin area and switch the posterior chain on before a brisk walk, particularly after a period of sitting. Clock positions are 15 seconds each, then 30 seconds per side for the wall-supported hip lift, with 8-second changeovers. Total: 4:12. Keep it comfortable rather than turning it into a workout; stop if symptoms increase.";
   } else if(name==="Daily Prehab"){
     $("sessionNotice").innerHTML="<b>Prehab:</b> move smoothly and use the prescribed holds. Keep this as supportive work rather than turning it into a hard conditioning session.";
   } else if(!endurance.has(name)){
@@ -618,6 +1077,21 @@ function collectRows(){
     });
     return rows;
   }
+  if(name==="Pre-Walk Warm-Up"){
+    [...preWalkCompletedSteps].sort((a,b)=>a-b).forEach(i=>{
+      const step=preWalkSteps[i];
+      rows.push({
+        exercise:step.exercise,
+        set:i+1,
+        target:`${step.seconds} sec`,
+        load:"",
+        done:step.detail+` • completed ${step.seconds} sec`,
+        rpe:"",
+        pain:""
+      });
+    });
+    return rows;
+  }
   data.forEach((e,i)=>{
     for(let j=0;j<e.sets;j++){
       const r={exercise:e.name,set:j+1,target:e.target,load:draft[key(name,i,j,"load")]||"",done:draft[key(name,i,j,"done")]||"",rpe:draft[key(name,i,j,"rpe")]||"",pain:draft[key(name,i,j,"pain")]||""};
@@ -645,9 +1119,12 @@ $("save").addEventListener("click",()=>{
   };
   history.push(h);saveLocal();renderHome();clearCurrent();
   const quickCount=name==="Daily Quick Routine" ? h.rows.length : null;
+  const preWalkCount=name==="Pre-Walk Warm-Up" ? h.rows.length : null;
   $("status").textContent=name==="Daily Quick Routine"
     ? `Saved Daily Quick Routine for ${h.date} • ${quickCount}/12 work intervals completed.`
-    : `Saved ${name} for ${h.date}.`;
+    : name==="Pre-Walk Warm-Up"
+      ? `Saved Pre-Walk Warm-Up for ${h.date} • ${preWalkCount}/10 work intervals completed.`
+      : `Saved ${name} for ${h.date}.`;
   $("status").className="status good";
 });
 
@@ -667,6 +1144,52 @@ function renderHistory(){
     box.appendChild(x);
   });
 }
+
+$("saveBaseline").addEventListener("click",()=>{
+  baseline={
+    hrv:numOrNull($("baseHrv").value),
+    rhr:numOrNull($("baseRhr").value),
+    sleepScore:numOrNull($("baseSleepScore").value),
+    sleepMinutes:numOrNull($("baseSleepMinutes").value),
+    bodyBattery:numOrNull($("baseBodyBattery").value),
+    stress:numOrNull($("baseStress").value)
+  };
+  saveBaselineLocal();
+  $("baselineStatus").textContent="Personal baseline saved on this device.";
+  $("baselineStatus").className="status good";
+  renderReadiness(currentHealthEntry());
+  renderHealthHistory();
+});
+$("parseHealth").addEventListener("click",parseHealthText);
+$("clearHealthPaste").addEventListener("click",()=>{$("healthPaste").value="";$("parseStatus").textContent=""});
+$("previewReadiness").addEventListener("click",()=>renderReadiness(currentHealthEntry()));
+$("saveHealth").addEventListener("click",()=>{
+  const h=currentHealthEntry();
+  const meaningful=["sleepScore","sleepMinutes","hrv","rhr","bodyBattery","stress","steps"].some(k=>h[k]!==null);
+  if(!meaningful){
+    $("healthStatus").textContent="Enter at least one recovery value before saving.";
+    $("healthStatus").className="status warn";
+    return;
+  }
+  const existing=healthHistory.findIndex(x=>x.date===h.date);
+  if(existing>=0) healthHistory.splice(existing,1,h); else healthHistory.push(h);
+  saveHealthLocal();
+  const r=readinessFrom(h);
+  $("healthStatus").textContent=`Saved ${h.date} recovery snapshot • ${r.label}.`;
+  $("healthStatus").className="status good";
+  renderHealthHistory();
+  renderHome();
+});
+$("exportHealthCsv").addEventListener("click",downloadHealthCsv);
+$("exportHealthCsvData").addEventListener("click",downloadHealthCsv);
+$("deleteHealth").addEventListener("click",e=>{
+  if(e.currentTarget.dataset.confirm!=="1"){
+    e.currentTarget.dataset.confirm="1";e.currentTarget.textContent="Tap again to confirm";return;
+  }
+  healthHistory=[];saveHealthLocal();renderHealthHistory();renderHome();
+  e.currentTarget.dataset.confirm="0";e.currentTarget.textContent="Delete recovery history";
+});
+
 $("deleteAll").addEventListener("click",e=>{
   if(e.currentTarget.dataset.confirm!=="1"){
     e.currentTarget.dataset.confirm="1";e.currentTarget.textContent="Tap again to confirm";return;
@@ -898,6 +1421,160 @@ $("quickReset").addEventListener("click",()=>{
   renderQuickRoutine();
 });
 
+
+function preWalkCue(){
+  quickCue();
+}
+function preWalkOverallRemaining(){
+  if(preWalkCompleted) return 0;
+  if(preWalkPhase==="work"){
+    const futureWork=preWalkSteps.slice(preWalkIndex+1).reduce((sum,s)=>sum+s.seconds,0);
+    const futureRests=preWalkSteps.length-preWalkIndex-1;
+    return preWalkSeconds + futureWork + futureRests*PREWALK_REST_SECONDS;
+  }
+  const nextIndex=preWalkIndex+1;
+  const futureWork=preWalkSteps.slice(nextIndex).reduce((sum,s)=>sum+s.seconds,0);
+  const futureRests=Math.max(0,preWalkSteps.length-nextIndex-1);
+  return preWalkSeconds + futureWork + futureRests*PREWALK_REST_SECONDS;
+}
+function preWalkElapsed(){
+  if(preWalkCompleted) return PREWALK_TOTAL_SECONDS;
+  let elapsed=0;
+  for(let i=0;i<preWalkIndex;i++){
+    elapsed+=preWalkSteps[i].seconds+PREWALK_REST_SECONDS;
+  }
+  if(preWalkPhase==="work"){
+    elapsed+=preWalkSteps[preWalkIndex].seconds-preWalkSeconds;
+  }else{
+    elapsed+=preWalkSteps[preWalkIndex].seconds+(PREWALK_REST_SECONDS-preWalkSeconds);
+  }
+  return elapsed;
+}
+function renderPreWalk(){
+  const timerBox=$("preWalkTimer");
+  timerBox.classList.toggle("resting",!preWalkCompleted&&preWalkPhase==="rest");
+  const step=preWalkSteps[Math.min(preWalkIndex,preWalkSteps.length-1)];
+  const nextStep=preWalkSteps[Math.min(preWalkIndex+1,preWalkSteps.length-1)];
+
+  if(preWalkCompleted){
+    $("preWalkExercise").textContent="Warm-up complete ✓";
+    $("preWalkPosition").textContent="Ready to walk";
+    $("preWalkClock").textContent="0:00";
+    $("preWalkOverall").textContent="All 10 intervals complete • total 4:12";
+    $("preWalkNext").textContent="Tap Save session below to add the completed warm-up to History.";
+  } else if(preWalkPhase==="rest"){
+    $("preWalkExercise").textContent="Change position";
+    $("preWalkPosition").textContent=`Next: ${nextStep.detail}`;
+    $("preWalkClock").textContent=`0:${String(preWalkSeconds).padStart(2,"0")}`;
+    $("preWalkOverall").textContent=`Overall ${fmtShort(preWalkOverallRemaining())} remaining • 8-sec changeover`;
+    $("preWalkNext").textContent=`Get ready: ${nextStep.exercise} • ${nextStep.detail}`;
+  } else {
+    $("preWalkExercise").textContent=step.exercise;
+    $("preWalkPosition").textContent=step.detail;
+    $("preWalkClock").textContent=`0:${String(preWalkSeconds).padStart(2,"0")}`;
+    $("preWalkOverall").textContent=`Overall ${fmtShort(preWalkOverallRemaining())} remaining • interval ${preWalkIndex+1} of ${preWalkSteps.length}`;
+    $("preWalkNext").textContent=preWalkIndex<preWalkSteps.length-1
+      ? `Next: 8-sec changeover → ${preWalkSteps[preWalkIndex+1].detail}`
+      : "Next: finish";
+  }
+
+  $("preWalkProgress").style.width=`${Math.min(100,(preWalkElapsed()/PREWALK_TOTAL_SECONDS)*100)}%`;
+  $("preWalkList").innerHTML=preWalkSteps.map((x,i)=>{
+    const done=preWalkCompletedSteps.has(i);
+    const current=!preWalkCompleted && ((preWalkPhase==="work"&&i===preWalkIndex)||(preWalkPhase==="rest"&&i===preWalkIndex+1));
+    return `<div class="routine-step ${done?"done":current?"current":""}"><b>${i+1}</b><span>${esc(x.exercise)}<br><small>${esc(x.detail)}</small></span><span class="t">0:${String(x.seconds).padStart(2,"0")}</span></div>`;
+  }).join("");
+}
+function preWalkStop(){clearInterval(preWalkTimerId);preWalkTimerId=null;}
+function preWalkAdvance(){
+  if(preWalkPhase==="work"){
+    preWalkCompletedSteps.add(preWalkIndex);
+    preWalkCue();
+    if(preWalkIndex>=preWalkSteps.length-1){
+      preWalkStop();
+      preWalkCompleted=true;
+      preWalkSeconds=0;
+      renderPreWalk();
+      $("status").textContent="Pre-Walk Warm-Up complete — 10/10 intervals finished. Tap Save session to add it to History.";
+      $("status").className="status good";
+      return;
+    }
+    preWalkPhase="rest";
+    preWalkSeconds=PREWALK_REST_SECONDS;
+    renderPreWalk();
+    return;
+  }
+  preWalkCue();
+  preWalkIndex++;
+  preWalkPhase="work";
+  preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+  renderPreWalk();
+}
+function preWalkPrevious(){
+  preWalkStop();
+  preWalkCompleted=false;
+  if(preWalkPhase==="rest"){
+    preWalkPhase="work";
+    preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+    preWalkCompletedSteps.delete(preWalkIndex);
+  }else if(preWalkIndex>0){
+    preWalkCompletedSteps.delete(preWalkIndex);
+    preWalkIndex--;
+    preWalkPhase="work";
+    preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+    preWalkCompletedSteps.delete(preWalkIndex);
+  }else{
+    preWalkSeconds=preWalkSteps[0].seconds;
+    preWalkCompletedSteps.delete(0);
+  }
+  renderPreWalk();
+}
+$("preWalkStart").addEventListener("click",()=>{
+  if(preWalkCompleted){
+    preWalkIndex=0;
+    preWalkSeconds=preWalkSteps[0].seconds;
+    preWalkPhase="work";
+    preWalkCompleted=false;
+    preWalkCompletedSteps.clear();
+    renderPreWalk();
+  }
+  if(preWalkTimerId)return;
+  preWalkCue();
+  preWalkTimerId=setInterval(()=>{
+    preWalkSeconds--;
+    if(preWalkSeconds<=0) preWalkAdvance(); else renderPreWalk();
+  },1000);
+});
+$("preWalkPause").addEventListener("click",preWalkStop);
+$("preWalkSkip").addEventListener("click",()=>{
+  preWalkStop();
+  if(preWalkCompleted) return;
+  if(preWalkPhase==="work"){
+    if(preWalkIndex>=preWalkSteps.length-1){
+      preWalkCompleted=true;
+      preWalkSeconds=0;
+    }else{
+      preWalkPhase="rest";
+      preWalkSeconds=PREWALK_REST_SECONDS;
+    }
+  }else{
+    preWalkIndex++;
+    preWalkPhase="work";
+    preWalkSeconds=preWalkSteps[preWalkIndex].seconds;
+  }
+  renderPreWalk();
+});
+$("preWalkBack").addEventListener("click",preWalkPrevious);
+$("preWalkReset").addEventListener("click",()=>{
+  preWalkStop();
+  preWalkIndex=0;
+  preWalkSeconds=preWalkSteps[0].seconds;
+  preWalkPhase="work";
+  preWalkCompleted=false;
+  preWalkCompletedSteps.clear();
+  renderPreWalk();
+});
+
 function renderClock(){
   const m=String(Math.floor(cftRemaining/60)).padStart(2,"0"),s=String(cftRemaining%60).padStart(2,"0");
   $("clock").textContent=`${m}:${s}`;
@@ -909,7 +1586,7 @@ $("timerStart").addEventListener("click",()=>{
 $("timerPause").addEventListener("click",()=>{clearInterval(timerId);timerId=null});
 $("timerReset").addEventListener("click",()=>{clearInterval(timerId);timerId=null;cftRemaining=15*60;renderClock()});
 
-loadLocal();renderWeek();renderHome();renderSession();renderClock();renderQuickRoutine();
+loadLocal();loadHealth();renderWeek();renderHome();renderSession();renderClock();renderHealthHistory();$("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();
 
 // PWA install + service worker
 let deferredInstallPrompt = null;
