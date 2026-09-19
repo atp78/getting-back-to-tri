@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Getting Back to Tri",
   "short_name": "Back to Tri",
-  "description": "Rehab, strength, mobility, circulation, recovery and triathlon training logger.",
+  "description": "Private local exercise library, guided movement, recovery and triathlon session logger.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

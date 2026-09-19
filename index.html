@@ -147,6 +147,13 @@ main{padding:14px 0 90px}
   .timerbar{top:76px}.nav button{font-size:.73rem}
 }
 @media(max-width:365px){.nav{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr 1fr}}
+
+.library-exercise{border:1px solid var(--line);background:#111d25;border-radius:12px;padding:10px;margin-bottom:7px}
+.library-exercise-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.library-exercise .actions{margin-top:7px}
+.library-exercise small{color:var(--muted)}
+.check{display:flex!important;align-items:center;gap:8px;color:var(--text)}
+.check input{width:auto}
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -164,9 +171,9 @@ main{padding:14px 0 90px}
     <div class="brand">
       <div>
         <h1>Getting Back to Tri</h1>
-        <div class="subtitle">Rehab • strength • mobility • swim • bike • run</div>
+        <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <span class="version">v1.6.1 PWA</span>
+      <span class="version">v1.6.3 PWA</span>
     </div>
   </div>
 </header>
@@ -184,25 +191,27 @@ main{padding:14px 0 90px}
     <div class="hero">
       <div class="kicker">Foundation phase</div>
       <h2>Build resilience first. Triathlon follows.</h2>
-      <p>One place for James’s rehab programme, CFT strength work, prehab and endurance-session logging.</p>
+      <p>One place for your private exercise library, guided movement routines and endurance-session logging.</p>
       <div class="today" id="todayPills"></div>
     </div>
 
     <div class="stats">
       <div class="stat"><b id="statWeek">0</b><span>sessions this week</span></div>
-      <div class="stat"><b id="statStrength">0</b><span>strength / rehab</span></div>
+      <div class="stat"><b id="statStrength">0</b><span>strength / exercise</span></div>
       <div class="stat"><b id="statEndurance">0</b><span>swim / bike / run</span></div>
     </div>
 
     <section class="panel">
       <div class="kicker">Start a session</div>
+      <div id="mySessionQuickWrap" class="hidden">
+        <div class="small" style="margin:8px 0 6px">MY LOCAL SESSIONS</div>
+        <div id="mySessionQuickCards" class="quickcards"></div>
+      </div>
       <div class="quickcards" style="margin-top:9px">
-        <div class="quickcard" data-start="Lower Body"><div class="icon">🏋️</div><b>Rehab</b><small>Lower body</small></div>
-        <div class="quickcard" data-start="Daily Prehab"><div class="icon">🧘</div><b>Prehab</b><small>Daily mobility</small></div>
-        <div class="quickcard" data-start="CFT Upper-Back Reset"><div class="icon">💪</div><b>CFT</b><small>15-min reset</small></div>
         <div class="quickcard" data-start="Daily Quick Routine"><div class="icon">⏱️</div><b>Daily quick</b><small>7:28 guided</small></div>
         <div class="quickcard" data-start="Pre-Walk Warm-Up"><div class="icon">🚶</div><b>Pre-walk</b><small>4:12 guided</small></div>
         <div class="quickcard" data-start="Circulation Reset"><div class="icon">💧</div><b>Circulation</b><small>6:25 guided</small></div>
+        <div class="quickcard" data-library-manager="1"><div class="icon">🗂️</div><b>My sessions</b><small>Manage local library</small></div>
       </div>
       <div class="quickcards" style="margin-top:8px">
         <div class="quickcard" data-start="Swim"><div class="icon">🏊</div><b>Swim</b><small>Quick log</small></div>
@@ -223,7 +232,7 @@ main{padding:14px 0 90px}
       <div id="homeReadinessText" class="small" style="margin-top:8px">Add your personal baseline and a daily Garmin snapshot in Recovery.</div>
     </section>
 
-    <h3 class="section-title">Current weekly framework</h3>
+    <h3 class="section-title">My weekly plan</h3>
     <section class="panel week" id="weekPlan"></section>
   </section>
 
@@ -240,8 +249,8 @@ main{padding:14px 0 90px}
       <div id="sessionSummary" class="status"></div>
     </section>
 
-    <div id="cftTimer" class="timerbar hidden">
-      <div><div class="small">CFT SESSION TIMER</div><div id="clock" class="clock">15:00</div></div>
+    <div id="sessionTimer" class="timerbar hidden">
+      <div><div class="small" id="sessionTimerLabel">SESSION TIMER</div><div id="clock" class="clock">15:00</div></div>
       <div class="actions" style="flex:1 1 260px">
         <button id="timerStart" class="primary">Start / Resume</button>
         <button id="timerPause">Pause</button>
@@ -369,7 +378,7 @@ main{padding:14px 0 90px}
         </label>
       </div>
       <label style="display:block;margin-top:8px">Notes
-        <textarea id="notes" placeholder="How you felt, progression, any symptoms, anything to discuss with James…"></textarea>
+        <textarea id="notes" placeholder="How you felt, progression, symptoms or anything to review later…"></textarea>
       </label>
       <div class="actions" style="margin-top:9px">
         <button id="save" class="primary">Save session</button>
@@ -537,6 +546,98 @@ main{padding:14px 0 90px}
       </div>
       <div id="installStatus" class="status">Install will become available when Android/Chrome detects the hosted PWA.</div>
     </section>
+
+    <section class="panel" id="libraryManager">
+      <div class="kicker">Private exercise library</div>
+      <h3 style="margin:6px 0 8px">Sessions live on this device</h3>
+      <p class="notice">The public app contains no personal strength-session prescriptions. Create sessions here or import a private JSON backup. Do not upload your private library JSON to a public repository.</p>
+      <div id="libraryStatus" class="status">No local exercise library loaded yet.</div>
+      <div class="actions" style="margin-top:9px">
+        <button id="newLibrarySession" class="primary">New session</button>
+        <button id="exportLibrary">Export library JSON</button>
+        <label class="btn" for="importLibrary">Import library JSON</label>
+        <input id="importLibrary" type="file" accept=".json,application/json" class="hidden">
+      </div>
+
+      <div id="libraryEditor" class="hidden" style="margin-top:12px">
+        <div class="grid2">
+          <label>Edit session
+            <select id="librarySessionSelect"></select>
+          </label>
+          <label>Session name
+            <input id="libraryName" placeholder="e.g. Strength A">
+          </label>
+        </div>
+        <label style="display:block;margin-top:8px">Summary
+          <input id="librarySummary" placeholder="Short description">
+        </label>
+        <div class="grid2" style="margin-top:8px">
+          <label>Category
+            <select id="libraryCategory">
+              <option>Exercise</option>
+              <option>Mobility</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>Session timer (minutes)
+            <input id="libraryTimer" type="number" min="0" max="240" step="1" placeholder="0 = none">
+          </label>
+        </div>
+        <label class="check" style="margin-top:9px"><input id="libraryPinned" type="checkbox"> Show as a quick-start card on Home</label>
+        <div class="actions" style="margin-top:9px">
+          <button id="saveLibrarySession" class="primary">Save session details</button>
+          <button id="deleteLibrarySession" class="danger">Delete session</button>
+        </div>
+
+        <h3 class="section-title" style="margin-top:16px">Exercises</h3>
+        <div id="libraryExerciseList"></div>
+
+        <section class="health-entry" style="margin-top:9px">
+          <div class="kicker" id="exerciseEditorTitle">Add exercise</div>
+          <input id="libraryExerciseIndex" type="hidden" value="">
+          <div class="grid2" style="margin-top:7px">
+            <label>Exercise name
+              <input id="exerciseName" placeholder="Exercise name">
+            </label>
+            <label>Sets
+              <input id="exerciseSets" type="number" min="1" max="20" step="1" value="3">
+            </label>
+          </div>
+          <div class="grid2" style="margin-top:8px">
+            <label>Target
+              <input id="exerciseTarget" placeholder="e.g. 8–10 or 30 sec">
+            </label>
+            <label>Tag / note
+              <input id="exerciseTag" placeholder="e.g. each side">
+            </label>
+          </div>
+          <label style="display:block;margin-top:8px">Demo video URL (optional)
+            <input id="exerciseVideo" type="url" placeholder="https://…">
+          </label>
+          <label style="display:block;margin-top:8px">Demo search terms (optional)
+            <input id="exerciseSearch" placeholder="Used for YouTube search if no direct URL">
+          </label>
+          <label style="display:block;margin-top:8px">Technique cues (optional, one per line)
+            <textarea id="exerciseCues" placeholder="Cue 1&#10;Cue 2"></textarea>
+          </label>
+          <div class="actions" style="margin-top:9px">
+            <button id="saveExercise" class="primary">Add exercise</button>
+            <button id="cancelExerciseEdit">Clear</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel" id="weeklyPlanManager">
+      <div class="kicker">Private weekly plan</div>
+      <h3 style="margin:6px 0 8px">Optional Home-screen plan</h3>
+      <div id="weeklyPlanInputs"></div>
+      <div class="actions" style="margin-top:9px">
+        <button id="saveWeeklyPlan" class="primary">Save weekly plan</button>
+      </div>
+      <div id="weeklyPlanStatus" class="status"></div>
+    </section>
+
     <section class="panel">
       <div class="kicker">Backup & migration</div>
       <h3 style="margin:6px 0 8px">Keep your training history portable</h3>
@@ -546,18 +647,14 @@ main{padding:14px 0 90px}
         <label class="btn" for="importCsv">Import training CSV</label>
         <input id="importCsv" type="file" accept=".csv,text/csv" class="hidden">
       </div>
-      <div id="csvStatus" class="status">Compatible with the older RehabTrainingLog CSV layout.</div>
+      <div id="csvStatus" class="status">Training CSV remains compatible with earlier app exports.</div>
     </section>
     <section class="panel notice">
-      <b style="color:#fff">Storage:</b> training and recovery entries are saved locally in this browser/PWA. No personal recovery figures are stored in the public GitHub source. Export CSV backups periodically.
-    </section>
-    <section class="panel">
-      <div class="kicker">Included in v1.0</div>
-      <p class="notice">Invicta Lower Body, Upper Body, Whole Body and Daily Prehab; guided Daily Quick Routine; guided Pre-Walk Warm-Up; guided Circulation Reset; BodyCraft CFT upper-back reset; swim/bike/run logging; recovery dashboard with personal baselines and readiness; training + recovery CSV export.</p>
+      <b style="color:#fff">Storage:</b> training, recovery and exercise-library data are saved locally in this browser/PWA. Personal exercise prescriptions are not stored in the public GitHub source. Export CSV/JSON backups periodically.
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.6.1.1 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.6.3 PWA • installable offline training app</div>
 </main>
 
 <script>
@@ -573,111 +670,7 @@ const STORAGE = "gbtt_tri_history_v1";
 const HEALTH_STORAGE = "gbtt_tri_health_v1";
 const BASELINE_STORAGE = "gbtt_tri_baseline_v1";
 const CIRCULATION_PREF_STORAGE = "gbtt_tri_circulation_pref_v1";
-
-const rehab = {
-  "Lower Body":[
-    ["Midfoot Reach",2,"8","Warm-up","midfoot reach running exercise hip"],
-    ["SL Posterior Chain Isometric",2,"30s","Warm-up","single leg posterior chain isometric exercise"],
-    ["Lateral Hip Raise",2,"15","Side-lying straight leg lift","side lying hip abduction physiotherapy"],
-    ["Assisted Split Squat",3,"8","Each side","assisted split squat technique"],
-    ["Plate Hip Hinge",3,"12","","plate hip hinge exercise"],
-    ["Counterweight Step Up",3,"12","Each side","counterweight step up exercise"],
-    ["Short Lever Copenhagen",3,"60s","","short lever copenhagen plank"],
-    ["Short Lever Hamstring Bridge",3,"15","","short lever hamstring bridge"],
-    ["Star Plank Raises",3,"15","","star plank leg raise"],
-    ["DL Smith Machine Soleus Raise",3,"8","","smith machine soleus calf raise"],
-    ["SL Box Plank",3,"30s","","single leg box plank exercise"]
-  ],
-  "Upper Body":[
-    ["Deficit Push Up",2,"8","Warm-up","deficit push up technique"],
-    ["Three Point Toe Tap",2,"20","Warm-up","three point toe tap exercise"],
-    ["TRX Row",2,"8","Warm-up","TRX row technique"],
-    ["Dumbbell Chest Press – Incline Bench",3,"12","","incline dumbbell chest press technique"],
-    ["Dumbbell Single Arm Row",3,"12","","single arm dumbbell row technique"],
-    ["Dumbbell Decline Fly",3,"12","","decline dumbbell fly technique"],
-    ["Cable Close-grip Front Lat Pulldown",3,"12","","close grip lat pulldown technique"],
-    ["Dumbbell Seated Lateral Raise",3,"12","","seated dumbbell lateral raise technique"],
-    ["Prone Swimmer",3,"12","","prone swimmer shoulder exercise"],
-    ["Alternate Incline Dumbbell Curl",3,"8","","alternating incline dumbbell curl"],
-    ["Alternate Hammer Curl – Seated Dumbbells",3,"12","","seated alternating hammer curl"],
-    ["Dumbbell Incline Triceps Extension",3,"8","","incline dumbbell triceps extension"],
-    ["Close Grip Push-ups",3,"12","","close grip push up technique"]
-  ],
-  "Whole Body":[
-    ["Midfoot Reach",2,"8","Warm-up","midfoot reach running exercise hip"],
-    ["SL Posterior Chain Isometric",2,"30s","Warm-up","single leg posterior chain isometric exercise"],
-    ["Deficit Push Up",2,"8","Warm-up","deficit push up technique"],
-    ["Prone Swimmer",2,"8","Warm-up","prone swimmer shoulder exercise"],
-    ["Skater Squat",3,"8","","skater squat technique"],
-    ["TRX SL RDL",3,"8","Each side","TRX single leg RDL"],
-    ["Hammer Grip Pull-up",3,"Max","Bodyweight","neutral grip pull up technique"],
-    ["TRX Lateral Lunge",3,"8","James notes 6 each side","TRX lateral lunge"],
-    ["SL Hamstring Slider",3,"8","Start double leg; progress to single leg; 4-second eccentric","single leg hamstring slider physiotherapy"],
-    ["Half Kneeling Single Arm KB Press",3,"12","","half kneeling single arm kettlebell press"],
-    ["SL Smith Machine Calf Isometric",3,"30s","","single leg calf isometric smith machine"],
-    ["Bench External Rotations",3,"12","","bench external rotation shoulder"],
-    ["Scarecrow",3,"12","","scarecrow shoulder external rotation"],
-    ["Bench-to-Bench Hamstring Isometric",3,"30s","","bench hamstring isometric exercise"],
-    ["Side Plank – Two Legs",3,"60s","Each side","side plank correct technique"]
-  ],
-  "Daily Prehab":[
-    ["Seated Roll Down",1,"15","Exhales","seated roll down physiotherapy exercise"],
-    ["Cat Breath",1,"10","Exhale; draw hands towards knees","cat breath core exercise physiotherapy"],
-    ["Hip Flexor Stretch",1,"60s","Each side","hip flexor stretch physiotherapy"],
-    ["World's Greatest Stretch",1,"15","Each side","world's greatest stretch"],
-    ["Hamstring Rock Back",1,"15","Each side","hamstring rock back physiotherapy"],
-    ["Adductor Rock Back",1,"15","Each side","adductor rock back physiotherapy"],
-    ["Long Lever Hamstring Isometric",4,"30–45s","Target intensity 7/10","long lever hamstring isometric"]
-  ]
-};
-
-const cft = [
-  {
-    name:"Rope Face Pull",sets:2,target:"10–12",tag:"Face pull + external rotation",
-    video:"https://www.youtube-nocookie.com/embed/qCTlaGin9dQ",
-    search:"rope face pull external rotation",
-    cues:["CFT setup: both pulleys at forehead height; rope attached to both cables if practical, or one centred cable.",
-          "Form: ribs down, neck long, elbows travel out; finish with hands beside the ears rather than pulling to the chest.",
-          "Feel: rear shoulders and the area between/under the shoulder blades — not the neck.",
-          "Tempo: 2-sec squeeze, 3-sec return."]
-  },
-  {
-    name:"High-to-Low Scapular Row",sets:2,target:"8–10 each side",tag:"Single-arm high cable row",
-    video:"https://www.youtube-nocookie.com/embed/mGlzyVZ29jQ",
-    search:"single arm high cable row",
-    cues:["CFT setup: one pulley slightly above shoulder height; use a single D-handle.",
-          "Form: allow the shoulder blade to glide forward, then pull the elbow towards the lower ribs/back pocket without rotating.",
-          "Lengthening: the slow reach forward is part of the rep; do not keep the shoulder blade pinned back.",
-          "Tempo: 2-sec pause, 3-sec reach."]
-  },
-  {
-    name:"Controlled Straight-Arm Pulldown",sets:2,target:"10–12",tag:"Straight-arm pulldown",
-    video:"https://www.youtube-nocookie.com/embed/soX7zhZ7yfQ",
-    search:"straight arm cable pulldown",
-    cues:["CFT setup: pulleys high; use the straight bar or rope. Step back enough for a full overhead reach.",
-          "Form: soft knees, slight hip hinge, ribs stacked; keep elbows only slightly bent and fixed.",
-          "Avoid: arching the lower back or turning it into a triceps press-down.",
-          "Tempo: 1-sec finish, 3-sec overhead return."]
-  },
-  {
-    name:"Standing Reverse Fly",sets:2,target:"10–12",tag:"Reverse cable fly",
-    video:"https://www.youtube-nocookie.com/embed/CfLXDFh110w",
-    search:"standing cable reverse fly",
-    cues:["CFT setup: pulleys at shoulder height; cross the handles and use a staggered stance.",
-          "Form: move the arms in a broad arc with softly bent elbows; stop when upper arms are roughly in line with the torso.",
-          "Avoid: thrusting the chest, poking the head forward or using momentum.",
-          "Tempo: light load, 3-sec return."]
-  },
-  {
-    name:"Half-Row Isometric Hold",sets:2,target:"20–30 sec",tag:"Scapular retraction endurance",
-    video:"https://www.youtube-nocookie.com/embed/ZZaDLL9TsI8",
-    search:"cable scapular retraction isometric",
-    cues:["CFT setup: both pulleys around lower-chest height; use two D-handles.",
-          "Form: draw shoulder blades gently back and slightly down, then hold while breathing normally.",
-          "Quality rule: stop when the shoulders shrug, the head moves forward or you can no longer keep the ribs controlled.",
-          "Load: very light."]
-  }
-];
+const EXERCISE_LIBRARY_STORAGE = "gbtt_tri_exercise_library_v1";
 
 const quickRoutineSteps = [
   {exercise:"Clock Stretch", detail:"Right foot • 12 o'clock"},
@@ -719,33 +712,22 @@ const circulationSteps = [
 ];
 
 const endurance = new Set(["Swim","Bike","Run"]);
-const programmeNames = [...Object.keys(rehab),"Daily Quick Routine","Pre-Walk Warm-Up","Circulation Reset","CFT Upper-Back Reset","Swim","Bike","Run"];
+const systemSessions = ["Daily Quick Routine","Pre-Walk Warm-Up","Circulation Reset","Swim","Bike","Run"];
 const summaries = {
-  "Lower Body":"Invicta lower-body rehab strength session.",
-  "Upper Body":"Invicta upper-body strength session.",
-  "Whole Body":"Invicta whole-body strength session.",
-  "Daily Prehab":"Daily mobility + isometric prehab.",
   "Daily Quick Routine":"Guided 7:28 daily routine • 12 × 30-second work intervals with 8-second changeovers.",
   "Pre-Walk Warm-Up":"Guided 4:12 activation routine before walking • 8 clock positions + 2 wall-supported hip lifts • 8-second changeovers.",
   "Circulation Reset":"Guided 6:25 gentle movement routine • breathing, lower-leg muscle pump, marching, upper-body movement and an optional rebounder stage.",
-  "CFT Upper-Back Reset":"15-minute BodyCraft CFT accessory circuit • 2 rounds • 15–20 sec between exercises • 60–90 sec between rounds.",
   "Swim":"Quick-log a swim session.",
   "Bike":"Quick-log a bike session.",
   "Run":"Quick-log a run session."
 };
-const weekly = [
-  ["Sunday","Bike"],
-  ["Monday","Lower Body + Swim"],
-  ["Tuesday","Upper Body + Run"],
-  ["Wednesday","Mobility / Daily Prehab + Swim"],
-  ["Thursday","Whole Body + Bike"],
-  ["Friday","Rest / recovery"],
-  ["Saturday","Run"]
-];
+const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+let exerciseLibrary = {schema:"gbtt-exercise-library",version:1,sessions:[],weeklyPlan:{}};
 
 let history = [];
 let draft = {};
-let cftRemaining = 15*60;
+let sessionTimerRemaining = 0;
+let sessionTimerSession = "";
 let timerId = null;
 let quickIndex = 0;
 let quickSeconds = 30;
@@ -789,10 +771,179 @@ let baseline = {
 
 
 function esc(v){return String(v??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+function displayCategory(v){return v==="Rehab"?"Exercise":v}
 function key(session,i,j,f){return `${session}|${i}|${j}|${f}`}
 function localDate(d=new Date()){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-")}
 function weekStart(d=new Date()){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
 function saveLocal(){localStorage.setItem(STORAGE,JSON.stringify(history))}
+
+function normaliseExercise(x={}){
+  return {
+    name:String(x.name||"").trim(),
+    sets:Math.max(1,parseInt(x.sets||1,10)||1),
+    target:String(x.target||"").trim(),
+    tag:String(x.tag||"").trim(),
+    search:String(x.search||"").trim(),
+    video:String(x.video||"").trim(),
+    cues:Array.isArray(x.cues)?x.cues.map(v=>String(v)).filter(Boolean):[]
+  };
+}
+function normaliseSession(s={}){
+  const name=String(s.name||"").trim();
+  return {
+    id:String(s.id||name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||("session-"+Date.now())),
+    name,
+    category:["Exercise","Mobility","Other"].includes(s.category)?s.category:"Exercise",
+    summary:String(s.summary||"").trim(),
+    timerMinutes:Math.max(0,parseInt(s.timerMinutes||0,10)||0),
+    pinned:!!s.pinned,
+    exercises:Array.isArray(s.exercises)?s.exercises.map(normaliseExercise).filter(x=>x.name):[]
+  };
+}
+function normaliseLibrary(obj={}){
+  const sessions=Array.isArray(obj.sessions)?obj.sessions.map(normaliseSession).filter(s=>s.name):[];
+  const seen=new Set();
+  const unique=sessions.filter(s=>{
+    const k=s.name.toLowerCase();
+    if(seen.has(k)) return false;
+    seen.add(k);return true;
+  });
+  const weekly={};
+  dayNames.forEach(d=>weekly[d]=String(obj.weeklyPlan?.[d]||""));
+  return {schema:"gbtt-exercise-library",version:1,sessions:unique,weeklyPlan:weekly};
+}
+function loadExerciseLibrary(){
+  try{
+    exerciseLibrary=normaliseLibrary(JSON.parse(localStorage.getItem(EXERCISE_LIBRARY_STORAGE)||"{}"));
+  }catch(e){
+    exerciseLibrary=normaliseLibrary({});
+  }
+}
+function saveExerciseLibrary(){
+  localStorage.setItem(EXERCISE_LIBRARY_STORAGE,JSON.stringify(exerciseLibrary));
+}
+function librarySessionByName(name){
+  return exerciseLibrary.sessions.find(s=>s.name===name)||null;
+}
+function librarySessionById(id){
+  return exerciseLibrary.sessions.find(s=>s.id===id)||null;
+}
+function uniqueSessionName(base, ignoreId=""){
+  const root=(base||"New session").trim()||"New session";
+  let candidate=root, n=2;
+  const used=()=>exerciseLibrary.sessions.some(s=>s.id!==ignoreId&&s.name.toLowerCase()===candidate.toLowerCase());
+  while(used()) candidate=`${root} ${n++}`;
+  return candidate;
+}
+function refreshSessionSelect(preferred=""){
+  const select=$("session");
+  const current=preferred||select.value;
+  select.innerHTML="";
+  exerciseLibrary.sessions.forEach(s=>{
+    const o=document.createElement("option");o.value=s.name;o.textContent=s.name;select.appendChild(o);
+  });
+  systemSessions.forEach(name=>{
+    const o=document.createElement("option");o.value=name;o.textContent=name;select.appendChild(o);
+  });
+  const values=[...select.options].map(o=>o.value);
+  select.value=values.includes(current)?current:(exerciseLibrary.sessions[0]?.name||"Daily Quick Routine");
+}
+function renderMySessionQuickCards(){
+  const wrap=$("mySessionQuickWrap"),box=$("mySessionQuickCards");
+  if(!wrap||!box)return;
+  const pinned=exerciseLibrary.sessions.filter(s=>s.pinned);
+  wrap.classList.toggle("hidden",!pinned.length);
+  box.innerHTML=pinned.map(s=>`<div class="quickcard" data-local-start="${esc(s.name)}"><div class="icon">🏋️</div><b>${esc(s.name)}</b><small>${s.timerMinutes?esc(s.timerMinutes+" min timer"):esc(s.category)}</small></div>`).join("");
+}
+function renderWeeklyPlanInputs(){
+  const box=$("weeklyPlanInputs");if(!box)return;
+  box.innerHTML=dayNames.map(d=>`<label style="display:block;margin-top:7px">${esc(d)}<input data-plan-day="${esc(d)}" value="${esc(exerciseLibrary.weeklyPlan?.[d]||"")}" placeholder="Optional plan"></label>`).join("");
+}
+function renderLibraryManager(selectedId=""){
+  const status=$("libraryStatus");
+  if(status) status.textContent=`${exerciseLibrary.sessions.length} local session${exerciseLibrary.sessions.length===1?"":"s"} stored on this device.`;
+  const editor=$("libraryEditor");
+  const select=$("librarySessionSelect");
+  if(!editor||!select)return;
+
+  select.innerHTML=exerciseLibrary.sessions.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+  if(!exerciseLibrary.sessions.length){
+    editor.classList.add("hidden");
+    renderWeeklyPlanInputs();
+    renderMySessionQuickCards();
+    return;
+  }
+  editor.classList.remove("hidden");
+  const id=exerciseLibrary.sessions.some(s=>s.id===selectedId)?selectedId:(select.value||exerciseLibrary.sessions[0].id);
+  select.value=id;
+  fillLibraryEditor(id);
+  renderWeeklyPlanInputs();
+  renderMySessionQuickCards();
+}
+function fillLibraryEditor(id){
+  const s=librarySessionById(id);if(!s)return;
+  $("librarySessionSelect").value=s.id;
+  $("libraryName").value=s.name;
+  $("librarySummary").value=s.summary;
+  $("libraryCategory").value=s.category;
+  $("libraryTimer").value=s.timerMinutes||"";
+  $("libraryPinned").checked=!!s.pinned;
+  renderLibraryExerciseList(s);
+  clearExerciseEditor();
+}
+function renderLibraryExerciseList(s){
+  const box=$("libraryExerciseList");if(!box)return;
+  if(!s.exercises.length){
+    box.innerHTML='<div class="notice">No exercises yet. Add the first one below.</div>';return;
+  }
+  box.innerHTML=s.exercises.map((e,i)=>`
+    <article class="library-exercise">
+      <div class="library-exercise-top">
+        <div><b>${i+1}. ${esc(e.name)}</b><br><small>${esc(e.sets)} set${e.sets===1?"":"s"} • ${esc(e.target||"no target")}${e.tag?` • ${esc(e.tag)}`:""}</small></div>
+      </div>
+      <div class="actions">
+        <button data-lib-up="${i}" ${i===0?"disabled":""}>↑</button>
+        <button data-lib-down="${i}" ${i===s.exercises.length-1?"disabled":""}>↓</button>
+        <button data-lib-edit="${i}">Edit</button>
+        <button data-lib-delete="${i}" class="danger">Delete</button>
+      </div>
+    </article>`).join("");
+}
+function clearExerciseEditor(){
+  $("libraryExerciseIndex").value="";
+  $("exerciseEditorTitle").textContent="Add exercise";
+  $("exerciseName").value="";
+  $("exerciseSets").value="3";
+  $("exerciseTarget").value="";
+  $("exerciseTag").value="";
+  $("exerciseVideo").value="";
+  $("exerciseSearch").value="";
+  $("exerciseCues").value="";
+  $("saveExercise").textContent="Add exercise";
+}
+function editExercise(index){
+  const s=librarySessionById($("librarySessionSelect").value);if(!s||!s.exercises[index])return;
+  const e=s.exercises[index];
+  $("libraryExerciseIndex").value=String(index);
+  $("exerciseEditorTitle").textContent="Edit exercise";
+  $("exerciseName").value=e.name;
+  $("exerciseSets").value=e.sets;
+  $("exerciseTarget").value=e.target;
+  $("exerciseTag").value=e.tag;
+  $("exerciseVideo").value=e.video;
+  $("exerciseSearch").value=e.search;
+  $("exerciseCues").value=(e.cues||[]).join("\n");
+  $("saveExercise").textContent="Save exercise";
+  $("exerciseName").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function downloadLibraryJson(){
+  const payload=JSON.stringify(exerciseLibrary,null,2);
+  const blob=new Blob([payload],{type:"application/json;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="Getting_Back_to_Tri_Private_Exercise_Library.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+
 function loadLocal(){
   try{history=JSON.parse(localStorage.getItem(STORAGE)||"[]");if(!Array.isArray(history))history=[]}catch(e){history=[]}
 
@@ -823,9 +974,8 @@ function loadLocal(){
 }
 function categoryOf(name){
   if(endurance.has(name))return "Endurance";
-  if(name==="CFT Upper-Back Reset")return "CFT";
-  if(name==="Daily Prehab"||name==="Daily Quick Routine"||name==="Pre-Walk Warm-Up"||name==="Circulation Reset")return "Mobility";
-  return "Rehab";
+  if(["Daily Quick Routine","Pre-Walk Warm-Up","Circulation Reset"].includes(name))return "Mobility";
+  return librarySessionByName(name)?.category||"Exercise";
 }
 function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("hidden",v.id!==id));
@@ -833,6 +983,7 @@ function showView(id){
   if(id==="history")renderHistory();
   if(id==="recovery"){renderHealthHistory();renderReadiness(currentHealthEntry());}
   if(id==="home")renderHome();
+  if(id==="data")renderLibraryManager();
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
@@ -1096,44 +1247,71 @@ function downloadHealthCsv(){
 }
 
 function renderWeek(){
-  $("weekPlan").innerHTML=weekly.map(([d,p])=>`<div class="day"><b>${d}</b><span>${p}</span></div>`).join("");
+  const box=$("weekPlan");
+  box.innerHTML=dayNames.map(d=>{
+    const p=exerciseLibrary.weeklyPlan?.[d]||"";
+    return `<div class="day"><b>${esc(d)}</b><span>${p?esc(p):"—"}</span></div>`;
+  }).join("");
 }
 function renderHome(){
   const ws=weekStart(), next=new Date(ws);next.setDate(next.getDate()+7);
   const weekHist=history.filter(h=>{const d=new Date(h.date+"T12:00:00");return d>=ws&&d<next});
   $("statWeek").textContent=weekHist.length;
-  $("statStrength").textContent=weekHist.filter(h=>["Rehab","CFT","Mobility"].includes(h.category||categoryOf(h.session))).length;
+  $("statStrength").textContent=weekHist.filter(h=>["Rehab","Exercise","CFT","Mobility","Other"].includes(h.category||categoryOf(h.session))).length;
   $("statEndurance").textContent=weekHist.filter(h=>(h.category||categoryOf(h.session))==="Endurance").length;
   renderHomeReadiness();
-  const today=weekly[(new Date().getDay()+6)%7];
-  const parts=today[1].split(" + ");
-  $("todayPills").innerHTML=`<span class="pill">Today: ${esc(today[0])}</span>`+parts.map(x=>{
-    const cl=/swim/i.test(x)?"swim":/bike/i.test(x)?"bike":/run/i.test(x)?"run":"";
-    return `<span class="pill ${cl}">${esc(x)}</span>`
-  }).join("");
+  renderMySessionQuickCards();
+
+  const todayName=dayNames[new Date().getDay()];
+  const plan=exerciseLibrary.weeklyPlan?.[todayName]||"";
+  const parts=plan?plan.split(" + ").filter(Boolean):[];
+  $("todayPills").innerHTML=`<span class="pill">Today: ${esc(todayName)}</span>`+
+    (parts.length?parts.map(x=>{
+      const cl=/swim/i.test(x)?"swim":/bike/i.test(x)?"bike":/run/i.test(x)?"run":"";
+      return `<span class="pill ${cl}">${esc(x)}</span>`
+    }).join(""):'<span class="pill">No plan set</span>');
 }
 document.querySelectorAll("[data-start]").forEach(x=>x.addEventListener("click",()=>{
   $("session").value=x.dataset.start;
   renderSession();
   showView("train");
 }));
+document.querySelector("[data-library-manager]")?.addEventListener("click",()=>{
+  showView("data");
+  setTimeout(()=>$("libraryManager")?.scrollIntoView({behavior:"smooth",block:"start"}),50);
+});
+$("mySessionQuickCards").addEventListener("click",e=>{
+  const card=e.target.closest("[data-local-start]");
+  if(!card)return;
+  refreshSessionSelect(card.dataset.localStart);
+  renderSession();
+  showView("train");
+});
 
-for(const name of programmeNames){
-  const o=document.createElement("option");o.value=name;o.textContent=name;$("session").appendChild(o)
-}
+refreshSessionSelect();
 $("date").value=localDate();
-$("session").value="Lower Body";
-$("session").addEventListener("change",renderSession);
+$("session").addEventListener("change",()=>{resetSessionTimerForSelection();renderSession()});
 
 function sessionData(name){
-  if(rehab[name]) return rehab[name].map(x=>({name:x[0],sets:x[1],target:x[2],tag:x[3],search:x[4],cues:[]}));
-  if(name==="CFT Upper-Back Reset") return cft;
-  return [];
+  return librarySessionByName(name)?.exercises||[];
+}
+function resetSessionTimerForSelection(){
+  clearInterval(timerId);timerId=null;
+  const cfg=librarySessionByName($("session").value);
+  sessionTimerSession=cfg?.name||"";
+  sessionTimerRemaining=(cfg?.timerMinutes||0)*60;
+  renderClock();
 }
 function renderSession(){
   const name=$("session").value;
-  $("sessionSummary").textContent=summaries[name]||"";
-  $("cftTimer").classList.toggle("hidden",name!=="CFT Upper-Back Reset");
+  const cfg=librarySessionByName(name);
+  $("sessionSummary").textContent=cfg?.summary||summaries[name]||"";
+  const timerMinutes=cfg?.timerMinutes||0;
+  $("sessionTimer").classList.toggle("hidden",timerMinutes<=0);
+  if(timerMinutes>0){
+    $("sessionTimerLabel").textContent=`${name.toUpperCase()} • SESSION TIMER`;
+    if(sessionTimerSession!==name) resetSessionTimerForSelection();
+  }
   $("quickRoutineTimer").classList.toggle("hidden",name!=="Daily Quick Routine");
   if(name==="Daily Quick Routine") renderQuickRoutine();
   $("preWalkTimer").classList.toggle("hidden",name!=="Pre-Walk Warm-Up");
@@ -1142,18 +1320,15 @@ function renderSession(){
   if(name==="Circulation Reset") renderCirculation();
   $("enduranceFields").classList.toggle("hidden",!endurance.has(name));
   $("sessionNotice").classList.toggle("hidden",endurance.has(name));
-  if(name==="CFT Upper-Back Reset"){
-    $("sessionNotice").innerHTML="<b>How to run it:</b> 2-minute warm-up → exercises 1–5 → 15–20 sec between exercises → 60–90 sec after exercise 5 → repeat for round 2 → finish with a 1-minute doorway pec stretch or child's-pose reach. Stop for sharp pain, tingling, loss of strength or radiating arm pain.";
-  } else if(name==="Daily Quick Routine"){
-    $("sessionNotice").innerHTML="<b>Guided routine:</b> every work interval is 30 seconds, followed by an 8-second changeover before the next position. The timer advances automatically through 8 clock-stretch positions, 2 single-leg hip-thrust holds and 2 wall-supported hip lifts. Work time: 6:00 • changeovers: 1:28 • total: 7:28.";
+
+  if(name==="Daily Quick Routine"){
+    $("sessionNotice").innerHTML="<b>Guided routine:</b> every work interval is 30 seconds, followed by an 8-second changeover before the next position. The timer advances automatically through the routine. Work time: 6:00 • changeovers: 1:28 • total: 7:28.";
   } else if(name==="Pre-Walk Warm-Up"){
-    $("sessionNotice").innerHTML="<b>Pre-walk activation:</b> a short routine to loosen the hip-flexor/groin area and switch the posterior chain on before a brisk walk, particularly after a period of sitting. Clock positions are 15 seconds each, then 30 seconds per side for the wall-supported hip lift, with 8-second changeovers. Total: 4:12. Keep it comfortable rather than turning it into a workout; stop if symptoms increase.";
+    $("sessionNotice").innerHTML="<b>Pre-walk activation:</b> a short routine before a brisk walk, particularly after sitting. Keep it comfortable rather than turning it into a workout; stop if symptoms increase.";
   } else if(name==="Circulation Reset"){
-    $("sessionNotice").innerHTML="<b>Circulation Reset:</b> gentle breathing and rhythmic muscle movement intended to support normal circulation and lymphatic flow after waking or sitting. The rebounder is optional — marching works too. This is a movement/wellbeing routine, not a detox or treatment for a medical condition. Keep it easy and stop if you feel unwell, dizzy or develop unusual symptoms.";
-  } else if(name==="Daily Prehab"){
-    $("sessionNotice").innerHTML="<b>Prehab:</b> move smoothly and use the prescribed holds. Keep this as supportive work rather than turning it into a hard conditioning session.";
-  } else if(!endurance.has(name)){
-    $("sessionNotice").innerHTML="<b>Invicta programme:</b> the session structure below mirrors the programme we previously logged. James’s technique and current coaching instructions take priority over generic demo videos.";
+    $("sessionNotice").innerHTML="<b>Circulation Reset:</b> gentle breathing and rhythmic muscle movement intended to support normal circulation and lymphatic flow after waking or sitting. The rebounder is optional — marching works too. This is a movement/wellbeing routine, not a detox or treatment for a medical condition.";
+  } else if(cfg){
+    $("sessionNotice").innerHTML="<b>My local session:</b> exercise names, order, targets and technique notes are stored only in this browser/PWA. Adjust or stop if symptoms make a movement unsuitable.";
   }
   renderExercises();
 }
@@ -1170,12 +1345,13 @@ function renderExercises(){
     let media="";
     const searchUrl="https://www.youtube.com/results?search_query="+encodeURIComponent(e.search||e.name);
     if(e.cues?.length){
-      media+=`<div class="cues">${e.cues.map((c,idx)=>`<div class="cue">${esc(c)}</div>`).join("")}</div>`;
+      media+=`<div class="cues">${e.cues.map(c=>`<div class="cue">${esc(c)}</div>`).join("")}</div>`;
     }
     if(e.video){
-      media+=`<div class="video"><iframe src="${e.video}" title="${esc(e.name)} demonstration" loading="lazy" allowfullscreen></iframe></div>`;
+      media+=`<div class="demo"><a class="btn soft" target="_blank" rel="noopener" href="${esc(e.video)}">▶ Saved demo</a><div class="text">Link stored in your private local exercise library.</div></div>`;
+    }else{
+      media+=`<div class="demo"><a class="btn soft" target="_blank" rel="noopener" href="${searchUrl}">▶ Find a demo</a><div class="text">Search based on the exercise name or your saved search terms.</div></div>`;
     }
-    media+=`<div class="demo"><a class="btn soft" target="_blank" rel="noopener" href="${searchUrl}">▶ Demo video</a><div class="text">Movement reminder only. Use your prescribed technique if it differs.</div></div>`;
     body.innerHTML=media;
     for(let j=0;j<e.sets;j++){
       const set=document.createElement("div");set.className="set";
@@ -1344,6 +1520,105 @@ $("deleteHealth").addEventListener("click",e=>{
   }
   healthHistory=[];saveHealthLocal();renderHealthHistory();renderHome();
   e.currentTarget.dataset.confirm="0";e.currentTarget.textContent="Delete recovery history";
+});
+
+
+$("newLibrarySession").addEventListener("click",()=>{
+  const name=uniqueSessionName("New session");
+  const s=normaliseSession({name,category:"Exercise",summary:"",timerMinutes:0,pinned:false,exercises:[]});
+  exerciseLibrary.sessions.push(s);
+  saveExerciseLibrary();
+  refreshSessionSelect(s.name);
+  renderLibraryManager(s.id);
+  renderHome();renderWeek();
+});
+$("librarySessionSelect").addEventListener("change",()=>fillLibraryEditor($("librarySessionSelect").value));
+$("saveLibrarySession").addEventListener("click",()=>{
+  const s=librarySessionById($("librarySessionSelect").value);if(!s)return;
+  const oldName=s.name;
+  s.name=uniqueSessionName($("libraryName").value,s.id);
+  s.summary=$("librarySummary").value.trim();
+  s.category=$("libraryCategory").value;
+  s.timerMinutes=Math.max(0,parseInt($("libraryTimer").value||0,10)||0);
+  s.pinned=$("libraryPinned").checked;
+  saveExerciseLibrary();
+  refreshSessionSelect(s.name);
+  renderLibraryManager(s.id);
+  renderHome();renderWeek();
+  $("libraryStatus").textContent=`Saved ${s.name}${oldName!==s.name?` (renamed from ${oldName})`:""}.`;
+  $("libraryStatus").className="status good";
+});
+$("deleteLibrarySession").addEventListener("click",e=>{
+  const id=$("librarySessionSelect").value;
+  const s=librarySessionById(id);if(!s)return;
+  if(e.currentTarget.dataset.confirm!=="1"){
+    e.currentTarget.dataset.confirm="1";e.currentTarget.textContent=`Delete ${s.name}? Tap again`;return;
+  }
+  exerciseLibrary.sessions=exerciseLibrary.sessions.filter(x=>x.id!==id);
+  saveExerciseLibrary();refreshSessionSelect();renderLibraryManager();renderHome();renderWeek();
+  e.currentTarget.dataset.confirm="0";e.currentTarget.textContent="Delete session";
+});
+$("saveExercise").addEventListener("click",()=>{
+  const s=librarySessionById($("librarySessionSelect").value);if(!s)return;
+  const e=normaliseExercise({
+    name:$("exerciseName").value,
+    sets:$("exerciseSets").value,
+    target:$("exerciseTarget").value,
+    tag:$("exerciseTag").value,
+    video:$("exerciseVideo").value,
+    search:$("exerciseSearch").value,
+    cues:$("exerciseCues").value.split(/\n+/).map(x=>x.trim()).filter(Boolean)
+  });
+  if(!e.name){
+    $("libraryStatus").textContent="Give the exercise a name first.";
+    $("libraryStatus").className="status warn";return;
+  }
+  const idx=$("libraryExerciseIndex").value;
+  if(idx==="") s.exercises.push(e); else s.exercises[Number(idx)]=e;
+  saveExerciseLibrary();renderLibraryExerciseList(s);clearExerciseEditor();
+  refreshSessionSelect(s.name);renderSession();
+  $("libraryStatus").textContent=`Saved exercise in ${s.name}.`;
+  $("libraryStatus").className="status good";
+});
+$("cancelExerciseEdit").addEventListener("click",clearExerciseEditor);
+$("libraryExerciseList").addEventListener("click",e=>{
+  const s=librarySessionById($("librarySessionSelect").value);if(!s)return;
+  const up=e.target.closest("[data-lib-up]");
+  const down=e.target.closest("[data-lib-down]");
+  const edit=e.target.closest("[data-lib-edit]");
+  const del=e.target.closest("[data-lib-delete]");
+  if(up){
+    const i=Number(up.dataset.libUp);if(i>0)[s.exercises[i-1],s.exercises[i]]=[s.exercises[i],s.exercises[i-1]];
+  }else if(down){
+    const i=Number(down.dataset.libDown);if(i<s.exercises.length-1)[s.exercises[i+1],s.exercises[i]]=[s.exercises[i],s.exercises[i+1]];
+  }else if(edit){
+    editExercise(Number(edit.dataset.libEdit));return;
+  }else if(del){
+    s.exercises.splice(Number(del.dataset.libDelete),1);
+  }else return;
+  saveExerciseLibrary();renderLibraryExerciseList(s);renderSession();
+});
+$("exportLibrary").addEventListener("click",downloadLibraryJson);
+$("importLibrary").addEventListener("change",async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{
+    const parsed=JSON.parse(await file.text());
+    if(parsed.schema && parsed.schema!=="gbtt-exercise-library") throw new Error("Unsupported library format");
+    exerciseLibrary=normaliseLibrary(parsed);
+    saveExerciseLibrary();refreshSessionSelect();renderLibraryManager();renderWeek();renderHome();resetSessionTimerForSelection();renderSession();
+    $("libraryStatus").textContent=`Imported ${exerciseLibrary.sessions.length} local session${exerciseLibrary.sessions.length===1?"":"s"}.`;
+    $("libraryStatus").className="status good";
+  }catch(err){
+    $("libraryStatus").textContent="Could not import that exercise-library JSON.";
+    $("libraryStatus").className="status warn";
+  }
+  e.target.value="";
+});
+$("saveWeeklyPlan").addEventListener("click",()=>{
+  document.querySelectorAll("[data-plan-day]").forEach(inp=>exerciseLibrary.weeklyPlan[inp.dataset.planDay]=inp.value.trim());
+  saveExerciseLibrary();renderWeek();renderHome();
+  $("weeklyPlanStatus").textContent="Weekly plan saved locally.";
+  $("weeklyPlanStatus").className="status good";
 });
 
 $("deleteAll").addEventListener("click",e=>{
@@ -1911,17 +2186,31 @@ $("circulationContext").addEventListener("change",saveCirculationPreference);
 
 
 function renderClock(){
-  const m=String(Math.floor(cftRemaining/60)).padStart(2,"0"),s=String(cftRemaining%60).padStart(2,"0");
+  const total=Math.max(0,sessionTimerRemaining||0);
+  const m=String(Math.floor(total/60)).padStart(2,"0"),s=String(total%60).padStart(2,"0");
   $("clock").textContent=`${m}:${s}`;
 }
 $("timerStart").addEventListener("click",()=>{
-  if(timerId||cftRemaining<=0)return;
-  timerId=setInterval(()=>{cftRemaining--;renderClock();if(cftRemaining<=0){clearInterval(timerId);timerId=null;if(navigator.vibrate)navigator.vibrate([250,100,250]);alert("15-minute CFT session complete.");}},1000);
+  const cfg=librarySessionByName($("session").value);
+  if(!cfg?.timerMinutes)return;
+  if(sessionTimerSession!==cfg.name) resetSessionTimerForSelection();
+  if(timerId||sessionTimerRemaining<=0)return;
+  timerId=setInterval(()=>{
+    sessionTimerRemaining--;renderClock();
+    if(sessionTimerRemaining<=0){
+      clearInterval(timerId);timerId=null;
+      if(navigator.vibrate)navigator.vibrate([250,100,250]);
+      alert(`${cfg.name} timer complete.`);
+    }
+  },1000);
 });
 $("timerPause").addEventListener("click",()=>{clearInterval(timerId);timerId=null});
-$("timerReset").addEventListener("click",()=>{clearInterval(timerId);timerId=null;cftRemaining=15*60;renderClock()});
+$("timerReset").addEventListener("click",()=>resetSessionTimerForSelection());
 
-loadLocal();loadHealth();loadCirculationPreference();renderWeek();renderHome();renderSession();renderClock();renderHealthHistory();$("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();renderPreWalk();renderCirculation();
+loadExerciseLibrary();loadLocal();loadHealth();loadCirculationPreference();
+refreshSessionSelect();renderLibraryManager();renderWeeklyPlanInputs();renderWeek();renderHome();
+resetSessionTimerForSelection();renderSession();renderClock();renderHealthHistory();
+$("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();renderPreWalk();renderCirculation();
 
 // PWA install + service worker
 let deferredInstallPrompt = null;
