@@ -229,7 +229,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <div class="header-actions"><span class="version">v1.8a PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
+      <div class="header-actions"><span class="version">v1.8a.1 PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
     </div>
   </div>
 </header>
@@ -710,7 +710,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.8a PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.8a.1.1 PWA • installable offline training app</div>
 </main>
 
 
@@ -850,7 +850,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8a PWA</div>
+  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8a.1.1 PWA</div>
 </main>
 
 
@@ -858,7 +858,7 @@ main{padding:14px 0 90px}
   <div class="sync-card">
     <div class="sync-top">
       <div>
-        <div class="kicker">v1.8a • Cross-device sync</div>
+        <div class="kicker">v1.8a.1 • Cross-device sync</div>
         <h2 style="margin:6px 0 4px">Complete backup + Google Drive</h2>
         <div class="small">Manual Pull / Push first. Local storage remains the working copy, so the app still works offline.</div>
       </div>
@@ -910,6 +910,7 @@ main{padding:14px 0 90px}
         <button id="findDriveFile">Find / create sync file</button>
       </div>
       <div id="driveConnectionStatus" class="status">Not connected.</div>
+      <div class="small" style="margin-top:7px">If Google does not open, test <a target="_blank" rel="noopener" href="https://accounts.google.com/gsi/client">accounts.google.com/gsi/client</a> in Chrome. If that address is blocked, Google OAuth cannot start.</div>
     </section>
 
     <section class="panel">
@@ -932,7 +933,7 @@ main{padding:14px 0 90px}
   </div>
 </section>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script id="googleGisScript" src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script>
 (() => {
@@ -1442,12 +1443,68 @@ $("saveDriveSetup").addEventListener("click",()=>{
   $("driveConnectionStatus").className="status good";
 });
 
+let googleGisLoadPromise = null;
 function ensureGoogleLibrary(){
-  if(!window.google?.accounts?.oauth2)throw new Error("Google Identity Services has not loaded. Check the internet connection, then try again.");
+  if(window.google?.accounts?.oauth2) return Promise.resolve();
+
+  if(googleGisLoadPromise) return googleGisLoadPromise;
+
+  googleGisLoadPromise = new Promise((resolve,reject)=>{
+    let settled=false;
+    let checkTimer=null;
+    const finishOk=()=>{
+      if(settled)return;
+      settled=true;
+      clearTimeout(timeoutTimer);
+      if(checkTimer)clearInterval(checkTimer);
+      resolve();
+    };
+    const finishBad=(message)=>{
+      if(settled)return;
+      settled=true;
+      clearTimeout(timeoutTimer);
+      if(checkTimer)clearInterval(checkTimer);
+      googleGisLoadPromise=null;
+      reject(new Error(message));
+    };
+
+    // Retry with a fresh network request if the initial async script
+    // did not initialise in the installed PWA.
+    const oldScript=document.getElementById("googleGisScript");
+    if(oldScript) oldScript.remove();
+
+    const script=document.createElement("script");
+    script.id="googleGisScript";
+    script.src="https://accounts.google.com/gsi/client?gbtt="+Date.now();
+    script.async=true;
+    script.defer=true;
+    script.onload=()=>{
+      let attempts=0;
+      checkTimer=setInterval(()=>{
+        attempts++;
+        if(window.google?.accounts?.oauth2){
+          finishOk();
+        }else if(attempts>=20){
+          finishBad("Google Identity Services downloaded but did not initialise. Check browser privacy settings or content blocking for accounts.google.com.");
+        }
+      },100);
+    };
+    script.onerror=()=>finishBad("Could not download Google Identity Services from accounts.google.com. Check the internet connection, DNS/content blocking, or try the app once in Chrome.");
+    document.head.appendChild(script);
+
+    const timeoutTimer=setTimeout(
+      ()=>finishBad("Timed out loading Google Identity Services. Try opening the app in Chrome and check that accounts.google.com is reachable."),
+      12000
+    );
+  });
+
+  return googleGisLoadPromise;
 }
-function connectGoogleDrive(){
+async function connectGoogleDrive(){
   try{
-    ensureGoogleLibrary();
+    $("driveConnectionStatus").textContent="Loading Google Identity Services…";
+    $("driveConnectionStatus").className="status";
+    await ensureGoogleLibrary();
     driveConfig.clientId=$("driveClientId").value.trim();
     driveConfig.deviceLabel=$("driveDeviceLabel").value.trim()||defaultDeviceLabel();
     driveConfig.fileName=$("driveFileName").value.trim()||"Getting_Back_to_Tri_Sync.json";
