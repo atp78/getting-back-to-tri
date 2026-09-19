@@ -1,40 +1,50 @@
 # Getting Back to Tri
 
-Multi-mode Progressive Web App.
+Multi-mode, local-first Progressive Web App.
 
-Current release: **v1.7 PWA**.
+Current release: **v1.8a PWA**.
 
-## Modes
+## v1.8a — manual cross-device sync
 
-### Getting Back to Tri
-The existing private local exercise library, guided mobility/circulation routines, Recovery dashboard and swim/bike/run session logging.
+This first sync release keeps local browser/PWA storage as the working copy and adds:
+- complete JSON backup / restore
+- optional Google Drive connection
+- one private Drive sync file: `Getting_Back_to_Tri_Sync.json`
+- explicit **Pull from Drive** and **Push to Drive**
+- conflict protection: Push is blocked if the Drive file changed since this device last saw it
+- device labels and sync timestamps
+- selected mode remains device-local
+- OAuth access token remains in memory only
 
-### Morning Movement
-A completely separate simple mode intended for a short guided morning movement routine:
-- 7 guided movements
-- 6:15 total including 5-second changeovers
-- optional walk/march or gentle rebounder stage
-- optional energy-before and energy-after ratings (1–5)
-- optional notes
-- separate History and Settings
-- separate CSV export
-- separate local-storage namespace from Back-to-Tri data
+### Synced data
+- Back-to-Tri training history
+- recovery history and baseline
+- circulation preferences
+- private local exercise library / weekly plan
+- Morning Movement history and settings
 
-Morning Movement is a general wellbeing/movement tool, not a treatment for hypothyroidism and not a replacement for prescribed medication.
+### Not synced
+- selected app mode
+- Google OAuth Client ID / Drive file ID
+- transient UI state or running timers
 
-## Mode selection
-On the first v1.7 launch, the app asks which mode to enter. The explicit selection is persisted locally in `gbtt_selected_mode_v1`. Either mode has a **Switch mode** button, and switching does not delete or mix data.
+## Google Drive setup
+1. Create/select a Google Cloud project.
+2. Enable the Google Drive API.
+3. Configure the OAuth consent screen.
+4. Create an OAuth 2.0 Client ID for a Web application.
+5. Add `https://atp78.github.io` as an authorised JavaScript origin.
+6. Paste the Client ID into the app's Sync panel.
+7. Connect Google Drive, then Find / create the sync file.
 
-## Privacy / exercise-library architecture
-The public GitHub application contains a generic local exercise-session engine. Personal Back-to-Tri exercise prescriptions remain in local browser/PWA storage and can be imported/exported separately as private JSON.
+The app requests only `https://www.googleapis.com/auth/drive.file`.
 
-## GitHub Pages
-Publish from the `main` branch and `/(root)` folder.
+## Safe v1.8a workflow
+On a device that may be behind:
+1. Connect Google Drive.
+2. Find the sync file.
+3. Pull.
+4. Use the app.
+5. Push when finished.
 
-## v1.7
-- Adds persisted first-use mode selection.
-- Adds separate Morning Movement mode.
-- Adds simple guided 6:15 morning routine.
-- Adds energy-before/after logging and Morning-only history.
-- Adds Morning settings, CSV export and optional vibration cues.
-- Keeps Back-to-Tri and Morning data in separate local-storage namespaces.
+Automatic background sync is deliberately deferred until the manual file workflow has been proven reliable.

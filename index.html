@@ -181,6 +181,15 @@ main{padding:14px 0 90px}
   .mode-grid{grid-template-columns:1fr}
   .morning-summary{grid-template-columns:1fr 1fr}
 }
+
+.sync-overlay{position:fixed;inset:0;z-index:1000;background:rgba(5,10,13,.86);display:flex;align-items:flex-start;justify-content:center;padding:18px;overflow:auto}
+.sync-card{width:min(760px,100%);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.sync-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sync-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.sync-meta .metric{min-height:62px}
+.sync-steps{margin:9px 0 0;padding-left:20px;color:var(--muted);font-size:.78rem;line-height:1.45}
+.sync-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.72rem;word-break:break-all}
+@media(max-width:620px){.sync-meta{grid-template-columns:1fr}.sync-card{padding:13px}}
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -220,7 +229,7 @@ main{padding:14px 0 90px}
         <h1>Getting Back to Tri</h1>
         <div class="subtitle">Exercise • strength • mobility • swim • bike • run</div>
       </div>
-      <div class="header-actions"><span class="version">v1.7 PWA</span><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
+      <div class="header-actions"><span class="version">v1.8a PWA</span><button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button></div>
     </div>
   </div>
 </header>
@@ -701,7 +710,7 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Getting Back to Tri v1.7 PWA • installable offline training app</div>
+  <div class="footerNote">Getting Back to Tri v1.8a PWA • installable offline training app</div>
 </main>
 
 
@@ -714,7 +723,7 @@ main{padding:14px 0 90px}
       </div>
       <div class="header-actions">
         <span class="version">v1.7</span>
-        <button class="mode-switch" data-switch-mode="1">Switch mode</button>
+        <button class="mode-switch" data-open-sync="1">Sync</button><button class="mode-switch" data-switch-mode="1">Switch mode</button>
       </div>
     </div>
   </div>
@@ -841,8 +850,89 @@ main{padding:14px 0 90px}
     </section>
   </section>
 
-  <div class="footerNote">Morning Movement • Getting Back to Tri v1.7 PWA</div>
+  <div class="footerNote">Morning Movement • Getting Back to Tri v1.8a PWA</div>
 </main>
+
+
+<section id="syncOverlay" class="sync-overlay hidden">
+  <div class="sync-card">
+    <div class="sync-top">
+      <div>
+        <div class="kicker">v1.8a • Cross-device sync</div>
+        <h2 style="margin:6px 0 4px">Complete backup + Google Drive</h2>
+        <div class="small">Manual Pull / Push first. Local storage remains the working copy, so the app still works offline.</div>
+      </div>
+      <button id="closeSync" class="mode-switch">Close</button>
+    </div>
+
+    <section class="panel" style="margin-top:12px">
+      <div class="kicker">Safety first</div>
+      <h3 style="margin:6px 0 7px">Complete local backup</h3>
+      <p class="notice">This backup contains Back-to-Tri history, recovery data, private exercise library, Morning Movement history/settings and routine preferences. The selected app mode and Google sync credentials are intentionally excluded.</p>
+      <div class="actions">
+        <button id="downloadCompleteBackup" class="primary">Download complete backup</button>
+        <label class="btn" for="restoreCompleteBackup">Restore backup</label>
+        <input id="restoreCompleteBackup" class="hidden" type="file" accept=".json,application/json">
+      </div>
+      <div id="backupStatus" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Google Drive setup</div>
+      <h3 style="margin:6px 0 7px">One private JSON file</h3>
+      <p class="small">The app uses Google Identity Services and the narrow <span class="sync-code">drive.file</span> permission. OAuth access tokens stay in memory and are not saved in local storage.</p>
+
+      <details style="margin-top:9px">
+        <summary><b>One-time Google Cloud setup</b></summary>
+        <ol class="sync-steps">
+          <li>Create/select a Google Cloud project and enable the Google Drive API.</li>
+          <li>Configure the OAuth consent screen. While testing privately, add the Google accounts you will use as test users if Google asks for them.</li>
+          <li>Create an OAuth 2.0 Client ID for a <b>Web application</b>.</li>
+          <li>Add <span class="sync-code">https://atp78.github.io</span> as an authorised JavaScript origin.</li>
+          <li>Paste the Client ID below. No client secret is used in this browser app.</li>
+        </ol>
+      </details>
+
+      <label style="display:block;margin-top:10px">Google OAuth Web Client ID
+        <input id="driveClientId" placeholder="1234567890-abc…apps.googleusercontent.com">
+      </label>
+      <div class="grid2" style="margin-top:8px">
+        <label>Device label
+          <input id="driveDeviceLabel" placeholder="e.g. Andy Pixel 8">
+        </label>
+        <label>Cloud file name
+          <input id="driveFileName" value="Getting_Back_to_Tri_Sync.json">
+        </label>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="saveDriveSetup">Save setup</button>
+        <button id="connectDrive" class="primary">Connect Google Drive</button>
+        <button id="findDriveFile">Find / create sync file</button>
+      </div>
+      <div id="driveConnectionStatus" class="status">Not connected.</div>
+    </section>
+
+    <section class="panel">
+      <div class="kicker">Manual sync</div>
+      <div class="sync-meta">
+        <div class="metric"><b id="syncFileState">No file selected</b><span>Drive sync file</span></div>
+        <div class="metric"><b id="syncCloudUpdated">—</b><span>Last cloud modification</span></div>
+        <div class="metric"><b id="syncDeviceState">Local only</b><span>This device</span></div>
+        <div class="metric"><b id="syncLastAction">—</b><span>Last sync action</span></div>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="pullDrive" class="primary">⬇ Pull from Drive</button>
+        <button id="pushDrive">⬆ Push to Drive</button>
+      </div>
+      <div id="syncStatus" class="status"></div>
+      <p class="notice" style="margin-top:10px"><b>Safe workflow:</b> on a device you have not used recently, Pull first. v1.8a blocks a Push if the Drive file has changed since this device last saw it.</p>
+      <p class="small">Your selected mode remains device-local, so a phone can default to Back to Tri while a tablet defaults to Morning Movement.</p>
+      <div style="margin-top:8px"><a id="openDriveFile" class="btn soft hidden" target="_blank" rel="noopener">Open sync file in Google Drive</a></div>
+    </section>
+  </div>
+</section>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script>
 (() => {
@@ -853,6 +943,20 @@ const MODE_TRI = "tri";
 const MODE_MORNING = "morning";
 const MORNING_HISTORY_STORAGE = "gbtt_morning_history_v1";
 const MORNING_SETTINGS_STORAGE = "gbtt_morning_settings_v1";
+const DRIVE_CONFIG_STORAGE = "gbtt_drive_sync_config_v1";
+const DEVICE_ID_STORAGE = "gbtt_device_id_v1";
+const SYNC_SCHEMA = "gbtt-cloud-sync";
+const SYNC_VERSION = 1;
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+const SYNC_DATA_KEYS = [
+  "gbtt_tri_history_v1",
+  "gbtt_tri_health_v1",
+  "gbtt_tri_baseline_v1",
+  "gbtt_tri_circulation_pref_v1",
+  "gbtt_tri_exercise_library_v1",
+  "gbtt_morning_history_v1",
+  "gbtt_morning_settings_v1"
+];
 const LEGACY_STORAGE = "gettingBackToTri_v1_history";
 const LEGACY_HEALTH_STORAGE = "gettingBackToTri_v1_health";
 const LEGACY_BASELINE_STORAGE = "gettingBackToTri_v1_baseline";
@@ -962,6 +1066,20 @@ const CIRCULATION_REST_SECONDS = 5;
 const CIRCULATION_TOTAL_SECONDS = circulationSteps.reduce((sum,s)=>sum+s.seconds,0) + (circulationSteps.length-1)*CIRCULATION_REST_SECONDS;
 
 
+
+
+let driveAccessToken = "";
+let driveTokenExpiresAt = 0;
+let driveTokenClient = null;
+let driveConfig = {
+  clientId:"",
+  fileId:"",
+  fileName:"Getting_Back_to_Tri_Sync.json",
+  deviceLabel:"",
+  lastCloudModifiedTime:"",
+  hasPulled:false,
+  lastAction:""
+};
 
 let morningHistory = [];
 let morningSettings = {defaultMovement:"Walk / march", vibration:true};
@@ -1199,6 +1317,298 @@ function showView(id){
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
 
 
+
+
+function jsonValueFromStorage(key){
+  const raw=localStorage.getItem(key);
+  if(raw===null)return null;
+  try{return JSON.parse(raw)}catch(e){return raw}
+}
+function deviceId(){
+  let id=localStorage.getItem(DEVICE_ID_STORAGE);
+  if(!id){
+    id=(globalThis.crypto?.randomUUID?.() || ("device-"+Date.now()+"-"+Math.random().toString(36).slice(2)));
+    localStorage.setItem(DEVICE_ID_STORAGE,id);
+  }
+  return id;
+}
+function defaultDeviceLabel(){
+  return navigator.userAgentData?.platform || navigator.platform || "This device";
+}
+function loadDriveConfig(){
+  try{
+    const x=JSON.parse(localStorage.getItem(DRIVE_CONFIG_STORAGE)||"{}");
+    driveConfig={...driveConfig,...x};
+  }catch(e){}
+  if(!driveConfig.fileName)driveConfig.fileName="Getting_Back_to_Tri_Sync.json";
+  if(!driveConfig.deviceLabel)driveConfig.deviceLabel=defaultDeviceLabel();
+  fillDriveSetup();
+}
+function saveDriveConfig(){
+  localStorage.setItem(DRIVE_CONFIG_STORAGE,JSON.stringify(driveConfig));
+  fillDriveSetup();
+}
+function fillDriveSetup(){
+  if(!$("driveClientId"))return;
+  $("driveClientId").value=driveConfig.clientId||"";
+  $("driveDeviceLabel").value=driveConfig.deviceLabel||defaultDeviceLabel();
+  $("driveFileName").value=driveConfig.fileName||"Getting_Back_to_Tri_Sync.json";
+  renderSyncMeta();
+}
+function buildSyncPayload(){
+  const data={};
+  SYNC_DATA_KEYS.forEach(k=>data[k]=jsonValueFromStorage(k));
+  return {
+    schema:SYNC_SCHEMA,
+    version:SYNC_VERSION,
+    updatedAt:new Date().toISOString(),
+    sourceDevice:{id:deviceId(),label:driveConfig.deviceLabel||defaultDeviceLabel()},
+    data
+  };
+}
+function validateSyncPayload(payload){
+  return !!(payload && payload.schema===SYNC_SCHEMA && Number(payload.version)===SYNC_VERSION && payload.data && typeof payload.data==="object");
+}
+function applySyncPayload(payload){
+  if(!validateSyncPayload(payload))throw new Error("This is not a compatible Getting Back to Tri sync file.");
+  SYNC_DATA_KEYS.forEach(k=>{
+    if(Object.prototype.hasOwnProperty.call(payload.data,k)){
+      const v=payload.data[k];
+      if(v===null||v===undefined)localStorage.removeItem(k);
+      else localStorage.setItem(k,JSON.stringify(v));
+    }
+  });
+}
+function downloadJsonFile(name,obj){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json;charset=utf-8"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+function setSyncStatus(message,type=""){
+  $("syncStatus").textContent=message;
+  $("syncStatus").className="status"+(type?` ${type}`:"");
+}
+function renderSyncMeta(){
+  if(!$("syncFileState"))return;
+  $("syncFileState").textContent=driveConfig.fileId?(driveConfig.fileName||"Sync file"):"No file selected";
+  $("syncCloudUpdated").textContent=driveConfig.lastCloudModifiedTime?new Date(driveConfig.lastCloudModifiedTime).toLocaleString():"—";
+  $("syncDeviceState").textContent=driveConfig.hasPulled?"Ready to push":"Pull first";
+  $("syncLastAction").textContent=driveConfig.lastAction||"—";
+  const link=$("openDriveFile");
+  if(driveConfig.fileId){
+    link.href=`https://drive.google.com/open?id=${encodeURIComponent(driveConfig.fileId)}`;
+    link.classList.remove("hidden");
+  }else link.classList.add("hidden");
+}
+function openSyncPanel(){
+  $("syncOverlay").classList.remove("hidden");
+  fillDriveSetup();
+}
+function closeSyncPanel(){$("syncOverlay").classList.add("hidden")}
+document.querySelectorAll("[data-open-sync]").forEach(b=>b.addEventListener("click",openSyncPanel));
+$("closeSync").addEventListener("click",closeSyncPanel);
+$("syncOverlay").addEventListener("click",e=>{if(e.target===$("syncOverlay"))closeSyncPanel()});
+
+$("downloadCompleteBackup").addEventListener("click",()=>{
+  const payload=buildSyncPayload();
+  payload.backupType="manual-complete-backup";
+  downloadJsonFile(`Getting_Back_to_Tri_Complete_Backup_${localDate()}.json`,payload);
+  $("backupStatus").textContent="Complete backup downloaded.";
+  $("backupStatus").className="status good";
+});
+$("restoreCompleteBackup").addEventListener("change",async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{
+    const payload=JSON.parse(await file.text());
+    if(!validateSyncPayload(payload))throw new Error("Invalid backup");
+    if(!confirm("Restore this backup? Current synced data on this device will be replaced. Your selected mode and Google sync setup will be kept."))return;
+    applySyncPayload(payload);
+    $("backupStatus").textContent="Backup restored. Reloading app…";
+    $("backupStatus").className="status good";
+    setTimeout(()=>location.reload(),300);
+  }catch(err){
+    $("backupStatus").textContent="Could not restore that backup file.";
+    $("backupStatus").className="status warn";
+  }finally{e.target.value=""}
+});
+
+$("saveDriveSetup").addEventListener("click",()=>{
+  driveConfig.clientId=$("driveClientId").value.trim();
+  driveConfig.deviceLabel=$("driveDeviceLabel").value.trim()||defaultDeviceLabel();
+  driveConfig.fileName=$("driveFileName").value.trim()||"Getting_Back_to_Tri_Sync.json";
+  saveDriveConfig();
+  $("driveConnectionStatus").textContent="Sync setup saved on this device.";
+  $("driveConnectionStatus").className="status good";
+});
+
+function ensureGoogleLibrary(){
+  if(!window.google?.accounts?.oauth2)throw new Error("Google Identity Services has not loaded. Check the internet connection, then try again.");
+}
+function connectGoogleDrive(){
+  try{
+    ensureGoogleLibrary();
+    driveConfig.clientId=$("driveClientId").value.trim();
+    driveConfig.deviceLabel=$("driveDeviceLabel").value.trim()||defaultDeviceLabel();
+    driveConfig.fileName=$("driveFileName").value.trim()||"Getting_Back_to_Tri_Sync.json";
+    if(!driveConfig.clientId)throw new Error("Paste your Google OAuth Web Client ID first.");
+    saveDriveConfig();
+    driveTokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:driveConfig.clientId,
+      scope:DRIVE_SCOPE,
+      callback:(response)=>{
+        if(response?.error){
+          $("driveConnectionStatus").textContent=`Google connection failed: ${response.error}`;
+          $("driveConnectionStatus").className="status warn";
+          return;
+        }
+        if(!response?.access_token){
+          $("driveConnectionStatus").textContent="Google did not return an access token.";
+          $("driveConnectionStatus").className="status warn";
+          return;
+        }
+        driveAccessToken=response.access_token;
+        driveTokenExpiresAt=Date.now()+Math.max(60,Number(response.expires_in||3600))*1000;
+        const granted=google.accounts.oauth2.hasGrantedAllScopes
+          ? google.accounts.oauth2.hasGrantedAllScopes(response,DRIVE_SCOPE)
+          : true;
+        $("driveConnectionStatus").textContent=granted
+          ?"Connected to Google Drive for this browser session."
+          :"Connected, but Drive file permission was not granted.";
+        $("driveConnectionStatus").className=granted?"status good":"status warn";
+      }
+    });
+    driveTokenClient.requestAccessToken({prompt:""});
+  }catch(err){
+    $("driveConnectionStatus").textContent=err.message;
+    $("driveConnectionStatus").className="status warn";
+  }
+}
+$("connectDrive").addEventListener("click",connectGoogleDrive);
+
+function driveTokenReady(){
+  return !!driveAccessToken && Date.now()<driveTokenExpiresAt-30000;
+}
+async function driveFetch(url,options={}){
+  if(!driveTokenReady())throw new Error("Connect Google Drive first (access tokens are intentionally kept only in memory).");
+  const headers={...(options.headers||{}),Authorization:`Bearer ${driveAccessToken}`};
+  const res=await fetch(url,{...options,headers});
+  if(!res.ok){
+    let detail="";
+    try{detail=(await res.json())?.error?.message||""}catch(e){try{detail=await res.text()}catch(_){}}
+    if(res.status===401)driveAccessToken="";
+    throw new Error(detail||`Google Drive request failed (${res.status}).`);
+  }
+  return res;
+}
+async function getDriveMetadata(fileId){
+  const fields="id,name,modifiedTime,size";
+  const res=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?fields=${encodeURIComponent(fields)}`);
+  return await res.json();
+}
+async function searchSyncFiles(){
+  const q="appProperties has { key='gbttSync' and value='v1' } and trashed = false";
+  const fields="files(id,name,modifiedTime,size)";
+  const url=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&pageSize=10&orderBy=modifiedTime%20desc&fields=${encodeURIComponent(fields)}`;
+  const res=await driveFetch(url);
+  return (await res.json()).files||[];
+}
+async function createDriveSyncFile(){
+  const metadata={
+    name:driveConfig.fileName||"Getting_Back_to_Tri_Sync.json",
+    mimeType:"application/json",
+    appProperties:{gbttSync:"v1"}
+  };
+  let res=await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,modifiedTime,size",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(metadata)
+  });
+  let file=await res.json();
+  const payload=buildSyncPayload();
+  res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(file.id)}?uploadType=media&fields=id,name,modifiedTime,size`,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  });
+  file=await res.json();
+  driveConfig.fileId=file.id;
+  driveConfig.fileName=file.name||driveConfig.fileName;
+  driveConfig.lastCloudModifiedTime=file.modifiedTime||"";
+  driveConfig.hasPulled=true;
+  driveConfig.lastAction=`Created + pushed • ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+  saveDriveConfig();
+  return file;
+}
+$("findDriveFile").addEventListener("click",async()=>{
+  try{
+    setSyncStatus("Looking for the app sync file…");
+    const files=await searchSyncFiles();
+    if(files.length){
+      const f=files[0];
+      const same=f.id===driveConfig.fileId;
+      driveConfig.fileId=f.id;
+      driveConfig.fileName=f.name||driveConfig.fileName;
+      if(!same){
+        driveConfig.lastCloudModifiedTime="";
+        driveConfig.hasPulled=false;
+      }
+      saveDriveConfig();
+      setSyncStatus("Existing sync file found. Pull it before the first Push from this device.","good");
+    }else{
+      const f=await createDriveSyncFile();
+      setSyncStatus(`Created ${f.name||driveConfig.fileName} and uploaded this device's current data.`,"good");
+    }
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
+async function readDrivePayload(){
+  if(!driveConfig.fileId)throw new Error("Find or create the Drive sync file first.");
+  const meta=await getDriveMetadata(driveConfig.fileId);
+  const res=await driveFetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveConfig.fileId)}?alt=media`);
+  const payload=await res.json();
+  if(!validateSyncPayload(payload))throw new Error("The Drive file does not contain a compatible sync payload.");
+  return {meta,payload};
+}
+$("pullDrive").addEventListener("click",async()=>{
+  try{
+    setSyncStatus("Reading cloud copy…");
+    const {meta,payload}=await readDrivePayload();
+    const source=payload.sourceDevice?.label?` It was last written by “${payload.sourceDevice.label}”.`:"";
+    if(!confirm(`Pull the cloud copy and replace this device's synced app data?${source}`))return;
+    applySyncPayload(payload);
+    driveConfig.lastCloudModifiedTime=meta.modifiedTime||"";
+    driveConfig.hasPulled=true;
+    driveConfig.lastAction=`Pulled • ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+    saveDriveConfig();
+    setSyncStatus("Pulled cloud data successfully. Reloading app…","good");
+    setTimeout(()=>location.reload(),350);
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
+$("pushDrive").addEventListener("click",async()=>{
+  try{
+    if(!driveConfig.fileId)throw new Error("Find or create the Drive sync file first.");
+    if(!driveConfig.hasPulled)throw new Error("Pull from Drive first on this device before pushing. This protects an existing cloud copy.");
+    setSyncStatus("Checking the cloud copy for changes…");
+    const meta=await getDriveMetadata(driveConfig.fileId);
+    if(driveConfig.lastCloudModifiedTime && meta.modifiedTime && meta.modifiedTime!==driveConfig.lastCloudModifiedTime){
+      driveConfig.hasPulled=false;
+      saveDriveConfig();
+      throw new Error("The cloud file changed since this device last saw it. Pull first, review the data, then Push.");
+    }
+    const payload=buildSyncPayload();
+    const res=await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(driveConfig.fileId)}?uploadType=media&fields=id,name,modifiedTime,size`,{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
+    });
+    const updated=await res.json();
+    driveConfig.lastCloudModifiedTime=updated.modifiedTime||"";
+    driveConfig.hasPulled=true;
+    driveConfig.lastAction=`Pushed • ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+    saveDriveConfig();
+    setSyncStatus("Pushed this device's current data to Google Drive.","good");
+  }catch(err){setSyncStatus(err.message,"warn")}
+});
 
 function selectedEnergy(name){
   return numOrNull(document.querySelector(`input[name="${name}"]:checked`)?.value);
@@ -2701,6 +3111,7 @@ refreshSessionSelect();renderLibraryManager();renderWeeklyPlanInputs();renderWee
 resetSessionTimerForSelection();renderSession();renderClock();renderHealthHistory();
 $("healthDate").value=localDate();renderReadiness(currentHealthEntry());renderQuickRoutine();renderPreWalk();renderCirculation();
 loadMorning();renderMorning();renderMorningHistory();
+loadDriveConfig();deviceId();
 const initialMode=localStorage.getItem(MODE_SELECTION_STORAGE);
 if([MODE_TRI,MODE_MORNING].includes(initialMode)) activateMode(initialMode,false);
 else showModeChooser();
